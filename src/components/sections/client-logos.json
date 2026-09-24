@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_sections_client_logos",
+  "info": {
+    "displayName": "Klanten",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "clients": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.named-item"
+    }
+  }
+}

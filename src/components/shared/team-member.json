@@ -1,0 +1,38 @@
+{
+  "collectionName": "components_shared_team_members",
+  "info": {
+    "displayName": "Team member",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "initials": {
+      "type": "string",
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "role": {
+      "type": "string",
+      "required": true
+    },
+    "bio": {
+      "type": "text"
+    },
+    "accent": {
+      "type": "enumeration",
+      "enum": [
+        "orange",
+        "red",
+        "amber",
+        "emerald"
+      ],
+      "default": "orange"
+    },
+    "ring": {
+      "type": "string"
+    }
+  }
+}

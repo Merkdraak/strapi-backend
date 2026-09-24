@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_shared_article_types",
+  "info": {
+    "displayName": "Article type",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "example": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

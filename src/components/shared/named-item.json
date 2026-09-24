@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_shared_named_items",
+  "info": {
+    "displayName": "Named item",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "itemId": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

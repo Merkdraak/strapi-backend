@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_sections_service_cards",
+  "info": {
+    "displayName": "Diensten",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "cards": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.service-card"
+    }
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pages",
+  "info": {
+    "singularName": "page",
+    "pluralName": "pages",
+    "displayName": "Pagina",
+    "description": "Titel, URL, status en blokken. Technische sleutels vult het systeem zelf."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "site": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::site.site"
+    },
+    "siteKey": {
+      "type": "string",
+      "required": true
+    },
+    "entryKey": {
+      "type": "string",
+      "required": true
+    },
+    "scopeKey": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "navLabel": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "string"
+    },
+    "pageType": {
+      "type": "enumeration",
+      "enum": [
+        "home",
+        "company",
+        "overview",
+        "service",
+        "case",
+        "knowledge"
+      ],
+      "required": true
+    },
+    "cluster": {
+      "type": "string"
+    },
+    "phase": {
+      "type": "integer",
+      "default": 1
+    },
+    "visibility": {
+      "type": "enumeration",
+      "enum": [
+        "planned",
+        "concept",
+        "published"
+      ],
+      "default": "planned",
+      "required": true
+    },
+    "seoTitle": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "intro": {
+      "type": "text"
+    },
+    "eyebrow": {
+      "type": "string"
+    },
+    "cta": {
+      "type": "enumeration",
+      "enum": [
+        "marketingscan",
+        "websitescan",
+        "contact",
+        "cases"
+      ],
+      "default": "marketingscan",
+      "required": true
+    },
+    "parent": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::page.page"
+    },
+    "related": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::page.page"
+    },
+    "sections": {
+      "type": "dynamiczone",
+      "components": [
+        "sections.hero",
+        "sections.client-logos",
+        "sections.service-cards",
+        "sections.results",
+        "sections.case-grid",
+        "sections.testimonial",
+        "sections.process",
+        "sections.why-us",
+        "sections.team",
+        "sections.contact-cta",
+        "sections.notice",
+        "sections.prose",
+        "sections.bullet-list",
+        "sections.numbered-steps",
+        "sections.faq",
+        "sections.price-factors",
+        "sections.case-story",
+        "sections.page-index",
+        "sections.link-list"
+      ]
+    }
+  }
+}

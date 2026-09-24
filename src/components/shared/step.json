@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_shared_steps",
+  "info": {
+    "displayName": "Step",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "number": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "text": {
+      "type": "text"
+    },
+    "tone": {
+      "type": "string"
+    }
+  }
+}

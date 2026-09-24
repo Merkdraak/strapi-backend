@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_sections_processes",
+  "info": {
+    "displayName": "Werkwijze",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "steps": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.step"
+    }
+  }
+}

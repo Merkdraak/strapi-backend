@@ -1,0 +1,36 @@
+{
+  "collectionName": "components_shared_service_cards",
+  "info": {
+    "displayName": "Service card",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "cardId": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "items": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.text-item"
+    },
+    "accent": {
+      "type": "enumeration",
+      "enum": [
+        "orange",
+        "red",
+        "amber",
+        "emerald"
+      ],
+      "default": "orange"
+    }
+  }
+}

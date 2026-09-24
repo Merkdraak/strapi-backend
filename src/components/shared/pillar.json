@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_shared_pillars",
+  "info": {
+    "displayName": "Pillar",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "accent": {
+      "type": "enumeration",
+      "enum": [
+        "orange",
+        "red",
+        "amber",
+        "emerald"
+      ],
+      "default": "orange"
+    }
+  }
+}

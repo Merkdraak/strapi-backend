@@ -1,0 +1,44 @@
+{
+  "collectionName": "components_sections_case_stories",
+  "info": {
+    "displayName": "Caseverhaal",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "category": {
+      "type": "string"
+    },
+    "sector": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "text"
+    },
+    "approach": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.text-item"
+    },
+    "tools": {
+      "type": "string"
+    },
+    "imageSrc": {
+      "type": "string"
+    },
+    "imageAlt": {
+      "type": "string"
+    },
+    "imageWidth": {
+      "type": "integer"
+    },
+    "imageHeight": {
+      "type": "integer"
+    },
+    "metrics": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.stat"
+    }
+  }
+}

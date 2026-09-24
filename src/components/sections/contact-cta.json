@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_sections_contact_ctas",
+  "info": {
+    "displayName": "Contact",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "body": {
+      "type": "text"
+    },
+    "label": {
+      "type": "string"
+    },
+    "href": {
+      "type": "string"
+    }
+  }
+}

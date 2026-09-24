@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_nav_groups",
+  "info": {
+    "displayName": "Nav group",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "links": {
+      "type": "component",
+      "repeatable": true,
+      "component": "nav.page-link"
+    }
+  }
+}

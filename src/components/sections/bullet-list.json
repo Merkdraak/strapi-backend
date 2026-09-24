@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_sections_bullet_lists",
+  "info": {
+    "displayName": "Lijst",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string"
+    },
+    "variant": {
+      "type": "enumeration",
+      "enum": [
+        "problems",
+        "deliverables",
+        "plain"
+      ],
+      "default": "plain"
+    },
+    "items": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.text-item"
+    }
+  }
+}

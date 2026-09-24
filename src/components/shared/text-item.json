@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_shared_text_items",
+  "info": {
+    "displayName": "Text item",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

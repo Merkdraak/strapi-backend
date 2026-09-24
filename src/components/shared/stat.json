@@ -1,0 +1,44 @@
+{
+  "collectionName": "components_shared_stats",
+  "info": {
+    "displayName": "Stat",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "value": {
+      "type": "string",
+      "required": true
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "trend": {
+      "type": "boolean",
+      "default": false
+    },
+    "badge": {
+      "type": "string"
+    },
+    "note": {
+      "type": "string"
+    },
+    "detail": {
+      "type": "string"
+    },
+    "accent": {
+      "type": "enumeration",
+      "enum": [
+        "orange",
+        "red",
+        "amber",
+        "emerald"
+      ]
+    },
+    "emphasize": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

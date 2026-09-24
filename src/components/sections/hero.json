@@ -1,0 +1,40 @@
+{
+  "collectionName": "components_sections_heroes",
+  "info": {
+    "displayName": "Hero",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "highlight": {
+      "type": "string"
+    },
+    "body": {
+      "type": "text"
+    },
+    "primaryLabel": {
+      "type": "string"
+    },
+    "primaryHref": {
+      "type": "string"
+    },
+    "secondaryLabel": {
+      "type": "string"
+    },
+    "secondaryHref": {
+      "type": "string"
+    },
+    "stats": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.stat"
+    }
+  }
+}

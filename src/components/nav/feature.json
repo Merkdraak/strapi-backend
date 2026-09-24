@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_nav_features",
+  "info": {
+    "displayName": "Nav feature",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "body": {
+      "type": "text",
+      "required": true
+    },
+    "href": {
+      "type": "string",
+      "required": true
+    },
+    "cta": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

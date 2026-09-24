@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_sections_why_us",
+  "info": {
+    "displayName": "Waarom wij",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "pillars": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.pillar"
+    }
+  }
+}

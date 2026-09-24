@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_nav_page_links",
+  "info": {
+    "displayName": "Page link",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string"
+    },
+    "page": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::page.page"
+    }
+  }
+}

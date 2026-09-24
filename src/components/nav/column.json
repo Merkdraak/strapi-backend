@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_nav_columns",
+  "info": {
+    "displayName": "Nav column",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "groups": {
+      "type": "component",
+      "repeatable": true,
+      "component": "nav.group"
+    }
+  }
+}

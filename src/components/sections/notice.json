@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_sections_notices",
+  "info": {
+    "displayName": "Mededeling",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "body": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

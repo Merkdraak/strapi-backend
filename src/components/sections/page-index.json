@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_sections_page_indexes",
+  "info": {
+    "displayName": "Paginaoverzicht",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "mode": {
+      "type": "enumeration",
+      "enum": [
+        "children",
+        "cases",
+        "knowledge"
+      ],
+      "default": "children"
+    },
+    "notice": {
+      "type": "text"
+    },
+    "articleTypes": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.article-type"
+    },
+    "knowledgeNote": {
+      "type": "text"
+    },
+    "serviceKeys": {
+      "type": "json"
+    }
+  }
+}

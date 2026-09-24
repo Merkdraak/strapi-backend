@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_sections_testimonials",
+  "info": {
+    "displayName": "Citaat",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "quote": {
+      "type": "text",
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "role": {
+      "type": "string"
+    }
+  }
+}

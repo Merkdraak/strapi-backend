@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_sections_faqs",
+  "info": {
+    "displayName": "Vragen",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string"
+    },
+    "items": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.faq-item"
+    }
+  }
+}

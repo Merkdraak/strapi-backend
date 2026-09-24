@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_sections_results",
+  "info": {
+    "displayName": "Resultaten",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "stats": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.stat"
+    },
+    "chartLabels": {
+      "type": "json"
+    }
+  }
+}

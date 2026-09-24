@@ -1,0 +1,62 @@
+{
+  "kind": "collectionType",
+  "collectionName": "sites",
+  "info": {
+    "singularName": "site",
+    "pluralName": "sites",
+    "displayName": "Site"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "key": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "domain": {
+      "type": "string"
+    },
+    "phoneDisplay": {
+      "type": "string"
+    },
+    "phoneHref": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "emailHref": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "kvk": {
+      "type": "string"
+    },
+    "btw": {
+      "type": "string"
+    },
+    "hours": {
+      "type": "string"
+    },
+    "defaultTitle": {
+      "type": "string"
+    },
+    "defaultDescription": {
+      "type": "text"
+    },
+    "footerText": {
+      "type": "text"
+    },
+    "footerDisclaimer": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_nav_dropdowns",
+  "info": {
+    "displayName": "Dropdown",
+    "icon": "bulletList"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "links": {
+      "type": "component",
+      "repeatable": true,
+      "component": "nav.page-link"
+    }
+  }
+}
