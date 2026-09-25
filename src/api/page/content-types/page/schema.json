@@ -69,6 +69,10 @@
       "default": "planned",
       "required": true
     },
+    "composed": {
+      "type": "boolean",
+      "default": false
+    },
     "seoTitle": {
       "type": "string",
       "required": true
@@ -76,6 +80,24 @@
     "description": {
       "type": "text",
       "required": true
+    },
+    "canonicalUrl": {
+      "type": "string"
+    },
+    "ogTitle": {
+      "type": "string"
+    },
+    "ogDescription": {
+      "type": "text"
+    },
+    "ogImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "nofollow": {
+      "type": "boolean",
+      "default": false
     },
     "intro": {
       "type": "text"
@@ -125,7 +147,28 @@
         "sections.price-factors",
         "sections.case-story",
         "sections.page-index",
-        "sections.link-list"
+        "sections.link-list",
+        "sections.image-slider",
+        "sections.image",
+        "sections.video",
+        "sections.row",
+        "sections.heading",
+        "sections.button",
+        "sections.divider",
+        "sections.split",
+        "sections.takeaways",
+        "sections.table",
+        "sections.columns",
+        "sections.cards",
+        "sections.accordion",
+        "sections.expert",
+        "sections.sources",
+        "sections.gallery",
+        "sections.before-after",
+        "sections.reviews",
+        "sections.location",
+        "sections.document",
+        "sections.button-row"
       ]
     }
   }

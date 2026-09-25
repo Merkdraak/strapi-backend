@@ -492,7 +492,9 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    canonicalUrl: Schema.Attribute.String;
     cluster: Schema.Attribute.String;
+    composed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -509,6 +511,10 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::page.page'> &
       Schema.Attribute.Private;
     navLabel: Schema.Attribute.String & Schema.Attribute.Required;
+    nofollow: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    ogDescription: Schema.Attribute.Text;
+    ogImage: Schema.Attribute.Media<'images'>;
+    ogTitle: Schema.Attribute.String;
     pageType: Schema.Attribute.Enumeration<
       ['home', 'company', 'overview', 'service', 'case', 'knowledge']
     > &
@@ -541,6 +547,27 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.case-story',
         'sections.page-index',
         'sections.link-list',
+        'sections.image-slider',
+        'sections.image',
+        'sections.video',
+        'sections.row',
+        'sections.heading',
+        'sections.button',
+        'sections.divider',
+        'sections.split',
+        'sections.takeaways',
+        'sections.table',
+        'sections.columns',
+        'sections.cards',
+        'sections.accordion',
+        'sections.expert',
+        'sections.sources',
+        'sections.gallery',
+        'sections.before-after',
+        'sections.reviews',
+        'sections.location',
+        'sections.document',
+        'sections.button-row',
       ]
     >;
     seoTitle: Schema.Attribute.String & Schema.Attribute.Required;
@@ -578,6 +605,7 @@ export interface ApiSiteSite extends Struct.CollectionTypeSchema {
     defaultDescription: Schema.Attribute.Text;
     defaultTitle: Schema.Attribute.String;
     domain: Schema.Attribute.String;
+    editorUrl: Schema.Attribute.String;
     email: Schema.Attribute.String;
     emailHref: Schema.Attribute.String;
     footerDisclaimer: Schema.Attribute.String;

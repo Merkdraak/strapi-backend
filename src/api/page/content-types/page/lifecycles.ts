@@ -1,5 +1,3 @@
-const SITE_KEY = "merkdraak";
-
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -12,8 +10,8 @@ function slugify(value: string) {
 
 async function fill(data: Record<string, unknown> | undefined) {
   if (!data) return;
-  const siteKey = typeof data.siteKey === "string" && data.siteKey ? data.siteKey : SITE_KEY;
-  if (!data.siteKey) data.siteKey = siteKey;
+  const siteKey = typeof data.siteKey === "string" ? data.siteKey : "";
+  if (!siteKey) return;
   if (!data.entryKey) {
     const source = typeof data.slug === "string" && data.slug ? data.slug : String(data.title ?? "pagina");
     data.entryKey = slugify(source) || `pagina-${Date.now()}`;

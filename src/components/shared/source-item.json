@@ -1,0 +1,9 @@
+{
+  "collectionName": "components_shared_source_items",
+  "info": { "displayName": "Bron", "icon": "layer" },
+  "options": {},
+  "attributes": {
+    "label": { "type": "string" },
+    "href": { "type": "string" }
+  }
+}

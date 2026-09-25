@@ -13,10 +13,10 @@ export default {
   },
   bootstrap(app: StrapiApp) {
     app.addMenuLink({
-      to: "http://localhost:3000/editor",
+      to: "merkdraak-editor",
       icon: EditorIcon,
-      intlLabel: { id: "merkdraak.editor", defaultMessage: "Bewerk op de pagina" },
-      Component: () => null,
+      intlLabel: { id: "merkdraak.editor", defaultMessage: "Websites" },
+      Component: () => import("./pages/editor"),
       permissions: [],
     });
   },

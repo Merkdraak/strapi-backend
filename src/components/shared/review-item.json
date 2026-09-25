@@ -1,0 +1,11 @@
+{
+  "collectionName": "components_shared_review_items",
+  "info": { "displayName": "Review", "icon": "layer" },
+  "options": {},
+  "attributes": {
+    "quote": { "type": "text" },
+    "name": { "type": "string" },
+    "role": { "type": "string" },
+    "score": { "type": "string" }
+  }
+}

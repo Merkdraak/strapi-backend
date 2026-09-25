@@ -23,10 +23,10 @@
     "tools": {
       "type": "string"
     },
-    "imageSrc": {
+    "imageAlt": {
       "type": "string"
     },
-    "imageAlt": {
+    "imageSrc": {
       "type": "string"
     },
     "imageWidth": {
@@ -39,6 +39,48 @@
       "type": "component",
       "repeatable": true,
       "component": "shared.stat"
+    },
+    "appearance": {
+      "type": "enumeration",
+      "enum": [
+        "dark",
+        "light",
+        "accent"
+      ],
+      "default": "dark"
+    },
+    "align": {
+      "type": "enumeration",
+      "enum": [
+        "left",
+        "center"
+      ],
+      "default": "left"
+    },
+    "backgroundColor": {
+      "type": "string"
+    },
+    "textColor": {
+      "type": "string"
+    },
+    "accentColor": {
+      "type": "string"
+    },
+    "space": {
+      "type": "string"
+    },
+    "fontSize": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "anchor": {
+      "type": "string"
     }
   }
 }

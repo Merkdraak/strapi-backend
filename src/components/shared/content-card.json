@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_shared_content_cards",
+  "info": { "displayName": "Kaart", "icon": "layer" },
+  "options": {},
+  "attributes": {
+    "title": { "type": "string" },
+    "text": { "type": "text" },
+    "image": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "alt": { "type": "string" },
+    "pageId": { "type": "string" },
+    "href": { "type": "string" }
+  }
+}

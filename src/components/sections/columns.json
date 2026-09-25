@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_sections_columns",
+  "info": { "displayName": "Twee kolommen", "icon": "layout" },
+  "options": {},
+  "attributes": {
+    "heading": { "type": "string" },
+    "leftHeading": { "type": "string" },
+    "leftBody": { "type": "text" },
+    "rightHeading": { "type": "string" },
+    "rightBody": { "type": "text" },
+    "anchor": { "type": "string" }
+  }
+}

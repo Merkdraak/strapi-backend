@@ -21,6 +21,11 @@
     "bio": {
       "type": "text"
     },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
     "accent": {
       "type": "enumeration",
       "enum": [

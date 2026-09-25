@@ -1,0 +1,45 @@
+{
+  "collectionName": "components_sections_rows",
+  "info": {
+    "displayName": "Rij",
+    "icon": "apps"
+  },
+  "options": {},
+  "attributes": {
+    "columns": {
+      "type": "enumeration",
+      "enum": [
+        "2",
+        "3"
+      ],
+      "default": "2"
+    },
+    "left": {
+      "type": "json"
+    },
+    "right": {
+      "type": "json"
+    },
+    "extra": {
+      "type": "json"
+    },
+    "backgroundColor": {
+      "type": "string"
+    },
+    "textColor": {
+      "type": "string"
+    },
+    "accentColor": {
+      "type": "string"
+    },
+    "space": {
+      "type": "string"
+    },
+    "fontSize": {
+      "type": "string"
+    },
+    "anchor": {
+      "type": "string"
+    }
+  }
+}

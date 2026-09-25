@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_sections_locations",
+  "info": { "displayName": "Locatie", "icon": "pinMap" },
+  "options": {},
+  "attributes": {
+    "heading": { "type": "string" },
+    "name": { "type": "string" },
+    "street": { "type": "string" },
+    "postalCode": { "type": "string" },
+    "city": { "type": "string" },
+    "phone": { "type": "string" },
+    "email": { "type": "string" },
+    "href": { "type": "string" },
+    "anchor": { "type": "string" }
+  }
+}

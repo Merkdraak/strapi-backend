@@ -1,0 +1,12 @@
+{
+  "collectionName": "components_sections_documents",
+  "info": { "displayName": "Document", "icon": "file" },
+  "options": {},
+  "attributes": {
+    "heading": { "type": "string" },
+    "label": { "type": "string" },
+    "file": { "type": "media", "multiple": false, "allowedTypes": ["files", "images"] },
+    "href": { "type": "string" },
+    "anchor": { "type": "string" }
+  }
+}

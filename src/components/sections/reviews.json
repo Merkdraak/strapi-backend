@@ -1,0 +1,10 @@
+{
+  "collectionName": "components_sections_reviews",
+  "info": { "displayName": "Reviews", "icon": "quote" },
+  "options": {},
+  "attributes": {
+    "heading": { "type": "string" },
+    "items": { "type": "component", "repeatable": true, "component": "shared.review-item" },
+    "anchor": { "type": "string" }
+  }
+}

@@ -18,5 +18,17 @@ export default {
       handler: "page.editorSave",
       config: { auth: false },
     },
+    {
+      method: "GET",
+      path: "/editor/media",
+      handler: "page.editorMedia",
+      config: { auth: false },
+    },
+    {
+      method: "POST",
+      path: "/editor/media",
+      handler: "page.editorMedia",
+      config: { auth: false },
+    },
   ],
 };

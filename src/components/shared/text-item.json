@@ -9,6 +9,12 @@
     "text": {
       "type": "text",
       "required": true
+    },
+    "href": {
+      "type": "string"
+    },
+    "pageId": {
+      "type": "string"
     }
   }
 }

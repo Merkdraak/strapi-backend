@@ -1,0 +1,9 @@
+{
+  "collectionName": "components_sections_dividers",
+  "info": { "displayName": "Scheiding", "icon": "minus" },
+  "options": {},
+  "attributes": {
+    "space": { "type": "string" },
+    "anchor": { "type": "string" }
+  }
+}

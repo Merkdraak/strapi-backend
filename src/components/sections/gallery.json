@@ -1,0 +1,10 @@
+{
+  "collectionName": "components_sections_galleries",
+  "info": { "displayName": "Galerij", "icon": "picture" },
+  "options": {},
+  "attributes": {
+    "heading": { "type": "string" },
+    "items": { "type": "component", "repeatable": true, "component": "shared.slide" },
+    "anchor": { "type": "string" }
+  }
+}

@@ -22,6 +22,9 @@
     "domain": {
       "type": "string"
     },
+    "editorUrl": {
+      "type": "string"
+    },
     "phoneDisplay": {
       "type": "string"
     },

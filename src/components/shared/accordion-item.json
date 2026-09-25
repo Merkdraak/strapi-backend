@@ -1,0 +1,9 @@
+{
+  "collectionName": "components_shared_accordion_items",
+  "info": { "displayName": "Uitklap-item", "icon": "layer" },
+  "options": {},
+  "attributes": {
+    "title": { "type": "string" },
+    "body": { "type": "text" }
+  }
+}

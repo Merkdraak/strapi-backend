@@ -6,6 +6,9 @@
   },
   "options": {},
   "attributes": {
+    "heading": {
+      "type": "string"
+    },
     "mode": {
       "type": "enumeration",
       "enum": [
@@ -28,6 +31,41 @@
     },
     "serviceKeys": {
       "type": "json"
+    },
+    "appearance": {
+      "type": "enumeration",
+      "enum": [
+        "dark",
+        "light",
+        "accent"
+      ],
+      "default": "dark"
+    },
+    "align": {
+      "type": "enumeration",
+      "enum": [
+        "left",
+        "center"
+      ],
+      "default": "left"
+    },
+    "backgroundColor": {
+      "type": "string"
+    },
+    "textColor": {
+      "type": "string"
+    },
+    "accentColor": {
+      "type": "string"
+    },
+    "space": {
+      "type": "string"
+    },
+    "fontSize": {
+      "type": "string"
+    },
+    "anchor": {
+      "type": "string"
     }
   }
 }

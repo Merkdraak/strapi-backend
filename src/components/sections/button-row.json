@@ -1,0 +1,12 @@
+{
+  "collectionName": "components_sections_button_rows",
+  "info": { "displayName": "Knoppen", "icon": "cursor" },
+  "options": {},
+  "attributes": {
+    "primaryLabel": { "type": "string" },
+    "primaryHref": { "type": "string" },
+    "secondaryLabel": { "type": "string" },
+    "secondaryHref": { "type": "string" },
+    "anchor": { "type": "string" }
+  }
+}

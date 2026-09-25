@@ -17,6 +17,12 @@
       "type": "text",
       "required": true
     },
+    "href": {
+      "type": "string"
+    },
+    "pageId": {
+      "type": "string"
+    },
     "items": {
       "type": "component",
       "repeatable": true,

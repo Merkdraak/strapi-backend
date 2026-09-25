@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_sections_experts",
+  "info": { "displayName": "Expert", "icon": "user" },
+  "options": {},
+  "attributes": {
+    "heading": { "type": "string" },
+    "name": { "type": "string" },
+    "role": { "type": "string" },
+    "bio": { "type": "text" },
+    "image": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "alt": { "type": "string" },
+    "pageId": { "type": "string" },
+    "href": { "type": "string" },
+    "anchor": { "type": "string" }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "collectionName": "components_sections_tables",
+  "info": { "displayName": "Tabel", "icon": "table" },
+  "options": {},
+  "attributes": {
+    "heading": { "type": "string" },
+    "rows": { "type": "component", "repeatable": true, "component": "shared.table-row" },
+    "anchor": { "type": "string" }
+  }
+}

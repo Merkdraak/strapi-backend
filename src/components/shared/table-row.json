@@ -1,0 +1,9 @@
+{
+  "collectionName": "components_shared_table_rows",
+  "info": { "displayName": "Tabelrij", "icon": "layer" },
+  "options": {},
+  "attributes": {
+    "label": { "type": "string" },
+    "text": { "type": "text" }
+  }
+}

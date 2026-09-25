@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_sections_before_afters",
+  "info": { "displayName": "Voor en na", "icon": "picture" },
+  "options": {},
+  "attributes": {
+    "heading": { "type": "string" },
+    "before": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "beforeAlt": { "type": "string" },
+    "beforeCaption": { "type": "string" },
+    "after": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "afterAlt": { "type": "string" },
+    "afterCaption": { "type": "string" },
+    "anchor": { "type": "string" }
+  }
+}

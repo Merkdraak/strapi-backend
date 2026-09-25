@@ -1,0 +1,39 @@
+{
+  "collectionName": "components_sections_image_sliders",
+  "info": {
+    "displayName": "Slider",
+    "icon": "picture"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string"
+    },
+    "width": {
+      "type": "string"
+    },
+    "slides": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.slide"
+    },
+    "backgroundColor": {
+      "type": "string"
+    },
+    "textColor": {
+      "type": "string"
+    },
+    "accentColor": {
+      "type": "string"
+    },
+    "space": {
+      "type": "string"
+    },
+    "fontSize": {
+      "type": "string"
+    },
+    "anchor": {
+      "type": "string"
+    }
+  }
+}

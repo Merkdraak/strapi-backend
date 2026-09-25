@@ -16,6 +16,27 @@
       "type": "component",
       "repeatable": true,
       "component": "shared.team-member"
+    },
+    "eyebrow": {
+      "type": "string"
+    },
+    "backgroundColor": {
+      "type": "string"
+    },
+    "textColor": {
+      "type": "string"
+    },
+    "accentColor": {
+      "type": "string"
+    },
+    "space": {
+      "type": "string"
+    },
+    "fontSize": {
+      "type": "string"
+    },
+    "anchor": {
+      "type": "string"
     }
   }
 }
