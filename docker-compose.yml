@@ -1,0 +1,23 @@
+services:
+  strapi:
+    build: .
+    image: merkdraak-strapi:local
+    container_name: merkdraak-strapi
+    restart: unless-stopped
+    env_file: .env
+    expose:
+      - "1337"
+    volumes:
+      - strapi_data:/opt/app/.tmp
+      - strapi_uploads:/opt/app/public/uploads
+    networks:
+      - web
+
+volumes:
+  strapi_data:
+  strapi_uploads:
+
+networks:
+  web:
+    external: true
+    name: n8n_n8n_net
