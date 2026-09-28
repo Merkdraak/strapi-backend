@@ -117,6 +117,9 @@
     "publishedOn": {
       "type": "date"
     },
+    "formEmail": {
+      "type": "string"
+    },
     "formThanks": {
       "type": "text"
     },

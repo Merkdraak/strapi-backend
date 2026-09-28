@@ -517,6 +517,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     description: Schema.Attribute.Text & Schema.Attribute.Required;
     entryKey: Schema.Attribute.String & Schema.Attribute.Required;
     eyebrow: Schema.Attribute.String;
+    formEmail: Schema.Attribute.String;
     formRedirect: Schema.Attribute.String;
     formThanks: Schema.Attribute.Text;
     intro: Schema.Attribute.Text;

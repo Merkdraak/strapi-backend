@@ -561,20 +561,32 @@ export default function MerkdraakEditor() {
           <Box background="neutral0" hasRadius shadow="filterShadow" padding={6}>
             <Typography variant="delta" tag="h2">Contact</Typography>
             <Box paddingTop={1}>
-              <Typography variant="pi" textColor="neutral600">Deze gegevens staan in de footer van de website.</Typography>
+              <Typography variant="pi" textColor="neutral600">Dit staat in de footer.</Typography>
             </Box>
             <Flex direction="column" alignItems="stretch" gap={4} paddingTop={4}>
               {textField("phone", "Telefoon", nav.contact.phoneDisplay, (value) => setNav({ ...nav, contact: { ...nav.contact, phoneDisplay: value } }))}
               {textField("email", "E-mail", nav.contact.email, (value) => setNav({ ...nav, contact: { ...nav.contact, email: value } }))}
               {textField("address", "Adres", nav.contact.address, (value) => setNav({ ...nav, contact: { ...nav.contact, address: value } }))}
-              {textField("articlePrefix", "Artikelbasis", nav.settings.articlePrefix, (value) => setNav({ ...nav, settings: { ...nav.settings, articlePrefix: value } }))}
-              {textField("googlePlaceId", "Google Place ID", nav.settings.googlePlaceId, (value) => setNav({ ...nav, settings: { ...nav.settings, googlePlaceId: value } }))}
-              {textField("formWebhook", "Webhook na formulier", nav.settings.formWebhook, (value) => setNav({ ...nav, settings: { ...nav.settings, formWebhook: value } }))}
             </Flex>
-            <Box paddingTop={2}>
-              <Typography variant="pi" textColor="neutral600">
-                Nieuwe kennisbankartikelen krijgen de artikelbasis als vast begin van de URL. Wijzig je die, dan volgt een 301 vanaf het oude pad. Het Place ID hoort bij Google-reviews. De webhook krijgt een seintje na een formulierinzending.
-              </Typography>
+            <Box paddingTop={6}>
+              <Divider />
+            </Box>
+            <Box paddingTop={6}>
+              <Typography variant="delta" tag="h2">Website</Typography>
+              <Flex direction="column" alignItems="stretch" gap={4} paddingTop={4}>
+                <Box>
+                  {textField("articlePrefix", "Artikelbasis", nav.settings.articlePrefix, (value) => setNav({ ...nav, settings: { ...nav.settings, articlePrefix: value } }))}
+                  <Box paddingTop={1}>
+                    <Typography variant="pi" textColor="neutral600">Nieuwe kennisbankartikelen krijgen dit als vast begin van de URL. Wijzig je het, dan volgt een doorverwijzing vanaf het oude adres.</Typography>
+                  </Box>
+                </Box>
+                <Box>
+                  {textField("googlePlaceId", "Google Place ID", nav.settings.googlePlaceId, (value) => setNav({ ...nav, settings: { ...nav.settings, googlePlaceId: value } }))}
+                  <Box paddingTop={1}>
+                    <Typography variant="pi" textColor="neutral600">Alleen nodig als een reviewblok de reviews van het Google-bedrijfsprofiel toont.</Typography>
+                  </Box>
+                </Box>
+              </Flex>
             </Box>
             <Box paddingTop={6}>
               <Divider />
