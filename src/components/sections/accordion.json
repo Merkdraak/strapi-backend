@@ -4,6 +4,7 @@
   "options": {},
   "attributes": {
     "heading": { "type": "string" },
+    "faqSchema": { "type": "boolean", "default": false },
     "items": { "type": "component", "repeatable": true, "component": "shared.accordion-item" },
     "anchor": { "type": "string" }
   }

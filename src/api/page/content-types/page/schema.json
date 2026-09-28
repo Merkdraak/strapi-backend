@@ -10,6 +10,11 @@
   "options": {
     "draftAndPublish": true
   },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": false
+    }
+  },
   "attributes": {
     "site": {
       "type": "relation",
@@ -69,6 +74,9 @@
       "default": "planned",
       "required": true
     },
+    "publishAt": {
+      "type": "datetime"
+    },
     "composed": {
       "type": "boolean",
       "default": false
@@ -98,6 +106,22 @@
     "nofollow": {
       "type": "boolean",
       "default": false
+    },
+    "showInMenu": {
+      "type": "boolean",
+      "default": false
+    },
+    "authorName": {
+      "type": "string"
+    },
+    "publishedOn": {
+      "type": "date"
+    },
+    "formThanks": {
+      "type": "text"
+    },
+    "formRedirect": {
+      "type": "string"
     },
     "intro": {
       "type": "text"

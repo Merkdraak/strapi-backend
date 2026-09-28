@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "form_submissions",
+  "info": {
+    "singularName": "form-submission",
+    "pluralName": "form-submissions",
+    "displayName": "Formulierinzending",
+    "description": "Niet openbaar op de site. Alleen zichtbaar in het beheerpaneel."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "siteKey": {
+      "type": "string",
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "string",
+      "required": true
+    },
+    "phone": {
+      "type": "string"
+    },
+    "message": {
+      "type": "text",
+      "required": true
+    },
+    "interest": {
+      "type": "string"
+    }
+  }
+}

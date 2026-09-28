@@ -9,6 +9,11 @@
   "options": {
     "draftAndPublish": true
   },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": false
+    }
+  },
   "attributes": {
     "site": {
       "type": "relation",

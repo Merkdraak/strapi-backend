@@ -4,6 +4,7 @@
   "options": {},
   "attributes": {
     "heading": { "type": "string" },
+    "source": { "type": "enumeration", "enum": ["manual", "google"], "default": "manual" },
     "items": { "type": "component", "repeatable": true, "component": "shared.review-item" },
     "anchor": { "type": "string" }
   }

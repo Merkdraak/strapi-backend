@@ -1,3 +1,5 @@
+import { applyKnowledgeSlug, normalizePrefix } from "../../../../knowledge";
+
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -32,13 +34,26 @@ async function fill(data: Record<string, unknown> | undefined) {
   if (!data.cta) data.cta = "marketingscan";
 }
 
+async function withKnowledgeSlug(data: Record<string, unknown>) {
+  if (data.pageType !== "knowledge") return;
+  const siteKey = typeof data.siteKey === "string" ? data.siteKey : "";
+  if (!siteKey) return;
+  const site = await strapi.documents("api::site.site").findFirst({
+    filters: { key: siteKey },
+    status: "published",
+  });
+  applyKnowledgeSlug(data, normalizePrefix(site?.articlePrefix));
+}
+
 export default {
   async beforeCreate(event: { params: { data?: Record<string, unknown> } }) {
+    if (event.params.data?.pageType === "knowledge") await withKnowledgeSlug(event.params.data);
     await fill(event.params.data);
   },
   async beforeUpdate(event: { params: { data?: Record<string, unknown> } }) {
     const data = event.params.data;
     if (!data) return;
     if (data.siteKey === "" || data.entryKey === "" || data.scopeKey === "") await fill(data);
+    if (data.pageType === "knowledge") await withKnowledgeSlug(data);
   },
 };

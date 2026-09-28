@@ -1,4 +1,5 @@
 import { factories } from "@strapi/strapi";
+import { applyKnowledgeSlug, normalizePrefix, rememberRedirect } from "../../../knowledge";
 
 function authorized(ctx: { request: { header: { authorization?: string } } }) {
   const secret = process.env.EDITOR_SECRET;
@@ -101,8 +102,25 @@ export default factories.createCoreController("api::page.page", ({ strapi }) => 
     const data = body.data;
     if (!data || typeof data !== "object") return ctx.badRequest("data ontbreekt");
     const siteKey = String(body.siteKey ?? data.siteKey ?? "");
-    if (!(await knownSite(siteKey))) return ctx.notFound();
+    const site = await knownSite(siteKey);
+    if (!site) return ctx.notFound();
     data.siteKey = siteKey;
+    let previousSlug = "";
+    if (body.documentId) {
+      const current = await strapi.documents("api::page.page").findOne({
+        documentId: body.documentId,
+        status: "draft",
+        fields: ["slug"],
+      });
+      previousSlug = current?.slug ?? "";
+    }
+    applyKnowledgeSlug(data, normalizePrefix(site.articlePrefix));
+    if (!data.publishedOn) data.publishedOn = null;
+    data.showInMenu = data.showInMenu === true || data.showInMenu === "true";
+    const nextSlug = typeof data.slug === "string" ? data.slug : "";
+    if (previousSlug && nextSlug && previousSlug !== nextSlug) {
+      await rememberRedirect(strapi, siteKey, `/${previousSlug}`, `/${nextSlug}`);
+    }
 
     const parentKey = typeof data.parentKey === "string" ? data.parentKey : "";
     const relatedKeys = Array.isArray(data.relatedKeys) ? data.relatedKeys.filter((item) => typeof item === "string") : [];
@@ -125,6 +143,10 @@ export default factories.createCoreController("api::page.page", ({ strapi }) => 
       data.related = related.map((item) => item.documentId);
     }
 
+    const publishAt = typeof data.publishAt === "string" ? Date.parse(data.publishAt) : Number.NaN;
+    const scheduled = Number.isFinite(publishAt) && publishAt > Date.now();
+    if (!data.publishAt) data.publishAt = null;
+    if (scheduled) data.visibility = "planned";
     const pageData = data as never;
     const visibility = String(data.visibility ?? "planned");
     let documentId = body.documentId;

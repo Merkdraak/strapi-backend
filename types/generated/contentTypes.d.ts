@@ -453,6 +453,11 @@ export interface ApiNavigationNavigation extends Struct.CollectionTypeSchema {
   options: {
     draftAndPublish: true;
   };
+  pluginOptions: {
+    'content-manager': {
+      visible: false;
+    };
+  };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -491,7 +496,13 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
   options: {
     draftAndPublish: true;
   };
+  pluginOptions: {
+    'content-manager': {
+      visible: false;
+    };
+  };
   attributes: {
+    authorName: Schema.Attribute.String;
     canonicalUrl: Schema.Attribute.String;
     cluster: Schema.Attribute.String;
     composed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
@@ -506,6 +517,8 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     description: Schema.Attribute.Text & Schema.Attribute.Required;
     entryKey: Schema.Attribute.String & Schema.Attribute.Required;
     eyebrow: Schema.Attribute.String;
+    formRedirect: Schema.Attribute.String;
+    formThanks: Schema.Attribute.Text;
     intro: Schema.Attribute.Text;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::page.page'> &
@@ -521,7 +534,9 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
       Schema.Attribute.Required;
     parent: Schema.Attribute.Relation<'manyToOne', 'api::page.page'>;
     phase: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
+    publishAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
+    publishedOn: Schema.Attribute.Date;
     related: Schema.Attribute.Relation<'oneToMany', 'api::page.page'>;
     scopeKey: Schema.Attribute.String &
       Schema.Attribute.Required &
@@ -571,6 +586,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
       ]
     >;
     seoTitle: Schema.Attribute.String & Schema.Attribute.Required;
+    showInMenu: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     site: Schema.Attribute.Relation<'manyToOne', 'api::site.site'>;
     siteKey: Schema.Attribute.String & Schema.Attribute.Required;
     slug: Schema.Attribute.String;
@@ -596,8 +612,15 @@ export interface ApiSiteSite extends Struct.CollectionTypeSchema {
   options: {
     draftAndPublish: true;
   };
+  pluginOptions: {
+    'content-manager': {
+      visible: false;
+    };
+  };
   attributes: {
     address: Schema.Attribute.String;
+    articlePrefix: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'kennisbank'>;
     btw: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -610,16 +633,84 @@ export interface ApiSiteSite extends Struct.CollectionTypeSchema {
     emailHref: Schema.Attribute.String;
     footerDisclaimer: Schema.Attribute.String;
     footerText: Schema.Attribute.Text;
+    formWebhook: Schema.Attribute.String;
+    googlePlaceId: Schema.Attribute.String;
     hours: Schema.Attribute.String;
     key: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
     kvk: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::site.site'> &
       Schema.Attribute.Private;
+    menuBackfilled: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
     name: Schema.Attribute.String & Schema.Attribute.Required;
     phoneDisplay: Schema.Attribute.String;
     phoneHref: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiRedirectRedirect extends Struct.CollectionTypeSchema {
+  collectionName: 'redirects';
+  info: {
+    displayName: 'Redirect';
+    pluralName: 'redirects';
+    singularName: 'redirect';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    enabled: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    fromPath: Schema.Attribute.String & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::redirect.redirect'> &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    siteKey: Schema.Attribute.String & Schema.Attribute.Required;
+    statusCode: Schema.Attribute.Enumeration<['301', '302']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'301'>;
+    toPath: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiFormSubmissionFormSubmission extends Struct.CollectionTypeSchema {
+  collectionName: 'form_submissions';
+  info: {
+    displayName: 'Formulierinzending';
+    pluralName: 'form-submissions';
+    singularName: 'form-submission';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.String & Schema.Attribute.Required;
+    interest: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::form-submission.form-submission'
+    > &
+      Schema.Attribute.Private;
+    message: Schema.Attribute.Text & Schema.Attribute.Required;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    phone: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    siteKey: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1137,8 +1228,10 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::form-submission.form-submission': ApiFormSubmissionFormSubmission;
       'api::navigation.navigation': ApiNavigationNavigation;
       'api::page.page': ApiPagePage;
+      'api::redirect.redirect': ApiRedirectRedirect;
       'api::site.site': ApiSiteSite;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

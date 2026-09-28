@@ -1,4 +1,37 @@
 import type { StrapiApp } from "@strapi/strapi/admin";
+import { Navigate, useLocation } from "react-router-dom";
+
+function isContentManagerPath(path: string | undefined) {
+  return path === "content-manager" || Boolean(path?.startsWith("content-manager/") || path?.startsWith("content-manager*"));
+}
+
+function EditorRedirect() {
+  const page = useLocation().pathname.match(/collection-types\/api::page\.page\/([^/]+)/);
+  const documentId = page?.[1];
+  if (documentId === "create") {
+    return <Navigate to="/merkdraak-editor?siteKey=merkdraak&documentId=nieuw" replace />;
+  }
+  if (documentId) {
+    return <Navigate to={`/merkdraak-editor?siteKey=merkdraak&documentId=${encodeURIComponent(documentId)}`} replace />;
+  }
+  return <Navigate to="/merkdraak-editor?siteKey=merkdraak" replace />;
+}
+
+function hideDefaultEditor(app: StrapiApp) {
+  const menu = app.router.menu;
+  for (let index = menu.length - 1; index >= 0; index -= 1) {
+    if (isContentManagerPath(menu[index].to)) menu.splice(index, 1);
+  }
+  const routes = app.router.routes;
+  for (let index = routes.length - 1; index >= 0; index -= 1) {
+    if (isContentManagerPath(routes[index].path)) routes.splice(index, 1);
+  }
+  app.router.addRoute({
+    path: "content-manager/*",
+    element: <EditorRedirect />,
+  });
+  app.widgets.register((widgets) => widgets.filter((widget) => widget.pluginId !== "content-manager"));
+}
 
 const EditorIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1rem" height="1rem" fill="none" stroke="currentColor" strokeWidth="2">
@@ -10,6 +43,9 @@ const EditorIcon = () => (
 export default {
   config: {
     locales: ["nl"],
+  },
+  register(app: StrapiApp) {
+    hideDefaultEditor(app);
   },
   bootstrap(app: StrapiApp) {
     app.addMenuLink({

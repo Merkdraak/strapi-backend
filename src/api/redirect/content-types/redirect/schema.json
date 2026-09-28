@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "redirects",
+  "info": {
+    "singularName": "redirect",
+    "pluralName": "redirects",
+    "displayName": "Redirect",
+    "description": "Van een oud pad naar een nieuw pad."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "siteKey": {
+      "type": "string",
+      "required": true
+    },
+    "fromPath": {
+      "type": "string",
+      "required": true
+    },
+    "toPath": {
+      "type": "string",
+      "required": true
+    },
+    "statusCode": {
+      "type": "enumeration",
+      "enum": ["301", "302"],
+      "default": "301",
+      "required": true
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

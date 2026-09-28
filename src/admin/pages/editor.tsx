@@ -1,11 +1,32 @@
 import { Fragment, useEffect, useState } from "react";
-import { useFetchClient } from "@strapi/strapi/admin";
+import { styled } from "styled-components";
+import { Layouts, Page, Table, useFetchClient, useNotification } from "@strapi/strapi/admin";
+import {
+  Alert,
+  Badge,
+  Box,
+  Button,
+  Divider,
+  EmptyStateLayout,
+  Field,
+  Flex,
+  Link,
+  Loader,
+  Searchbar,
+  SearchForm,
+  Status,
+  TextInput,
+  Typography,
+} from "@strapi/design-system";
+import { ArrowLeft, ArrowRight, ChevronDown, ChevronRight, Cog, Globe, Plus } from "@strapi/icons";
+import { EmptyDocuments } from "@strapi/icons/symbols";
 
 type SiteRow = { key: string; name: string; domain: string; editorUrl: string };
 type PageRow = { documentId: string; title: string; slug: string; visibility: string; pageType: string };
 type LinkRow = { label?: string; href?: string };
 type SiteEditor = {
   contact: { phoneDisplay: string; email: string; address: string };
+  settings: { articlePrefix: string; googlePlaceId: string; formWebhook: string };
   footerServices: LinkRow[];
   footerOrganization: LinkRow[];
   items: { __component?: string; label?: string; page?: { entryKey?: string }; links?: { label?: string; page?: { entryKey?: string } }[] }[];
@@ -26,30 +47,54 @@ const typeLabel: Record<string, string> = {
   knowledge: "Kennis",
 };
 
-const statusTone: Record<string, { background: string; color: string }> = {
-  published: { background: "#eafbe7", color: "#328048" },
-  concept: { background: "#fdf4dc", color: "#8c5a00" },
-  planned: { background: "#f0f0ff", color: "#4945ff" },
+const statusVariant: Record<string, "success" | "secondary" | "alternative"> = {
+  published: "success",
+  concept: "secondary",
+  planned: "alternative",
 };
 
-const buttonStyle = {
-  border: 0,
-  borderRadius: 4,
-  background: "#4945ff",
-  color: "#fff",
-  fontWeight: 600,
-  padding: "8px 14px",
-  cursor: "pointer",
-} as const;
+const pageHeaders = [
+  { name: "title", label: "Pagina" },
+  { name: "slug", label: "Pad" },
+  { name: "pageType", label: "Soort" },
+  { name: "visibility", label: "Status" },
+];
 
-const fieldStyle = {
-  display: "block",
-  width: "100%",
-  marginTop: 8,
-  padding: "8px 10px",
-  borderRadius: 4,
-  border: "1px solid #dcdce4",
-} as const;
+const SiteCard = styled(Box)`
+  width: 100%;
+  max-width: 36rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary200};
+  }
+
+  &:hover [data-arrow] {
+    color: ${({ theme }) => theme.colors.primary600};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.primary600};
+    outline-offset: 2px;
+  }
+`;
+
+function BackLink({ href, label, onBack }: { href: string; label: string; onBack: () => void }) {
+  return (
+    <Link
+      startIcon={<ArrowLeft />}
+      href={href}
+      onClick={(event) => {
+        event.preventDefault();
+        onBack();
+      }}
+    >
+      {label}
+    </Link>
+  );
+}
 
 function sectionName(page: PageRow) {
   const first = (page.slug ?? "").split("/").filter(Boolean)[0] ?? "";
@@ -85,16 +130,6 @@ function groupPages(pages: PageRow[]) {
   }));
 }
 
-const ghostStyle = {
-  border: "1px solid #dcdce4",
-  borderRadius: 4,
-  background: "#fff",
-  color: "#32324d",
-  fontWeight: 600,
-  padding: "8px 14px",
-  cursor: "pointer",
-} as const;
-
 export default function MerkdraakEditor() {
   const [sites, setSites] = useState<SiteRow[]>([]);
   const [pages, setPages] = useState<PageRow[]>([]);
@@ -103,6 +138,7 @@ export default function MerkdraakEditor() {
   const [src, setSrc] = useState("");
   const [error, setError] = useState("");
   const [loadingPages, setLoadingPages] = useState(false);
+  const [loadingSites, setLoadingSites] = useState(true);
   const [nav, setNav] = useState<SiteEditor | null>(null);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("");
@@ -112,14 +148,21 @@ export default function MerkdraakEditor() {
     "Merk en creatie": true,
   });
   const { get, post } = useFetchClient();
+  const { toggleNotification } = useNotification();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setSiteKey(params.get("siteKey") ?? "");
-    setDocumentId(params.get("documentId") ?? "");
+    function syncFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      setSiteKey(params.get("siteKey") ?? "");
+      setDocumentId(params.get("documentId") ?? "");
+    }
+    syncFromUrl();
+    window.addEventListener("popstate", syncFromUrl);
     get("/admin/merkdraak-editor/sites")
       .then((response: { data?: { sites?: SiteRow[] } }) => setSites(response.data?.sites ?? []))
-      .catch(() => setError("Websites konden niet worden geladen."));
+      .catch(() => setError("Websites konden niet worden geladen."))
+      .finally(() => setLoadingSites(false));
+    return () => window.removeEventListener("popstate", syncFromUrl);
   }, [get]);
 
   useEffect(() => {
@@ -156,7 +199,21 @@ export default function MerkdraakEditor() {
   useEffect(() => {
     if (documentId !== "site" || !siteKey) return;
     get(`/admin/merkdraak-editor/navigation?siteKey=${encodeURIComponent(siteKey)}`)
-      .then((response: { data?: SiteEditor }) => setNav(response.data ?? null))
+      .then((response: { data?: SiteEditor }) => {
+        const data = response.data;
+        if (!data) {
+          setNav(null);
+          return;
+        }
+        setNav({
+          ...data,
+          settings: {
+            articlePrefix: data.settings?.articlePrefix || "kennisbank",
+            googlePlaceId: data.settings?.googlePlaceId ?? "",
+            formWebhook: data.settings?.formWebhook ?? "",
+          },
+        });
+      })
       .catch(() => setError("De site kon niet worden geladen."));
   }, [documentId, get, siteKey]);
 
@@ -165,7 +222,7 @@ export default function MerkdraakEditor() {
     if (nextSite) params.set("siteKey", nextSite);
     if (nextDocument) params.set("documentId", nextDocument);
     const query = params.toString();
-    window.history.replaceState(null, "", query ? `${window.location.pathname}?${query}` : window.location.pathname);
+    window.history.pushState(null, "", query ? `${window.location.pathname}?${query}` : window.location.pathname);
     setSiteKey(nextSite);
     setDocumentId(nextDocument);
     setError("");
@@ -175,25 +232,67 @@ export default function MerkdraakEditor() {
 
   if (!siteKey) {
     return (
-      <div style={{ padding: 32, maxWidth: 960 }}>
-        <h1 style={{ margin: 0, fontSize: 28, color: "#32324d" }}>Websites</h1>
-        <p style={{ color: "#666687" }}>Kies een website en bewerk de pagina's.</p>
-        {error ? <p>{error}</p> : null}
-        <div style={{ display: "grid", gap: 16, marginTop: 24 }}>
-          {sites.map((item) => (
-            <article key={item.key} style={{ border: "1px solid #dcdce4", borderRadius: 8, padding: 20, background: "#fff" }}>
-              <h2 style={{ margin: "0 0 4px", fontSize: 20 }}>{item.name}</h2>
-              <p style={{ margin: 0, color: "#666687" }}>{item.domain || item.key}</p>
-              <div style={{ marginTop: 16 }}>
-                <button type="button" style={buttonStyle} onClick={() => remember(item.key, "")} disabled={!item.editorUrl}>
-                  Bewerk website
-                </button>
-                {!item.editorUrl ? <span style={{ marginLeft: 12, color: "#666687" }}>Geen editor-adres</span> : null}
-              </div>
-            </article>
-          ))}
-        </div>
-      </div>
+      <Page.Main>
+        <Page.Title>Websites</Page.Title>
+        <Layouts.Header title="Websites" subtitle={sites.length ? `${sites.length} ${sites.length === 1 ? "website" : "websites"}` : "Kies een website en bewerk de pagina's."} />
+        <Layouts.Content>
+          {error ? (
+            <Box paddingBottom={4}>
+              <Alert closeLabel="Sluiten" title="Laden mislukt" variant="danger" onClose={() => setError("")}>
+                {error}
+              </Alert>
+            </Box>
+          ) : null}
+          {loadingSites ? (
+            <Flex justifyContent="center" padding={11}>
+              <Loader>Websites laden…</Loader>
+            </Flex>
+          ) : sites.length === 0 ? (
+            <EmptyStateLayout icon={<EmptyDocuments width="10rem" />} content={error || "Nog geen websites."} />
+          ) : (
+            <Flex direction="column" alignItems="stretch" gap={4}>
+              {sites.map((item) => (
+                <SiteCard
+                  key={item.key}
+                  role="button"
+                  tabIndex={0}
+                  hasRadius
+                  background="neutral0"
+                  shadow="tableShadow"
+                  padding={5}
+                  borderColor="neutral150"
+                  borderStyle="solid"
+                  borderWidth="1px"
+                  onClick={() => remember(item.key, "")}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      remember(item.key, "");
+                    }
+                  }}
+                >
+                  <Flex justifyContent="space-between" alignItems="center" gap={4}>
+                    <Flex gap={4} alignItems="center">
+                      <Flex background="primary100" hasRadius width="3.2rem" height="3.2rem" alignItems="center" justifyContent="center" flex="0 0 auto">
+                        <Typography textColor="primary600" aria-hidden>
+                          <Globe width="1.4rem" height="1.4rem" />
+                        </Typography>
+                      </Flex>
+                      <Flex direction="column" alignItems="flex-start" gap={1}>
+                        <Typography variant="delta" fontWeight="bold" textColor="neutral800">{item.name}</Typography>
+                        <Typography variant="pi" textColor="neutral600">{item.domain || item.key}</Typography>
+                      </Flex>
+                    </Flex>
+                    <Typography textColor="neutral500" data-arrow aria-hidden>
+                      <ArrowRight width="1.2rem" height="1.2rem" />
+                    </Typography>
+                  </Flex>
+                </SiteCard>
+              ))}
+            </Flex>
+          )}
+        </Layouts.Content>
+      </Page.Main>
     );
   }
 
@@ -210,208 +309,356 @@ export default function MerkdraakEditor() {
       concept: pages.filter((page) => page.visibility === "concept").length,
       planned: pages.filter((page) => page.visibility === "planned").length,
     };
+    const tableRows = visible.map((page) => ({ ...page, id: page.documentId }));
+    const subtitle = [site?.domain || siteKey, pages.length ? `${pages.length} pagina's` : ""].filter(Boolean).join(" · ");
     return (
-      <div style={{ padding: "28px 40px 56px" }}>
-        <button type="button" onClick={() => remember("", "")} style={{ border: 0, background: "transparent", color: "#4945ff", fontWeight: 600, padding: 0, cursor: "pointer" }}>
-          ← Alle websites
-        </button>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 16, marginTop: 18 }}>
-          <div>
-            <h1 style={{ margin: 0, fontSize: 32, lineHeight: 1.1, color: "#32324d" }}>{site?.name ?? siteKey}</h1>
-            <p style={{ margin: "8px 0 0", color: "#666687" }}>
-              {site?.domain || siteKey}
-              {pages.length ? ` · ${pages.length} pagina's` : ""}
-            </p>
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button type="button" style={ghostStyle} onClick={() => remember(siteKey, "site")}>
+      <Page.Main>
+        <Page.Title>{site?.name ?? siteKey}</Page.Title>
+        <Layouts.Header
+          title={site?.name ?? siteKey}
+          subtitle={subtitle}
+          navigationAction={<BackLink href="/admin/merkdraak-editor" label="Alle websites" onBack={() => remember("", "")} />}
+          secondaryAction={
+            <Button variant="secondary" startIcon={<Cog />} onClick={() => remember(siteKey, "site")}>
               Menu en footer
-            </button>
-            <button type="button" style={buttonStyle} onClick={() => remember(siteKey, "nieuw")}>
+            </Button>
+          }
+          primaryAction={
+            <Button startIcon={<Plus />} onClick={() => remember(siteKey, "nieuw")}>
               Nieuwe pagina
-            </button>
-          </div>
-        </div>
-        <section style={{ marginTop: 24, background: "#fff", border: "1px solid #eaeaef", borderRadius: 8, overflow: "hidden" }}>
-          <div style={{ display: "flex", gap: 12, alignItems: "center", padding: 16, borderBottom: "1px solid #eaeaef" }}>
-            <input
-              aria-label="Zoek pagina"
-              placeholder="Zoek op naam of pad"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              style={{ ...fieldStyle, marginTop: 0, flex: "1 1 240px", maxWidth: 360 }}
-            />
-            <div style={{ display: "flex", gap: 6, marginLeft: "auto" }}>
-              {(["", "published", "concept", "planned"] as const).map((value) => {
-                const active = status === value;
-                return (
-                  <button
-                    key={value || "all"}
-                    type="button"
-                    onClick={() => setStatus(value)}
-                    style={{
-                      border: active ? "1px solid #4945ff" : "1px solid #dcdce4",
-                      borderRadius: 20,
-                      background: active ? "#f0f0ff" : "#fff",
-                      color: active ? "#271fe0" : "#32324d",
-                      fontWeight: 600,
-                      padding: "6px 12px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {value ? statusLabel[value] : "Alles"} {counts[value]}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-          {error && pages.length === 0 ? <p style={{ padding: 16, margin: 0 }}>{error}</p> : null}
-          {loadingPages ? <p style={{ padding: 16, margin: 0, color: "#666687" }}>Pagina's laden…</p> : null}
-          <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
-            <thead>
-              <tr style={{ textAlign: "left", color: "#666687", fontSize: 12, letterSpacing: "0.04em", textTransform: "uppercase" }}>
-                <th style={{ width: "38%", padding: "12px 16px", fontWeight: 600 }}>Pagina</th>
-                <th style={{ width: "34%", padding: "12px 16px", fontWeight: 600 }}>Pad</th>
-                <th style={{ width: "14%", padding: "12px 16px", fontWeight: 600 }}>Soort</th>
-                <th style={{ width: "14%", padding: "12px 16px", fontWeight: 600 }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {groupPages(visible).map((group) => {
-                const open = needle.length > 0 || !closed[group.name];
-                return (
-                  <Fragment key={group.name}>
-                    <tr>
-                      <td colSpan={4} style={{ padding: 0, background: "#f6f6f9", borderTop: "1px solid #eaeaef" }}>
-                        <button
-                          type="button"
-                          aria-expanded={open}
-                          onClick={() => setClosed((current) => ({ ...current, [group.name]: open }))}
-                          style={{ width: "100%", textAlign: "left", border: 0, background: "transparent", padding: "10px 16px", fontSize: 12, letterSpacing: "0.04em", textTransform: "uppercase", fontWeight: 700, color: "#32324d", cursor: "pointer" }}
-                        >
-                          {open ? "▾" : "▸"} {group.name} · {group.pages.length}
-                        </button>
-                      </td>
-                    </tr>
-                    {open
-                      ? group.pages.map((page) => {
-                          const tone = statusTone[page.visibility] ?? { background: "#f6f6f9", color: "#32324d" };
-                          const depth = Math.max(0, (page.slug ?? "").split("/").filter(Boolean).length - 1);
-                          return (
-                            <tr
-                              key={page.documentId}
-                              onClick={() => remember(siteKey, page.documentId)}
-                              style={{ cursor: "pointer", borderTop: "1px solid #f0f0f5" }}
-                              onMouseEnter={(event) => {
-                                event.currentTarget.style.background = "#f6f6f9";
-                              }}
-                              onMouseLeave={(event) => {
-                                event.currentTarget.style.background = "";
-                              }}
-                            >
-                              <td style={{ padding: "14px 16px", paddingLeft: 16 + depth * 18, fontWeight: depth ? 500 : 700, color: "#32324d" }}>{page.title}</td>
-                              <td style={{ padding: "14px 16px", color: "#666687" }}>{page.slug ? `/${page.slug}` : "/"}</td>
-                              <td style={{ padding: "14px 16px", color: "#666687" }}>{typeLabel[page.pageType] ?? page.pageType}</td>
-                              <td style={{ padding: "14px 16px" }}>
-                                <span style={{ display: "inline-block", borderRadius: 4, padding: "4px 8px", fontSize: 12, fontWeight: 700, background: tone.background, color: tone.color }}>
-                                  {statusLabel[page.visibility] ?? page.visibility}
-                                </span>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      : null}
-                  </Fragment>
-                );
-              })}
-            </tbody>
-          </table>
-          {!loadingPages && visible.length === 0 ? (
-            <p style={{ margin: 0, padding: 24, color: "#666687" }}>{pages.length ? "Geen pagina's voor deze zoekopdracht." : "Nog geen pagina's."}</p>
+            </Button>
+          }
+        />
+        <Layouts.Action
+          startActions={
+            <Box minWidth="16rem" maxWidth="32rem" width="100%">
+              <SearchForm onSubmit={(event) => event.preventDefault()}>
+                <Searchbar
+                  name="pages"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  onClear={() => setQuery("")}
+                  clearLabel="Zoekopdracht wissen"
+                  placeholder="Zoek op naam of pad"
+                >
+                  Zoek op naam of pad
+                </Searchbar>
+              </SearchForm>
+            </Box>
+          }
+          endActions={
+            <Flex gap={2} wrap="wrap" alignItems="center">
+              {(["", "published", "concept", "planned"] as const).map((value) => (
+                <Badge
+                  key={value || "all"}
+                  size="S"
+                  active={status === value}
+                  cursor="pointer"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setStatus(value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      setStatus(value);
+                    }
+                  }}
+                >
+                  {value ? statusLabel[value] : "Alles"} {counts[value]}
+                </Badge>
+              ))}
+            </Flex>
+          }
+        />
+        <Layouts.Content>
+          {error && pages.length === 0 ? (
+            <Box paddingBottom={4}>
+              <Alert closeLabel="Sluiten" title="Laden mislukt" variant="danger" onClose={() => setError("")}>
+                {error}
+              </Alert>
+            </Box>
           ) : null}
-        </section>
-      </div>
+          <Table.Root rows={tableRows} headers={pageHeaders} isLoading={loadingPages && pages.length === 0}>
+            <Table.Content>
+              <Table.Head>
+                {pageHeaders.map((header) => (
+                  <Table.HeaderCell key={header.name} {...header} />
+                ))}
+              </Table.Head>
+              <Table.Loading>Pagina's laden…</Table.Loading>
+              <Table.Empty
+                content={pages.length ? "Geen pagina's voor deze zoekopdracht." : "Nog geen pagina's."}
+                action={
+                  pages.length ? undefined : (
+                    <Button variant="secondary" startIcon={<Plus />} onClick={() => remember(siteKey, "nieuw")}>
+                      Nieuwe pagina
+                    </Button>
+                  )
+                }
+              />
+              <Table.Body>
+                {groupPages(visible).map((group) => {
+                  const open = needle.length > 0 || !closed[group.name];
+                  return (
+                    <Fragment key={group.name}>
+                      <Table.Row
+                        cursor="pointer"
+                        tabIndex={0}
+                        aria-expanded={open}
+                        onClick={() => setClosed((current) => ({ ...current, [group.name]: open }))}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            setClosed((current) => ({ ...current, [group.name]: open }));
+                          }
+                        }}
+                      >
+                        <Table.Cell colSpan={4} background="neutral100">
+                          <Flex justifyContent="space-between" alignItems="center" paddingTop={1} paddingBottom={1}>
+                            <Flex gap={2} alignItems="center">
+                              <Typography textColor="neutral600" aria-hidden>
+                                {open ? <ChevronDown width="0.8rem" height="0.8rem" /> : <ChevronRight width="0.8rem" height="0.8rem" />}
+                              </Typography>
+                              <Typography fontWeight="semiBold" textColor="neutral800">
+                                {group.name}
+                              </Typography>
+                            </Flex>
+                            <Badge size="S">{group.pages.length}</Badge>
+                          </Flex>
+                        </Table.Cell>
+                      </Table.Row>
+                      {open
+                        ? group.pages.map((page) => {
+                            const depth = Math.max(0, (page.slug ?? "").split("/").filter(Boolean).length - 1);
+                            return (
+                              <Table.Row
+                                key={page.documentId}
+                                cursor="pointer"
+                                tabIndex={0}
+                                onClick={() => remember(siteKey, page.documentId)}
+                                onKeyDown={(event) => {
+                                  if (event.key === "Enter" || event.key === " ") {
+                                    event.preventDefault();
+                                    remember(siteKey, page.documentId);
+                                  }
+                                }}
+                              >
+                                <Table.Cell>
+                                  <Box paddingLeft={depth * 4}>
+                                    <Typography fontWeight="semiBold" textColor="primary600">
+                                      {page.title}
+                                    </Typography>
+                                  </Box>
+                                </Table.Cell>
+                                <Table.Cell>
+                                  <Typography textColor="neutral600" ellipsis>
+                                    {page.slug ? `/${page.slug}` : "/"}
+                                  </Typography>
+                                </Table.Cell>
+                                <Table.Cell>
+                                  <Typography textColor="neutral600">{typeLabel[page.pageType] ?? page.pageType}</Typography>
+                                </Table.Cell>
+                                <Table.Cell>
+                                  <Status variant={statusVariant[page.visibility] ?? "alternative"} size="S">
+                                    <Typography variant="omega" fontWeight="bold">
+                                      {statusLabel[page.visibility] ?? page.visibility}
+                                    </Typography>
+                                  </Status>
+                                </Table.Cell>
+                              </Table.Row>
+                            );
+                          })
+                        : null}
+                    </Fragment>
+                  );
+                })}
+              </Table.Body>
+            </Table.Content>
+          </Table.Root>
+        </Layouts.Content>
+      </Page.Main>
     );
   }
 
-  if (documentId === "site" && nav) {
+  if (documentId === "site") {
+    const pagesHref = `/admin/merkdraak-editor?siteKey=${encodeURIComponent(siteKey)}`;
+    if (!nav) {
+      return (
+        <Page.Main>
+          <Page.Title>Menu en footer</Page.Title>
+          <Layouts.Header title="Menu en footer" navigationAction={<BackLink href={pagesHref} label="Pagina's" onBack={() => remember(siteKey, "")} />} />
+          <Layouts.Content>
+            <Flex justifyContent="center" padding={11}>
+              <Loader>Menu laden…</Loader>
+            </Flex>
+          </Layouts.Content>
+        </Page.Main>
+      );
+    }
     function saveSite() {
       post(`/admin/merkdraak-editor/navigation`, { siteKey, ...nav })
-        .then(() => setError(""))
-        .catch(() => setError("De site kon niet worden opgeslagen."));
+        .then(() => {
+          setError("");
+          toggleNotification({ type: "success", message: "Menu en footer opgeslagen." });
+        })
+        .catch(() => {
+          setError("De site kon niet worden opgeslagen.");
+          toggleNotification({ type: "danger", message: "De site kon niet worden opgeslagen." });
+        });
+    }
+    function textField(name: string, label: string, value: string, onChange: (value: string) => void) {
+      return (
+        <Field.Root name={name}>
+          <Field.Label>{label}</Field.Label>
+          <TextInput name={name} value={value} onChange={(event) => onChange(event.target.value)} />
+        </Field.Root>
+      );
     }
     function links(title: string, rows: LinkRow[], key: "footerServices" | "footerOrganization") {
       return (
-        <section style={{ marginTop: 24 }}>
-          <h2 style={{ fontSize: 18 }}>{title}</h2>
-          {rows.map((row, index) => (
-            <div key={`${key}-${index}`} style={{ display: "flex", gap: 8, marginTop: 8 }}>
-              <input style={fieldStyle} aria-label="Label" value={row.label ?? ""} onChange={(event) => {
-                const next = [...rows];
-                next[index] = { ...row, label: event.target.value };
-                setNav({ ...nav, [key]: next });
-              }} />
-              <input style={fieldStyle} aria-label="Link" value={row.href ?? ""} onChange={(event) => {
-                const next = [...rows];
-                next[index] = { ...row, href: event.target.value };
-                setNav({ ...nav, [key]: next });
-              }} />
-            </div>
-          ))}
-        </section>
+        <Box paddingTop={6}>
+          <Typography variant="delta" tag="h2">{title}</Typography>
+          <Flex direction="column" alignItems="stretch" gap={4} paddingTop={4}>
+            {rows.map((row, index) => (
+              <Flex key={`${key}-${index}`} gap={4} alignItems="flex-end">
+                <Box flex="1">
+                  {textField(`${key}-label-${index}`, "Label", row.label ?? "", (value) => {
+                    const next = [...rows];
+                    next[index] = { ...row, label: value };
+                    setNav({ ...nav, [key]: next });
+                  })}
+                </Box>
+                <Box flex="1">
+                  {textField(`${key}-href-${index}`, "Link", row.href ?? "", (value) => {
+                    const next = [...rows];
+                    next[index] = { ...row, href: value };
+                    setNav({ ...nav, [key]: next });
+                  })}
+                </Box>
+              </Flex>
+            ))}
+          </Flex>
+        </Box>
       );
     }
     return (
-      <div style={{ padding: 32, maxWidth: 800 }}>
-        <button type="button" style={ghostStyle} onClick={() => remember(siteKey, "")}>Terug naar pagina's</button>
-        <h1 style={{ fontSize: 28 }}>Menu en footer</h1>
-        <label>Telefoon <input style={fieldStyle} value={nav.contact.phoneDisplay} onChange={(event) => setNav({ ...nav, contact: { ...nav.contact, phoneDisplay: event.target.value } })} /></label>
-        <label style={{ display: "block", marginTop: 8 }}>E-mail <input style={fieldStyle} value={nav.contact.email} onChange={(event) => setNav({ ...nav, contact: { ...nav.contact, email: event.target.value } })} /></label>
-        <label style={{ display: "block", marginTop: 8 }}>Adres <input style={fieldStyle} value={nav.contact.address} onChange={(event) => setNav({ ...nav, contact: { ...nav.contact, address: event.target.value } })} /></label>
-        <section style={{ marginTop: 24 }}>
-          <h2 style={{ fontSize: 18 }}>Menu</h2>
-          {nav.items.map((item, index) => (
-            <div key={`${item.label}-${index}`} style={{ marginTop: 8 }}>
-              <input style={fieldStyle} aria-label="Menunaam" value={item.label ?? ""} onChange={(event) => {
-                const items = [...nav.items];
-                items[index] = { ...item, label: event.target.value };
-                setNav({ ...nav, items });
-              }} />
-              {item.__component === "nav.link" ? (
-                <input style={{ ...fieldStyle, marginLeft: 8 }} aria-label="Paginasleutel" value={item.page?.entryKey ?? ""} onChange={(event) => {
-                  const items = [...nav.items];
-                  items[index] = { ...item, page: { entryKey: event.target.value } };
-                  setNav({ ...nav, items });
-                }} />
-              ) : null}
-            </div>
-          ))}
-        </section>
-        {links("Footer diensten", nav.footerServices, "footerServices")}
-        {links("Footer organisatie", nav.footerOrganization, "footerOrganization")}
-        <p style={{ marginTop: 24 }}><button type="button" style={buttonStyle} onClick={saveSite}>Opslaan</button></p>
-        {error ? <p>{error}</p> : null}
-      </div>
+      <Page.Main>
+        <Page.Title>Menu en footer</Page.Title>
+        <Layouts.Header
+          title="Menu en footer"
+          subtitle={site?.name ?? siteKey}
+          navigationAction={<BackLink href={pagesHref} label="Pagina's" onBack={() => remember(siteKey, "")} />}
+          primaryAction={<Button onClick={saveSite}>Opslaan</Button>}
+        />
+        <Layouts.Content>
+          {error ? (
+            <Box paddingBottom={4}>
+              <Alert closeLabel="Sluiten" title="Opslaan mislukt" variant="danger" onClose={() => setError("")}>
+                {error}
+              </Alert>
+            </Box>
+          ) : null}
+          <Box background="neutral0" hasRadius shadow="filterShadow" padding={6}>
+            <Typography variant="delta" tag="h2">Contact</Typography>
+            <Box paddingTop={1}>
+              <Typography variant="pi" textColor="neutral600">Deze gegevens staan in de footer van de website.</Typography>
+            </Box>
+            <Flex direction="column" alignItems="stretch" gap={4} paddingTop={4}>
+              {textField("phone", "Telefoon", nav.contact.phoneDisplay, (value) => setNav({ ...nav, contact: { ...nav.contact, phoneDisplay: value } }))}
+              {textField("email", "E-mail", nav.contact.email, (value) => setNav({ ...nav, contact: { ...nav.contact, email: value } }))}
+              {textField("address", "Adres", nav.contact.address, (value) => setNav({ ...nav, contact: { ...nav.contact, address: value } }))}
+              {textField("articlePrefix", "Artikelbasis", nav.settings.articlePrefix, (value) => setNav({ ...nav, settings: { ...nav.settings, articlePrefix: value } }))}
+              {textField("googlePlaceId", "Google Place ID", nav.settings.googlePlaceId, (value) => setNav({ ...nav, settings: { ...nav.settings, googlePlaceId: value } }))}
+              {textField("formWebhook", "Webhook na formulier", nav.settings.formWebhook, (value) => setNav({ ...nav, settings: { ...nav.settings, formWebhook: value } }))}
+            </Flex>
+            <Box paddingTop={2}>
+              <Typography variant="pi" textColor="neutral600">
+                Nieuwe kennisbankartikelen krijgen de artikelbasis als vast begin van de URL. Wijzig je die, dan volgt een 301 vanaf het oude pad. Het Place ID hoort bij Google-reviews. De webhook krijgt een seintje na een formulierinzending.
+              </Typography>
+            </Box>
+            <Box paddingTop={6}>
+              <Divider />
+            </Box>
+            <Box paddingTop={6}>
+              <Typography variant="delta" tag="h2">Menu</Typography>
+              <Box paddingTop={1}>
+                <Typography variant="pi" textColor="neutral600">Namen en links van het hoofdmenu.</Typography>
+              </Box>
+              <Flex direction="column" alignItems="stretch" gap={4} paddingTop={4}>
+                {nav.items.map((item, index) => (
+                  <Flex key={`${item.label}-${index}`} gap={4} alignItems="flex-end">
+                    <Box flex="1">
+                      {textField(`menu-label-${index}`, "Menunaam", item.label ?? "", (value) => {
+                        const items = [...nav.items];
+                        items[index] = { ...item, label: value };
+                        setNav({ ...nav, items });
+                      })}
+                    </Box>
+                    {item.__component === "nav.link" ? (
+                      <Box flex="1">
+                        {textField(`menu-key-${index}`, "Paginasleutel", item.page?.entryKey ?? "", (value) => {
+                          const items = [...nav.items];
+                          items[index] = { ...item, page: { entryKey: value } };
+                          setNav({ ...nav, items });
+                        })}
+                      </Box>
+                    ) : null}
+                  </Flex>
+                ))}
+              </Flex>
+            </Box>
+            <Box paddingTop={6}>
+              <Divider />
+            </Box>
+            {links("Footer diensten", nav.footerServices, "footerServices")}
+            {links("Footer organisatie", nav.footerOrganization, "footerOrganization")}
+          </Box>
+        </Layouts.Content>
+      </Page.Main>
     );
   }
 
   const page = pages.find((item) => item.documentId === documentId);
+  const title = documentId === "nieuw" ? "Nieuwe pagina" : (page?.title ?? "Pagina");
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 56px)", background: "#fff" }}>
-      <div style={{ display: "flex", gap: 12, alignItems: "center", padding: "10px 16px", borderBottom: "1px solid #eaeaef" }}>
-        <button type="button" style={{ ...ghostStyle, padding: "6px 12px" }} onClick={() => remember(siteKey, "")}>
-          ← Pagina's
-        </button>
-        <strong style={{ color: "#32324d" }}>{documentId === "nieuw" ? "Nieuwe pagina" : (page?.title ?? "Pagina")}</strong>
-        {page?.slug !== undefined ? <span style={{ color: "#666687" }}>{page.slug ? `/${page.slug}` : "/"}</span> : null}
-      </div>
-      {error && !src ? <p style={{ padding: 24 }}>{error}</p> : null}
+    <Flex direction="column" alignItems="stretch" height="100dvh" background="neutral0">
+      <Flex
+        paddingLeft={6}
+        paddingRight={6}
+        paddingTop={3}
+        paddingBottom={3}
+        gap={3}
+        alignItems="center"
+        background="neutral0"
+        borderColor="neutral150"
+        borderStyle="solid"
+        borderWidth="0 0 1px 0"
+      >
+        <BackLink href={`/admin/merkdraak-editor?siteKey=${encodeURIComponent(siteKey)}`} label="Pagina's" onBack={() => remember(siteKey, "")} />
+        <Box paddingLeft={3} borderColor="neutral200" borderStyle="solid" borderWidth="0 0 0 1px">
+          <Typography tag="h1" variant="delta" textColor="neutral800">{title}</Typography>
+        </Box>
+        {page?.slug !== undefined ? (
+          <Box background="neutral100" hasRadius paddingLeft={2} paddingRight={2} paddingTop={1} paddingBottom={1}>
+            <Typography variant="pi" textColor="neutral600">{page.slug ? `/${page.slug}` : "/"}</Typography>
+          </Box>
+        ) : null}
+      </Flex>
+      {error && !src ? (
+        <Box padding={6}>
+          <Alert closeLabel="Sluiten" title="Editor" variant="danger" onClose={() => setError("")}>{error}</Alert>
+        </Box>
+      ) : null}
       {src ? (
-        <iframe title="Bewerk pagina" src={src} style={{ flex: 1, width: "100%", border: 0, background: "#fff" }} />
+        <Box flex="1" position="relative" minHeight={0}>
+          <iframe title="Bewerk pagina" src={src} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0, background: "#fff" }} />
+        </Box>
       ) : (
-        <p style={{ padding: 24, color: "#666687" }}>Editor laden…</p>
+        <Flex flex="1" justifyContent="center" alignItems="center">
+          <Loader>Editor laden…</Loader>
+        </Flex>
       )}
-    </div>
+    </Flex>
   );
 }

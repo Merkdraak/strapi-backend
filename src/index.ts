@@ -1,4 +1,6 @@
 import type { Core } from "@strapi/strapi";
+import { backfillMenu, normalizePrefix, syncArticlePrefix } from "./knowledge";
+import { publishScheduledPages } from "./publish-scheduled";
 
 // Webhook events that refresh the public site when content is saved.
 const events = ["entry.create", "entry.update", "entry.delete", "entry.publish", "entry.unpublish"];
@@ -96,6 +98,11 @@ export default {
             email: site?.email ?? "",
             address: site?.address ?? "",
           },
+          settings: {
+            articlePrefix: site?.articlePrefix || "kennisbank",
+            googlePlaceId: site?.googlePlaceId ?? "",
+            formWebhook: site?.formWebhook ?? "",
+          },
           footerServices: navigation?.footerServices ?? [],
           footerOrganization: navigation?.footerOrganization ?? [],
           items: navigation?.items ?? [],
@@ -115,15 +122,22 @@ export default {
           return;
         }
         const contact = (body.contact ?? {}) as { phoneDisplay?: string; email?: string; address?: string };
+        const settings = (body.settings ?? {}) as { articlePrefix?: string; googlePlaceId?: string; formWebhook?: string };
+        const previousPrefix = site.articlePrefix || "kennisbank";
+        const nextPrefix = normalizePrefix(settings.articlePrefix ?? previousPrefix);
         await strapi.documents("api::site.site").update({
           documentId: site.documentId,
           data: {
             phoneDisplay: contact.phoneDisplay ?? site.phoneDisplay ?? "",
             email: contact.email ?? site.email ?? "",
             address: contact.address ?? site.address ?? "",
+            articlePrefix: nextPrefix,
+            googlePlaceId: String(settings.googlePlaceId ?? site.googlePlaceId ?? "").trim(),
+            formWebhook: String(settings.formWebhook ?? site.formWebhook ?? "").trim(),
           },
           status: "published",
         });
+        await syncArticlePrefix(strapi, siteKey, previousPrefix, nextPrefix);
         const navigation = await strapi.documents("api::navigation.navigation").findFirst({
           filters: { siteKey },
           status: "draft",
@@ -181,23 +195,34 @@ export default {
     }
     const url = process.env.REVALIDATE_URL;
     const secret = process.env.REVALIDATE_SECRET;
-    if (!url || !secret) return;
-    const store = strapi.get("webhookStore") as {
-      findWebhooks: () => Promise<{ url: string }[]>;
-      createWebhook: (data: {
-        name: string;
-        url: string;
-        headers: Record<string, string>;
-        events: string[];
-      }) => Promise<unknown>;
-    };
-    const existing = await store.findWebhooks();
-    if (existing.some((hook) => hook.url === url)) return;
-    await store.createWebhook({
-      name: "frontend-revalidate",
-      url,
-      headers: { Authorization: `Bearer ${secret}` },
-      events,
+    if (url && secret) {
+      const store = strapi.get("webhookStore") as {
+        findWebhooks: () => Promise<{ url: string }[]>;
+        createWebhook: (data: {
+          name: string;
+          url: string;
+          headers: Record<string, string>;
+          events: string[];
+        }) => Promise<unknown>;
+      };
+      const existing = await store.findWebhooks();
+      if (!existing.some((hook) => hook.url === url)) {
+        await store.createWebhook({
+          name: "frontend-revalidate",
+          url,
+          headers: { Authorization: `Bearer ${secret}` },
+          events,
+        });
+      }
+    }
+    setInterval(() => {
+      publishScheduledPages(strapi).catch((error: unknown) => {
+        strapi.log.error(error);
+      });
+    }, 60_000);
+    await publishScheduledPages(strapi);
+    await backfillMenu(strapi).catch((error: unknown) => {
+      strapi.log.error(error);
     });
   },
 };

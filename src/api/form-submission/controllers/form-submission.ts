@@ -1,0 +1,35 @@
+import { factories } from "@strapi/strapi";
+
+function clip(value: unknown, max: number) {
+  return String(value ?? "").trim().slice(0, max);
+}
+
+function authorized(ctx: { request: { header: { authorization?: string } } }) {
+  const secret = process.env.EDITOR_SECRET;
+  return Boolean(secret) && ctx.request.header.authorization === `Bearer ${secret}`;
+}
+
+export default factories.createCoreController("api::form-submission.form-submission", ({ strapi }) => ({
+  async submit(ctx) {
+    if (!authorized(ctx)) return ctx.unauthorized();
+    const body = (ctx.request.body ?? {}) as Record<string, unknown>;
+    const siteKey = clip(body.siteKey, 80);
+    const name = clip(body.name, 120);
+    const email = clip(body.email, 200);
+    const phone = clip(body.phone, 40);
+    const message = clip(body.message, 4000);
+    const interest = clip(body.interest, 120);
+    if (!siteKey || !name || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return ctx.badRequest("Vul naam, een geldig e-mailadres en een bericht in.");
+    }
+    const site = await strapi.documents("api::site.site").findFirst({
+      filters: { key: siteKey },
+      status: "published",
+    });
+    if (!site) return ctx.notFound();
+    await strapi.documents("api::form-submission.form-submission").create({
+      data: { siteKey, name, email, phone, message, interest },
+    });
+    ctx.body = { ok: true };
+  },
+}));

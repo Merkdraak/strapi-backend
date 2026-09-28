@@ -108,6 +108,7 @@ export interface SectionsAccordion extends Struct.ComponentSchema {
   };
   attributes: {
     anchor: Schema.Attribute.String;
+    faqSchema: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     heading: Schema.Attribute.String;
     items: Schema.Attribute.Component<'shared.accordion-item', true>;
   };
@@ -681,6 +682,8 @@ export interface SectionsReviews extends Struct.ComponentSchema {
     anchor: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     items: Schema.Attribute.Component<'shared.review-item', true>;
+    source: Schema.Attribute.Enumeration<['manual', 'google']> &
+      Schema.Attribute.DefaultTo<'manual'>;
   };
 }
 

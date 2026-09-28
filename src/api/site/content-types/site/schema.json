@@ -9,6 +9,11 @@
   "options": {
     "draftAndPublish": true
   },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": false
+    }
+  },
   "attributes": {
     "key": {
       "type": "uid",
@@ -60,6 +65,20 @@
     },
     "footerDisclaimer": {
       "type": "string"
+    },
+    "articlePrefix": {
+      "type": "string",
+      "default": "kennisbank"
+    },
+    "googlePlaceId": {
+      "type": "string"
+    },
+    "formWebhook": {
+      "type": "string"
+    },
+    "menuBackfilled": {
+      "type": "boolean",
+      "default": false
     }
   }
 }
