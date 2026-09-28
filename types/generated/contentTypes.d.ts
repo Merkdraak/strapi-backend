@@ -674,9 +674,9 @@ export interface ApiRedirectRedirect extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     siteKey: Schema.Attribute.String & Schema.Attribute.Required;
-    statusCode: Schema.Attribute.Enumeration<['301', '302']> &
+    statusCode: Schema.Attribute.Enumeration<['permanent', 'temporary']> &
       Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'301'>;
+      Schema.Attribute.DefaultTo<'permanent'>;
     toPath: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

@@ -66,7 +66,7 @@ export async function rememberRedirect(strapi: Core.Strapi, siteKey: string, fro
   const existing = await strapi.documents("api::redirect.redirect").findFirst({
     filters: { siteKey, fromPath },
   });
-  const data = { siteKey, fromPath, toPath, statusCode: "301" as const, enabled: true };
+  const data = { siteKey, fromPath, toPath, statusCode: "permanent" as const, enabled: true };
   if (existing?.documentId) {
     await strapi.documents("api::redirect.redirect").update({ documentId: existing.documentId, data });
     return;

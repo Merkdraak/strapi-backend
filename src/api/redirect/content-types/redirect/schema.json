@@ -25,8 +25,8 @@
     },
     "statusCode": {
       "type": "enumeration",
-      "enum": ["301", "302"],
-      "default": "301",
+      "enum": ["permanent", "temporary"],
+      "default": "permanent",
       "required": true
     },
     "enabled": {

@@ -15,7 +15,7 @@ export default factories.createCoreController("api::redirect.redirect", ({ strap
         const fromPath = safeInternalPath(row.fromPath);
         const toPath = safeInternalPath(row.toPath);
         if (!fromPath || !toPath || fromPath === toPath) return [];
-        return [{ fromPath, toPath, statusCode: row.statusCode === "302" ? 302 : 301 }];
+        return [{ fromPath, toPath, statusCode: row.statusCode === "temporary" ? 302 : 301 }];
       }),
     };
   },
