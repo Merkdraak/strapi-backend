@@ -1,9 +1,34 @@
 {
   "collectionName": "components_sections_dividers",
-  "info": { "displayName": "Scheiding", "icon": "minus" },
+  "info": {
+    "displayName": "Scheiding",
+    "icon": "minus"
+  },
   "options": {},
   "attributes": {
-    "space": { "type": "string" },
-    "anchor": { "type": "string" }
+    "space": {
+      "type": "string"
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "spaceTop": {
+      "type": "string"
+    },
+    "spaceBottom": {
+      "type": "string"
+    },
+    "spaceTopTablet": {
+      "type": "string"
+    },
+    "spaceBottomTablet": {
+      "type": "string"
+    },
+    "spaceTopMobile": {
+      "type": "string"
+    },
+    "spaceBottomMobile": {
+      "type": "string"
+    }
   }
 }

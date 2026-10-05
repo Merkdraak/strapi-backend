@@ -37,6 +37,24 @@
     },
     "anchor": {
       "type": "string"
+    },
+    "spaceTop": {
+      "type": "string"
+    },
+    "spaceBottom": {
+      "type": "string"
+    },
+    "spaceTopTablet": {
+      "type": "string"
+    },
+    "spaceBottomTablet": {
+      "type": "string"
+    },
+    "spaceTopMobile": {
+      "type": "string"
+    },
+    "spaceBottomMobile": {
+      "type": "string"
     }
   }
 }

@@ -1,10 +1,39 @@
 {
   "collectionName": "components_sections_galleries",
-  "info": { "displayName": "Galerij", "icon": "picture" },
+  "info": {
+    "displayName": "Galerij",
+    "icon": "picture"
+  },
   "options": {},
   "attributes": {
-    "heading": { "type": "string" },
-    "items": { "type": "component", "repeatable": true, "component": "shared.slide" },
-    "anchor": { "type": "string" }
+    "heading": {
+      "type": "string"
+    },
+    "items": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.slide"
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "spaceTop": {
+      "type": "string"
+    },
+    "spaceBottom": {
+      "type": "string"
+    },
+    "spaceTopTablet": {
+      "type": "string"
+    },
+    "spaceBottomTablet": {
+      "type": "string"
+    },
+    "spaceTopMobile": {
+      "type": "string"
+    },
+    "spaceBottomMobile": {
+      "type": "string"
+    }
   }
 }

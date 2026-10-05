@@ -1,16 +1,55 @@
 {
   "collectionName": "components_sections_locations",
-  "info": { "displayName": "Locatie", "icon": "pinMap" },
+  "info": {
+    "displayName": "Locatie",
+    "icon": "pinMap"
+  },
   "options": {},
   "attributes": {
-    "heading": { "type": "string" },
-    "name": { "type": "string" },
-    "street": { "type": "string" },
-    "postalCode": { "type": "string" },
-    "city": { "type": "string" },
-    "phone": { "type": "string" },
-    "email": { "type": "string" },
-    "href": { "type": "string" },
-    "anchor": { "type": "string" }
+    "heading": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "street": {
+      "type": "string"
+    },
+    "postalCode": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "href": {
+      "type": "string"
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "spaceTop": {
+      "type": "string"
+    },
+    "spaceBottom": {
+      "type": "string"
+    },
+    "spaceTopTablet": {
+      "type": "string"
+    },
+    "spaceBottomTablet": {
+      "type": "string"
+    },
+    "spaceTopMobile": {
+      "type": "string"
+    },
+    "spaceBottomMobile": {
+      "type": "string"
+    }
   }
 }

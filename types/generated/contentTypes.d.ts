@@ -605,6 +605,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.heading',
         'sections.button',
         'sections.divider',
+        'sections.spacer',
         'sections.split',
         'sections.takeaways',
         'sections.table',

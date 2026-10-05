@@ -35,6 +35,7 @@ const sectionPopulate = {
     "sections.heading": { populate: "*" },
     "sections.button": { populate: "*" },
     "sections.divider": { populate: "*" },
+    "sections.spacer": { populate: "*" },
     "sections.split": { populate: ["image"] },
     "sections.takeaways": { populate: ["items"] },
     "sections.table": { populate: ["rows"] },

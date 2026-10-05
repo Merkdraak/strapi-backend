@@ -111,6 +111,12 @@ export interface SectionsAccordion extends Struct.ComponentSchema {
     faqSchema: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     heading: Schema.Attribute.String;
     items: Schema.Attribute.Component<'shared.accordion-item', true>;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
   };
 }
 
@@ -129,6 +135,12 @@ export interface SectionsBeforeAfter extends Struct.ComponentSchema {
     beforeAlt: Schema.Attribute.String;
     beforeCaption: Schema.Attribute.String;
     heading: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
   };
 }
 
@@ -150,6 +162,12 @@ export interface SectionsBulletList extends Struct.ComponentSchema {
     heading: Schema.Attribute.String;
     items: Schema.Attribute.Component<'shared.text-item', true>;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
     variant: Schema.Attribute.Enumeration<
       ['problems', 'deliverables', 'plain']
@@ -171,6 +189,12 @@ export interface SectionsButton extends Struct.ComponentSchema {
     href: Schema.Attribute.String;
     label: Schema.Attribute.String & Schema.Attribute.Required;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
   };
 }
 
@@ -186,6 +210,12 @@ export interface SectionsButtonRow extends Struct.ComponentSchema {
     primaryLabel: Schema.Attribute.String;
     secondaryHref: Schema.Attribute.String;
     secondaryLabel: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
   };
 }
 
@@ -199,6 +229,12 @@ export interface SectionsCards extends Struct.ComponentSchema {
     anchor: Schema.Attribute.String;
     cards: Schema.Attribute.Component<'shared.content-card', true>;
     heading: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
   };
 }
 
@@ -216,6 +252,12 @@ export interface SectionsCaseGrid extends Struct.ComponentSchema {
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
   };
 }
@@ -245,6 +287,12 @@ export interface SectionsCaseStory extends Struct.ComponentSchema {
     metrics: Schema.Attribute.Component<'shared.stat', true>;
     sector: Schema.Attribute.String;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     summary: Schema.Attribute.Text;
     textColor: Schema.Attribute.String;
     tools: Schema.Attribute.String;
@@ -265,6 +313,12 @@ export interface SectionsClientLogos extends Struct.ComponentSchema {
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
   };
 }
@@ -282,6 +336,12 @@ export interface SectionsColumns extends Struct.ComponentSchema {
     leftHeading: Schema.Attribute.String;
     rightBody: Schema.Attribute.Text;
     rightHeading: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
   };
 }
 
@@ -301,6 +361,12 @@ export interface SectionsContactCta extends Struct.ComponentSchema {
     href: Schema.Attribute.String;
     label: Schema.Attribute.String;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
     title: Schema.Attribute.String;
   };
@@ -315,6 +381,12 @@ export interface SectionsDivider extends Struct.ComponentSchema {
   attributes: {
     anchor: Schema.Attribute.String;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
   };
 }
 
@@ -330,6 +402,12 @@ export interface SectionsDocument extends Struct.ComponentSchema {
     heading: Schema.Attribute.String;
     href: Schema.Attribute.String;
     label: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
   };
 }
 
@@ -349,6 +427,12 @@ export interface SectionsExpert extends Struct.ComponentSchema {
     name: Schema.Attribute.String;
     pageId: Schema.Attribute.String;
     role: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
   };
 }
 
@@ -370,6 +454,12 @@ export interface SectionsFaq extends Struct.ComponentSchema {
     heading: Schema.Attribute.String;
     items: Schema.Attribute.Component<'shared.faq-item', true>;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
   };
 }
@@ -384,6 +474,12 @@ export interface SectionsGallery extends Struct.ComponentSchema {
     anchor: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     items: Schema.Attribute.Component<'shared.slide', true>;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
   };
 }
 
@@ -405,6 +501,12 @@ export interface SectionsHeading extends Struct.ComponentSchema {
     heading: Schema.Attribute.String & Schema.Attribute.Required;
     headingLevel: Schema.Attribute.String;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
   };
 }
@@ -429,6 +531,12 @@ export interface SectionsHero extends Struct.ComponentSchema {
     secondaryHref: Schema.Attribute.String;
     secondaryLabel: Schema.Attribute.String;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     stats: Schema.Attribute.Component<'shared.stat', true>;
     textColor: Schema.Attribute.String;
     title: Schema.Attribute.String & Schema.Attribute.Required;
@@ -451,6 +559,12 @@ export interface SectionsImage extends Struct.ComponentSchema {
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
     width: Schema.Attribute.String;
   };
@@ -470,6 +584,12 @@ export interface SectionsImageSlider extends Struct.ComponentSchema {
     heading: Schema.Attribute.String;
     slides: Schema.Attribute.Component<'shared.slide', true>;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
     width: Schema.Attribute.String;
   };
@@ -493,6 +613,12 @@ export interface SectionsLinkList extends Struct.ComponentSchema {
     heading: Schema.Attribute.String;
     items: Schema.Attribute.Component<'shared.text-item', true>;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
   };
 }
@@ -512,6 +638,12 @@ export interface SectionsLocation extends Struct.ComponentSchema {
     name: Schema.Attribute.String;
     phone: Schema.Attribute.String;
     postalCode: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     street: Schema.Attribute.String;
   };
 }
@@ -533,6 +665,12 @@ export interface SectionsNotice extends Struct.ComponentSchema {
     body: Schema.Attribute.Text & Schema.Attribute.Required;
     fontSize: Schema.Attribute.String;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
   };
 }
@@ -554,6 +692,12 @@ export interface SectionsNumberedSteps extends Struct.ComponentSchema {
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     steps: Schema.Attribute.Component<'shared.step', true>;
     textColor: Schema.Attribute.String;
   };
@@ -582,6 +726,12 @@ export interface SectionsPageIndex extends Struct.ComponentSchema {
     notice: Schema.Attribute.Text;
     serviceKeys: Schema.Attribute.JSON;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
   };
 }
@@ -604,6 +754,12 @@ export interface SectionsPriceFactors extends Struct.ComponentSchema {
     heading: Schema.Attribute.String;
     items: Schema.Attribute.Component<'shared.text-item', true>;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
   };
 }
@@ -623,6 +779,12 @@ export interface SectionsProcess extends Struct.ComponentSchema {
     heading: Schema.Attribute.String;
     intro: Schema.Attribute.Text;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     steps: Schema.Attribute.Component<'shared.step', true>;
     textColor: Schema.Attribute.String;
   };
@@ -647,6 +809,12 @@ export interface SectionsProse extends Struct.ComponentSchema {
     heading: Schema.Attribute.String;
     headingLevel: Schema.Attribute.String;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
   };
 }
@@ -667,6 +835,12 @@ export interface SectionsResults extends Struct.ComponentSchema {
     heading: Schema.Attribute.String;
     intro: Schema.Attribute.Text;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     stats: Schema.Attribute.Component<'shared.stat', true>;
     textColor: Schema.Attribute.String;
   };
@@ -684,6 +858,12 @@ export interface SectionsReviews extends Struct.ComponentSchema {
     items: Schema.Attribute.Component<'shared.review-item', true>;
     source: Schema.Attribute.Enumeration<['manual', 'google']> &
       Schema.Attribute.DefaultTo<'manual'>;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
   };
 }
 
@@ -704,6 +884,12 @@ export interface SectionsRow extends Struct.ComponentSchema {
     left: Schema.Attribute.JSON;
     right: Schema.Attribute.JSON;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
   };
 }
@@ -724,6 +910,12 @@ export interface SectionsServiceCards extends Struct.ComponentSchema {
     heading: Schema.Attribute.String;
     intro: Schema.Attribute.Text;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
   };
 }
@@ -738,6 +930,26 @@ export interface SectionsSources extends Struct.ComponentSchema {
     anchor: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     items: Schema.Attribute.Component<'shared.source-item', true>;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
+  };
+}
+
+export interface SectionsSpacer extends Struct.ComponentSchema {
+  collectionName: 'components_sections_spacers';
+  info: {
+    displayName: 'Afstand';
+    icon: 'layer';
+  };
+  attributes: {
+    anchor: Schema.Attribute.String;
+    height: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<64>;
+    heightMobile: Schema.Attribute.Integer;
+    heightTablet: Schema.Attribute.Integer;
   };
 }
 
@@ -764,6 +976,12 @@ export interface SectionsSplit extends Struct.ComponentSchema {
     label: Schema.Attribute.String;
     side: Schema.Attribute.String;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
   };
 }
@@ -778,6 +996,12 @@ export interface SectionsTable extends Struct.ComponentSchema {
     anchor: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     rows: Schema.Attribute.Component<'shared.table-row', true>;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
   };
 }
 
@@ -791,6 +1015,12 @@ export interface SectionsTakeaways extends Struct.ComponentSchema {
     anchor: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     items: Schema.Attribute.Component<'shared.text-item', true>;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
   };
 }
 
@@ -810,6 +1040,12 @@ export interface SectionsTeam extends Struct.ComponentSchema {
     members: Schema.Attribute.Component<'shared.team-member', true>;
     note: Schema.Attribute.Text;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
   };
 }
@@ -829,6 +1065,12 @@ export interface SectionsTestimonial extends Struct.ComponentSchema {
     quote: Schema.Attribute.Text & Schema.Attribute.Required;
     role: Schema.Attribute.String;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
   };
 }
@@ -851,6 +1093,12 @@ export interface SectionsVideo extends Struct.ComponentSchema {
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
     transcript: Schema.Attribute.Text;
     url: Schema.Attribute.String;
@@ -873,6 +1121,12 @@ export interface SectionsWhyUs extends Struct.ComponentSchema {
     intro: Schema.Attribute.Text;
     pillars: Schema.Attribute.Component<'shared.pillar', true>;
     space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
   };
 }
@@ -936,6 +1190,7 @@ export interface SharedNamedItem extends Struct.ComponentSchema {
     icon: 'layer';
   };
   attributes: {
+    href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
     itemId: Schema.Attribute.String;
     name: Schema.Attribute.String & Schema.Attribute.Required;
@@ -1073,9 +1328,11 @@ export interface SharedTeamMember extends Struct.ComponentSchema {
     > &
       Schema.Attribute.DefaultTo<'orange'>;
     bio: Schema.Attribute.Text;
+    href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
     initials: Schema.Attribute.String & Schema.Attribute.Required;
     name: Schema.Attribute.String & Schema.Attribute.Required;
+    pageId: Schema.Attribute.String;
     ring: Schema.Attribute.String;
     role: Schema.Attribute.String & Schema.Attribute.Required;
   };
@@ -1138,6 +1395,7 @@ declare module '@strapi/strapi' {
       'sections.row': SectionsRow;
       'sections.service-cards': SectionsServiceCards;
       'sections.sources': SectionsSources;
+      'sections.spacer': SectionsSpacer;
       'sections.split': SectionsSplit;
       'sections.table': SectionsTable;
       'sections.takeaways': SectionsTakeaways;
