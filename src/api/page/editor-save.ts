@@ -47,7 +47,7 @@ export async function saveEditorPage(
   strapi: Core.Strapi,
   input: SaveInput,
   helpers: {
-    knownSite: (siteKey: string) => Promise<{ articlePrefix?: string | null } | null>;
+    knownSite: (siteKey: string) => Promise<{ id?: number | string; documentId?: string; articlePrefix?: string | null } | null>;
     applyKnowledgeSlug: (data: Record<string, unknown>, prefix: unknown) => void;
     normalizePrefix: (value: unknown) => string;
     rememberRedirect: (cms: Core.Strapi, siteKey: string, from: string, to: string) => Promise<void>;
@@ -62,6 +62,7 @@ export async function saveEditorPage(
   const site = await helpers.knownSite(siteKey);
   if (!site) throw new EditorSaveError(404, "NOT_FOUND", "Deze website is niet gevonden.");
   data.siteKey = siteKey;
+  data.site = site.id ?? site.documentId;
 
   let previousSlug = "";
   if (input.documentId) {

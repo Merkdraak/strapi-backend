@@ -176,6 +176,10 @@ export function fromStrapiError(error: unknown, sections: unknown): EditorSaveEr
       field: "scopeKey",
     });
   }
+  const raw = `${safeErrorText(error)} ${JSON.stringify(error && typeof error === "object" ? { name: (error as { name?: string }).name, message: (error as { message?: string }).message } : {})}`;
+  if (/foreign key/i.test(raw)) {
+    return new EditorSaveError(400, "VALIDATION_ERROR", "De pagina kon niet aan de website worden gekoppeld. Probeer opnieuw op te slaan.");
+  }
 
   const path = pathFromError(error);
   const index = sectionIndex(path);

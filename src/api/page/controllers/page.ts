@@ -113,11 +113,15 @@ export default factories.createCoreController("api::page.page", ({ strapi }) => 
       ctx.status = result.status;
       ctx.body = result.body;
     } catch (error) {
-      if (error instanceof EditorSaveError) {
-        ctx.status = error.status;
+      const mapped =
+        error instanceof EditorSaveError || (error instanceof Error && error.name === "EditorSaveError" && "status" in error)
+          ? (error as EditorSaveError)
+          : null;
+      if (mapped) {
+        ctx.status = mapped.status;
         ctx.body = saveResponse({
           success: false,
-          error: errorPayload(error),
+          error: errorPayload(mapped),
         });
         return;
       }
