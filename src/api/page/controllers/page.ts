@@ -170,12 +170,17 @@ export default factories.createCoreController("api::page.page", ({ strapi }) => 
     if (ctx.method === "POST") {
       const uploaded = ctx.request.files?.files ?? ctx.request.files?.file;
       if (!uploaded) return ctx.badRequest("Geen bestand");
-      const created = await strapi.plugin("upload").service("upload").upload({
-        data: {},
-        files: uploaded,
-      });
-      const file = Array.isArray(created) ? created[0] : created;
-      ctx.body = { file: file ? { id: file.id, url: file.url, name: file.name } : null };
+      try {
+        const created = await strapi.plugin("upload").service("upload").upload({
+          data: {},
+          files: uploaded,
+        });
+        const file = Array.isArray(created) ? created[0] : created;
+        ctx.body = { file: file ? { id: file.id, url: file.url, name: file.name } : null };
+      } catch (error) {
+        strapi.log.error(error);
+        return ctx.badRequest("Upload mislukt");
+      }
       return;
     }
     const files = await strapi.db.query("plugin::upload.file").findMany({
