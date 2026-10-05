@@ -26,12 +26,18 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
+          test -n "$KOEKJE_SSH_HOST"
+          test -n "$KOEKJE_SSH_USER"
+          test -n "$KOEKJE_SSH_KEY"
+          test -n "$KOEKJE_KNOWN_HOSTS"
           mkdir -p "$HOME/.ssh"
           printf '%s\n' "$KOEKJE_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
           printf '%s\n' "$KOEKJE_SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519" "$HOME/.ssh/known_hosts"
           ssh -i "$HOME/.ssh/id_ed25519" \
+            -o BatchMode=yes \
             -o IdentitiesOnly=yes \
             -o StrictHostKeyChecking=yes \
             -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
             "${KOEKJE_SSH_USER}@${KOEKJE_SSH_HOST}" \
-            /usr/local/bin/merkdraak-strapi-deploy
+            sudo -n /usr/local/bin/merkdraak-strapi-deploy
