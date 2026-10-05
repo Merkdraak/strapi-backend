@@ -16,7 +16,7 @@ Pushes to `main` deploy Strapi on `koekje` via GitHub Actions.
 | `KOEKJE_SSH_HOST` | Server hostname or IP |
 | `KOEKJE_SSH_USER` | SSH user (`deploy`) |
 | `KOEKJE_SSH_KEY` | Private key for Actions only |
-| `KOEKJE_SSH_FINGERPRINT` | SHA256 host-key fingerprint |
+| `KOEKJE_KNOWN_HOSTS` | SSH `known_hosts` lines for the server |
 
 Do not commit `.env` or private keys. Production `.env` lives only on the server.
 

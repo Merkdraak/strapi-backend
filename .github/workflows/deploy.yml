@@ -18,11 +18,20 @@ jobs:
     timeout-minutes: 40
     steps:
       - name: Deploy over SSH
-        uses: appleboy/ssh-action@v1.2.5
-        with:
-          host: ${{ secrets.KOEKJE_SSH_HOST }}
-          username: ${{ secrets.KOEKJE_SSH_USER }}
-          key: ${{ secrets.KOEKJE_SSH_KEY }}
-          fingerprint: ${{ secrets.KOEKJE_SSH_FINGERPRINT }}
-          command_timeout: 30m
-          script: /usr/local/bin/merkdraak-strapi-deploy
+        env:
+          KOEKJE_SSH_HOST: ${{ secrets.KOEKJE_SSH_HOST }}
+          KOEKJE_SSH_USER: ${{ secrets.KOEKJE_SSH_USER }}
+          KOEKJE_SSH_KEY: ${{ secrets.KOEKJE_SSH_KEY }}
+          KOEKJE_KNOWN_HOSTS: ${{ secrets.KOEKJE_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$KOEKJE_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          printf '%s\n' "$KOEKJE_SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          ssh -i "$HOME/.ssh/id_ed25519" \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
+            "${KOEKJE_SSH_USER}@${KOEKJE_SSH_HOST}" \
+            /usr/local/bin/merkdraak-strapi-deploy
