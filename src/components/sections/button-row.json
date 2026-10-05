@@ -1,12 +1,43 @@
 {
   "collectionName": "components_sections_button_rows",
-  "info": { "displayName": "Knoppen", "icon": "cursor" },
+  "info": {
+    "displayName": "Knoppen",
+    "icon": "cursor"
+  },
   "options": {},
   "attributes": {
-    "primaryLabel": { "type": "string" },
-    "primaryHref": { "type": "string" },
-    "secondaryLabel": { "type": "string" },
-    "secondaryHref": { "type": "string" },
-    "anchor": { "type": "string" }
+    "primaryLabel": {
+      "type": "string"
+    },
+    "primaryHref": {
+      "type": "string"
+    },
+    "secondaryLabel": {
+      "type": "string"
+    },
+    "secondaryHref": {
+      "type": "string"
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "spaceTop": {
+      "type": "string"
+    },
+    "spaceBottom": {
+      "type": "string"
+    },
+    "spaceTopTablet": {
+      "type": "string"
+    },
+    "spaceBottomTablet": {
+      "type": "string"
+    },
+    "spaceTopMobile": {
+      "type": "string"
+    },
+    "spaceBottomMobile": {
+      "type": "string"
+    }
   }
 }

@@ -1,12 +1,49 @@
 {
   "collectionName": "components_sections_buttons",
-  "info": { "displayName": "Knop", "icon": "cursor" },
+  "info": {
+    "displayName": "Knop",
+    "icon": "cursor"
+  },
   "options": {},
   "attributes": {
-    "label": { "type": "string", "required": true },
-    "href": { "type": "string" },
-    "align": { "type": "enumeration", "enum": ["left", "center"], "default": "left" },
-    "anchor": { "type": "string" },
-    "space": { "type": "string" }
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "href": {
+      "type": "string"
+    },
+    "align": {
+      "type": "enumeration",
+      "enum": [
+        "left",
+        "center"
+      ],
+      "default": "left"
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "space": {
+      "type": "string"
+    },
+    "spaceTop": {
+      "type": "string"
+    },
+    "spaceBottom": {
+      "type": "string"
+    },
+    "spaceTopTablet": {
+      "type": "string"
+    },
+    "spaceBottomTablet": {
+      "type": "string"
+    },
+    "spaceTopMobile": {
+      "type": "string"
+    },
+    "spaceBottomMobile": {
+      "type": "string"
+    }
   }
 }

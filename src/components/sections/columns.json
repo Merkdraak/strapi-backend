@@ -1,13 +1,46 @@
 {
   "collectionName": "components_sections_columns",
-  "info": { "displayName": "Twee kolommen", "icon": "layout" },
+  "info": {
+    "displayName": "Twee kolommen",
+    "icon": "layout"
+  },
   "options": {},
   "attributes": {
-    "heading": { "type": "string" },
-    "leftHeading": { "type": "string" },
-    "leftBody": { "type": "text" },
-    "rightHeading": { "type": "string" },
-    "rightBody": { "type": "text" },
-    "anchor": { "type": "string" }
+    "heading": {
+      "type": "string"
+    },
+    "leftHeading": {
+      "type": "string"
+    },
+    "leftBody": {
+      "type": "text"
+    },
+    "rightHeading": {
+      "type": "string"
+    },
+    "rightBody": {
+      "type": "text"
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "spaceTop": {
+      "type": "string"
+    },
+    "spaceBottom": {
+      "type": "string"
+    },
+    "spaceTopTablet": {
+      "type": "string"
+    },
+    "spaceBottomTablet": {
+      "type": "string"
+    },
+    "spaceTopMobile": {
+      "type": "string"
+    },
+    "spaceBottomMobile": {
+      "type": "string"
+    }
   }
 }

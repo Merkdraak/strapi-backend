@@ -19,6 +19,9 @@
       "allowedTypes": [
         "images"
       ]
+    },
+    "href": {
+      "type": "string"
     }
   }
 }
