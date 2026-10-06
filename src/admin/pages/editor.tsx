@@ -22,7 +22,7 @@ import { ArrowLeft, ArrowRight, ChevronDown, ChevronRight, Cog, Globe, Plus } fr
 import { EmptyDocuments } from "@strapi/icons/symbols";
 
 type SiteRow = { key: string; name: string; domain: string; editorUrl: string };
-type PageRow = { documentId: string; title: string; slug: string; visibility: string; pageType: string };
+type PageRow = { documentId: string; title: string; slug: string; visibility: string; pageType: string; kind?: "page" | "case" };
 type LinkRow = { label?: string; href?: string };
 type SiteEditor = {
   contact: { phoneDisplay: string; email: string; address: string };
@@ -147,8 +147,24 @@ export default function MerkdraakEditor() {
     Websites: true,
     "Merk en creatie": true,
   });
+  const [nameDraft, setNameDraft] = useState("");
+  const [keyDraft, setKeyDraft] = useState("");
+  const [domainDraft, setDomainDraft] = useState("");
+  const [savingSite, setSavingSite] = useState(false);
+  const [keyTouched, setKeyTouched] = useState(false);
   const { get, post } = useFetchClient();
   const { toggleNotification } = useNotification();
+
+  function loadSites() {
+    setLoadingSites(true);
+    return get("/admin/merkdraak-editor/sites")
+      .then((response: { data?: { sites?: SiteRow[] } }) => {
+        setSites(response.data?.sites ?? []);
+        setError("");
+      })
+      .catch(() => setError("Websites konden niet worden geladen."))
+      .finally(() => setLoadingSites(false));
+  }
 
   useEffect(() => {
     function syncFromUrl() {
@@ -158,10 +174,7 @@ export default function MerkdraakEditor() {
     }
     syncFromUrl();
     window.addEventListener("popstate", syncFromUrl);
-    get("/admin/merkdraak-editor/sites")
-      .then((response: { data?: { sites?: SiteRow[] } }) => setSites(response.data?.sites ?? []))
-      .catch(() => setError("Websites konden niet worden geladen."))
-      .finally(() => setLoadingSites(false));
+    loadSites();
     return () => window.removeEventListener("popstate", syncFromUrl);
   }, [get]);
 
@@ -169,8 +182,8 @@ export default function MerkdraakEditor() {
     if (!siteKey) return;
     setLoadingPages(true);
     get(`/admin/merkdraak-editor/pages?siteKey=${encodeURIComponent(siteKey)}`)
-      .then((response: { data?: { pages?: PageRow[] } }) => {
-        setPages(response.data?.pages ?? []);
+      .then((response: { data?: { pages?: PageRow[]; cases?: PageRow[] } }) => {
+        setPages([...(response.data?.pages ?? []), ...(response.data?.cases ?? [])]);
         setError("");
       })
       .catch(() => setError("Pagina's konden niet worden geladen."))
@@ -182,7 +195,15 @@ export default function MerkdraakEditor() {
       setSrc("");
       return;
     }
-    const next = documentId === "nieuw" ? "/editor/nieuw" : `/editor/${documentId}`;
+    if (documentId !== "nieuw" && documentId !== "case-nieuw" && pages.length === 0) return;
+    const next =
+      documentId === "nieuw"
+        ? "/editor/nieuw"
+        : documentId === "case-nieuw"
+          ? "/editor/cases/nieuw"
+          : pages.find((item) => item.documentId === documentId)?.kind === "case" || pages.find((item) => item.documentId === documentId)?.pageType === "case"
+            ? `/editor/cases/${documentId}`
+            : `/editor/${documentId}`;
     get(`/admin/merkdraak-editor/open?siteKey=${encodeURIComponent(siteKey)}&next=${encodeURIComponent(next)}`)
       .then((response: { data?: { url?: string } }) => {
         if (!response.data?.url) {
@@ -194,7 +215,7 @@ export default function MerkdraakEditor() {
         setSrc(response.data.url);
       })
       .catch(() => setError("De editor kon niet worden geopend."));
-  }, [get, siteKey, documentId]);
+  }, [get, siteKey, documentId, pages]);
 
   useEffect(() => {
     if (documentId !== "site" || !siteKey) return;
@@ -230,11 +251,117 @@ export default function MerkdraakEditor() {
 
   const site = sites.find((item) => item.key === siteKey);
 
+  function suggestKey(name: string) {
+    return name
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 80);
+  }
+
+  function createSite() {
+    setSavingSite(true);
+    post("/admin/merkdraak-editor/sites", {
+      name: nameDraft.trim(),
+      key: keyDraft.trim(),
+      domain: domainDraft.trim(),
+    })
+      .then((response: { data?: { site?: SiteRow; error?: string } }) => {
+        const created = response.data?.site;
+        if (!created?.key) {
+          setError(response.data?.error || "De website kon niet worden aangemaakt.");
+          return;
+        }
+        setNameDraft("");
+        setKeyDraft("");
+        setDomainDraft("");
+        setKeyTouched(false);
+        setError("");
+        toggleNotification({ type: "success", message: "Website aangemaakt." });
+        return loadSites().then(() => remember(created.key, ""));
+      })
+      .catch((caught: { response?: { data?: { error?: string } } }) => {
+        setError(caught.response?.data?.error || "De website kon niet worden aangemaakt.");
+      })
+      .finally(() => setSavingSite(false));
+  }
+
+  if (!siteKey && documentId === "nieuwe-website") {
+    return (
+      <Page.Main>
+        <Page.Title>Nieuwe website</Page.Title>
+        <Layouts.Header
+          title="Nieuwe website"
+          subtitle="Naam, key en optioneel het domein. Pagina's voeg je daarna toe."
+          navigationAction={<BackLink href="/admin/merkdraak-editor" label="Alle websites" onBack={() => remember("", "")} />}
+          primaryAction={
+            <Button onClick={createSite} loading={savingSite} disabled={savingSite}>
+              Aanmaken
+            </Button>
+          }
+        />
+        <Layouts.Content>
+          {error ? (
+            <Box paddingBottom={4}>
+              <Alert closeLabel="Sluiten" title="Aanmaken mislukt" variant="danger" onClose={() => setError("")}>
+                {error}
+              </Alert>
+            </Box>
+          ) : null}
+          <Box background="neutral0" hasRadius shadow="filterShadow" padding={6} maxWidth="36rem">
+            <Flex direction="column" alignItems="stretch" gap={4}>
+              <Field.Root name="name" required>
+                <Field.Label>Naam</Field.Label>
+                <TextInput
+                  name="name"
+                  value={nameDraft}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setNameDraft(value);
+                    if (!keyTouched) setKeyDraft(suggestKey(value));
+                  }}
+                />
+              </Field.Root>
+              <Field.Root name="key" required>
+                <Field.Label>Key</Field.Label>
+                <TextInput
+                  name="key"
+                  value={keyDraft}
+                  onChange={(event) => {
+                    setKeyTouched(true);
+                    setKeyDraft(suggestKey(event.target.value));
+                  }}
+                />
+                <Box paddingTop={1}>
+                  <Typography variant="pi" textColor="neutral600">Korte vaste code, bijvoorbeeld isodeco. Later niet meer wijzigen.</Typography>
+                </Box>
+              </Field.Root>
+              <Field.Root name="domain">
+                <Field.Label>Domein</Field.Label>
+                <TextInput name="domain" value={domainDraft} onChange={(event) => setDomainDraft(event.target.value)} placeholder="isodeco.nl" />
+              </Field.Root>
+            </Flex>
+          </Box>
+        </Layouts.Content>
+      </Page.Main>
+    );
+  }
+
   if (!siteKey) {
     return (
       <Page.Main>
         <Page.Title>Websites</Page.Title>
-        <Layouts.Header title="Websites" subtitle={sites.length ? `${sites.length} ${sites.length === 1 ? "website" : "websites"}` : "Kies een website en bewerk de pagina's."} />
+        <Layouts.Header
+          title="Websites"
+          subtitle={sites.length ? `${sites.length} ${sites.length === 1 ? "website" : "websites"}` : "Kies een website en bewerk de pagina's."}
+          primaryAction={
+            <Button startIcon={<Plus />} onClick={() => remember("", "nieuwe-website")}>
+              Nieuwe website
+            </Button>
+          }
+        />
         <Layouts.Content>
           {error ? (
             <Box paddingBottom={4}>
@@ -248,7 +375,15 @@ export default function MerkdraakEditor() {
               <Loader>Websites laden…</Loader>
             </Flex>
           ) : sites.length === 0 ? (
-            <EmptyStateLayout icon={<EmptyDocuments width="10rem" />} content={error || "Nog geen websites."} />
+            <EmptyStateLayout
+              icon={<EmptyDocuments width="10rem" />}
+              content={error || "Nog geen websites."}
+              action={
+                <Button startIcon={<Plus />} onClick={() => remember("", "nieuwe-website")}>
+                  Nieuwe website
+                </Button>
+              }
+            />
           ) : (
             <Flex direction="column" alignItems="stretch" gap={4}>
               {sites.map((item) => (
@@ -280,7 +415,7 @@ export default function MerkdraakEditor() {
                       </Flex>
                       <Flex direction="column" alignItems="flex-start" gap={1}>
                         <Typography variant="delta" fontWeight="bold" textColor="neutral800">{item.name}</Typography>
-                        <Typography variant="pi" textColor="neutral600">{item.domain || item.key}</Typography>
+                        <Typography variant="pi" textColor="neutral600">{item.key}{item.domain ? ` · ${item.domain}` : ""}</Typography>
                       </Flex>
                     </Flex>
                     <Typography textColor="neutral500" data-arrow aria-hidden>
@@ -324,9 +459,14 @@ export default function MerkdraakEditor() {
             </Button>
           }
           primaryAction={
-            <Button startIcon={<Plus />} onClick={() => remember(siteKey, "nieuw")}>
-              Nieuwe pagina
-            </Button>
+            <Flex gap={2}>
+              <Button variant="secondary" startIcon={<Plus />} onClick={() => remember(siteKey, "case-nieuw")}>
+                Nieuwe case
+              </Button>
+              <Button startIcon={<Plus />} onClick={() => remember(siteKey, "nieuw")}>
+                Nieuwe pagina
+              </Button>
+            </Flex>
           }
         />
         <Layouts.Action
@@ -631,7 +771,7 @@ export default function MerkdraakEditor() {
   }
 
   const page = pages.find((item) => item.documentId === documentId);
-  const title = documentId === "nieuw" ? "Nieuwe pagina" : (page?.title ?? "Pagina");
+  const title = documentId === "nieuw" ? "Nieuwe pagina" : documentId === "case-nieuw" ? "Nieuwe case" : (page?.title ?? "Pagina");
 
   return (
     <Flex direction="column" alignItems="stretch" height="100dvh" background="neutral0">
@@ -664,7 +804,7 @@ export default function MerkdraakEditor() {
       ) : null}
       {src ? (
         <Box flex="1" position="relative" minHeight={0}>
-          <iframe title="Bewerk pagina" src={src} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0, background: "#fff" }} />
+          <iframe title="Bewerk in Puck" src={src} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0, background: "#fff" }} />
         </Box>
       ) : (
         <Flex flex="1" justifyContent="center" alignItems="center">

@@ -1,7 +1,7 @@
 {
-  "collectionName": "components_sections_bullet_lists",
+  "collectionName": "components_sections_vacancies",
   "info": {
-    "displayName": "Lijst",
+    "displayName": "Vacatures",
     "icon": "layer"
   },
   "options": {},
@@ -15,52 +15,35 @@
     "fontWeight": {
       "type": "string"
     },
-    "variant": {
-      "type": "enumeration",
-      "enum": [
-        "problems",
-        "deliverables",
-        "plain"
-      ],
-      "default": "plain"
+    "toggleLabel": {
+      "type": "string"
+    },
+    "dropdownSize": {
+      "type": "string"
+    },
+    "dropdownWeight": {
+      "type": "string"
+    },
+    "dropdownHeadingLevel": {
+      "type": "string"
+    },
+    "dropdownHeadingWeight": {
+      "type": "string"
     },
     "items": {
       "type": "component",
       "repeatable": true,
-      "component": "shared.text-item"
+      "component": "shared.vacancy"
     },
     "appearance": {
       "type": "enumeration",
-      "enum": [
-        "dark",
-        "light",
-        "accent"
-      ],
+      "enum": ["dark", "light", "accent"],
       "default": "dark"
     },
     "align": {
       "type": "enumeration",
-      "enum": [
-        "left",
-        "center",
-        "right"
-      ],
+      "enum": ["left", "center", "right"],
       "default": "left"
-    },
-    "backgroundColor": {
-      "type": "string"
-    },
-    "textColor": {
-      "type": "string"
-    },
-    "accentColor": {
-      "type": "string"
-    },
-    "space": {
-      "type": "string"
-    },
-    "fontSize": {
-      "type": "string"
     },
     "anchor": {
       "type": "string"

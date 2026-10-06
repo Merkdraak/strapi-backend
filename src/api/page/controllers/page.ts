@@ -1,5 +1,6 @@
 import { factories } from "@strapi/strapi";
 import { applyKnowledgeSlug, normalizePrefix, rememberRedirect } from "../../../knowledge";
+import { sectionPopulate } from "../../../editor-populate";
 import { EditorSaveError, errorPayload, saveResponse } from "../editor-errors";
 import { saveEditorPage } from "../editor-save";
 
@@ -7,51 +8,6 @@ function authorized(ctx: { request: { header: { authorization?: string } } }) {
   const secret = process.env.EDITOR_SECRET;
   return Boolean(secret) && ctx.request.header.authorization === `Bearer ${secret}`;
 }
-
-const sectionPopulate = {
-  on: {
-    "sections.hero": { populate: ["stats", "image"] },
-    "sections.client-logos": { populate: { clients: { populate: ["image"] } } },
-    "sections.results": { populate: ["stats"] },
-    "sections.process": { populate: ["steps"] },
-    "sections.why-us": { populate: ["pillars"] },
-    "sections.team": { populate: { members: { populate: ["image"] } } },
-    "sections.bullet-list": { populate: ["items"] },
-    "sections.numbered-steps": { populate: ["steps"] },
-    "sections.faq": { populate: ["items"] },
-    "sections.price-factors": { populate: ["items"] },
-    "sections.service-cards": { populate: { cards: { populate: ["items"] } } },
-    "sections.case-story": { populate: ["approach", "metrics", "image"] },
-    "sections.prose": { populate: "*" },
-    "sections.notice": { populate: "*" },
-    "sections.testimonial": { populate: "*" },
-    "sections.contact-cta": { populate: "*" },
-    "sections.case-grid": { populate: "*" },
-    "sections.page-index": { populate: ["articleTypes"] },
-    "sections.link-list": { populate: ["items"] },
-    "sections.image-slider": { populate: { slides: { populate: ["image"] } } },
-    "sections.image": { populate: ["image"] },
-    "sections.video": { populate: "*" },
-    "sections.heading": { populate: "*" },
-    "sections.button": { populate: "*" },
-    "sections.divider": { populate: "*" },
-    "sections.spacer": { populate: "*" },
-    "sections.split": { populate: ["image"] },
-    "sections.takeaways": { populate: ["items"] },
-    "sections.table": { populate: ["rows"] },
-    "sections.columns": { populate: "*" },
-    "sections.cards": { populate: { cards: { populate: ["image"] } } },
-    "sections.accordion": { populate: ["items"] },
-    "sections.expert": { populate: ["image"] },
-    "sections.sources": { populate: ["items"] },
-    "sections.gallery": { populate: { items: { populate: ["image"] } } },
-    "sections.before-after": { populate: ["before", "after"] },
-    "sections.reviews": { populate: ["items"] },
-    "sections.location": { populate: "*" },
-    "sections.document": { populate: ["file"] },
-    "sections.button-row": { populate: "*" },
-  },
-};
 
 async function knownSite(siteKey: string) {
   if (!siteKey) return null;
@@ -68,7 +24,7 @@ export default factories.createCoreController("api::page.page", ({ strapi }) => 
     if (!(await knownSite(siteKey))) return ctx.notFound();
     const pages = await strapi.documents("api::page.page").findMany({
       status: "draft",
-      filters: { siteKey },
+      filters: { siteKey, pageType: { $ne: "case" } },
       fields: ["title", "slug", "visibility", "navLabel", "entryKey", "pageType"],
       sort: ["title:asc"],
       pagination: { pageSize: 200 },
@@ -105,7 +61,7 @@ export default factories.createCoreController("api::page.page", ({ strapi }) => 
       return;
     }
     try {
-      const result = await saveEditorPage(strapi, ctx.request.body as { documentId?: string; siteKey?: string; data?: Record<string, unknown> }, {
+      const result = await saveEditorPage(strapi, ctx.request.body as { documentId?: string; siteKey?: string; kind?: string; data?: Record<string, unknown> }, {
         knownSite,
         applyKnowledgeSlug,
         normalizePrefix,
@@ -140,12 +96,17 @@ export default factories.createCoreController("api::page.page", ({ strapi }) => 
     if (ctx.method === "POST") {
       const uploaded = ctx.request.files?.files ?? ctx.request.files?.file;
       if (!uploaded) return ctx.badRequest("Geen bestand");
-      const created = await strapi.plugin("upload").service("upload").upload({
-        data: {},
-        files: uploaded,
-      });
-      const file = Array.isArray(created) ? created[0] : created;
-      ctx.body = { file: file ? { id: file.id, url: file.url, name: file.name } : null };
+      try {
+        const created = await strapi.plugin("upload").service("upload").upload({
+          data: {},
+          files: uploaded,
+        });
+        const file = Array.isArray(created) ? created[0] : created;
+        ctx.body = { file: file ? { id: file.id, url: file.url, name: file.name } : null };
+      } catch (error) {
+        strapi.log.error(error);
+        return ctx.badRequest("Upload mislukt");
+      }
       return;
     }
     const files = await strapi.db.query("plugin::upload.file").findMany({

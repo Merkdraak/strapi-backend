@@ -1,18 +1,18 @@
 {
   "kind": "collectionType",
-  "collectionName": "pages",
+  "collectionName": "cases",
   "info": {
-    "singularName": "page",
-    "pluralName": "pages",
-    "displayName": "Pagina",
-    "description": "Titel, URL, status en blokken. Technische sleutels vult het systeem zelf."
+    "singularName": "case",
+    "pluralName": "cases",
+    "displayName": "Case",
+    "description": "Cases worden in Puck bewerkt. Sectielijst gelijk houden aan api::page.page."
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {
     "content-manager": {
-      "visible": true
+      "visible": false
     }
   },
   "attributes": {
@@ -45,18 +45,6 @@
     "slug": {
       "type": "string"
     },
-    "pageType": {
-      "type": "enumeration",
-      "enum": [
-        "home",
-        "company",
-        "overview",
-        "service",
-        "case",
-        "knowledge"
-      ],
-      "required": true
-    },
     "cluster": {
       "type": "string"
     },
@@ -66,11 +54,7 @@
     },
     "visibility": {
       "type": "enumeration",
-      "enum": [
-        "planned",
-        "concept",
-        "published"
-      ],
+      "enum": ["planned", "concept", "published"],
       "default": "planned",
       "required": true
     },
@@ -107,25 +91,6 @@
       "type": "boolean",
       "default": false
     },
-    "showInMenu": {
-      "type": "boolean",
-      "default": false
-    },
-    "authorName": {
-      "type": "string"
-    },
-    "publishedOn": {
-      "type": "date"
-    },
-    "formEmail": {
-      "type": "string"
-    },
-    "formThanks": {
-      "type": "text"
-    },
-    "formRedirect": {
-      "type": "string"
-    },
     "intro": {
       "type": "text"
     },
@@ -134,12 +99,7 @@
     },
     "cta": {
       "type": "enumeration",
-      "enum": [
-        "marketingscan",
-        "websitescan",
-        "contact",
-        "cases"
-      ],
+      "enum": ["marketingscan", "websitescan", "contact", "cases"],
       "default": "marketingscan",
       "required": true
     },
@@ -188,7 +148,6 @@
         "sections.table",
         "sections.columns",
         "sections.cards",
-        "sections.vacancies",
         "sections.accordion",
         "sections.expert",
         "sections.sources",

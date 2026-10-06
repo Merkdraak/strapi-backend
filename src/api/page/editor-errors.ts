@@ -64,6 +64,7 @@ const blockLabel: Record<string, string> = {
   "sections.table": "Tabel",
   "sections.columns": "TweeKolommen",
   "sections.cards": "Kaarten",
+  "sections.vacancies": "Vacatures",
   "sections.accordion": "Uitklap",
   "sections.expert": "Expert",
   "sections.sources": "Bronnen",
@@ -140,7 +141,7 @@ export function isUniqueScopeKeyError(error: unknown) {
   const unique = /unique|duplicate|constraint/.test(text);
   if (!unique) return false;
   if (text.includes("scopekey")) return true;
-  return /unique constraint failed/.test(text) && text.includes("pages");
+  return /unique constraint failed/.test(text) && (text.includes("pages") || text.includes("cases"));
 }
 
 export function isValidationError(error: unknown) {
