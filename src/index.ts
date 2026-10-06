@@ -7,6 +7,16 @@ import { publishScheduledPages } from "./publish-scheduled";
 const events = ["entry.create", "entry.update", "entry.delete", "entry.publish", "entry.unpublish"];
 let scheduledTimer: ReturnType<typeof setInterval> | undefined;
 
+function siteKeyFrom(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80);
+}
+
 
 
 export default {
@@ -32,6 +42,55 @@ export default {
               domain: site.domain ?? "",
               editorUrl: site.editorUrl ?? "",
             })),
+        };
+      },
+      config: adminOnly,
+    });
+    routes.push({
+      method: "POST",
+      path: "/merkdraak-editor/sites",
+      handler: async (ctx: { request: { body: Record<string, unknown> }; body: unknown; status: number }) => {
+        const body = ctx.request.body ?? {};
+        const name = String(body.name ?? "").trim();
+        const key = siteKeyFrom(String(body.key ?? "") || name);
+        const domain = String(body.domain ?? "")
+          .trim()
+          .replace(/^https?:\/\//i, "")
+          .replace(/\/$/, "");
+        if (!name || !key) {
+          ctx.status = 400;
+          ctx.body = { error: "Vul een naam en een key in." };
+          return;
+        }
+        const existing = await strapi.documents("api::site.site").findFirst({
+          filters: { key },
+        });
+        if (existing) {
+          ctx.status = 409;
+          ctx.body = { error: "Deze key bestaat al." };
+          return;
+        }
+        const site = await strapi.documents("api::site.site").create({
+          data: { name, key, domain },
+          status: "published",
+        });
+        await strapi.documents("api::navigation.navigation").create({
+          data: {
+            site: site.documentId,
+            siteKey: key,
+            items: [],
+            footerServices: [],
+            footerOrganization: [],
+          },
+          status: "published",
+        });
+        ctx.body = {
+          site: {
+            key,
+            name: site.name ?? name,
+            domain: site.domain ?? domain,
+            editorUrl: site.editorUrl ?? "",
+          },
         };
       },
       config: adminOnly,
