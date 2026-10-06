@@ -1,0 +1,57 @@
+{
+  "collectionName": "components_shared_case_tabs",
+  "info": {
+    "displayName": "Case tab",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "tabLabel": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "sector": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "text"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "imageAlt": {
+      "type": "string"
+    },
+    "approach": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.text-item"
+    },
+    "metrics": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.stat"
+    },
+    "tools": {
+      "type": "string"
+    },
+    "href": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string"
+    },
+    "accent": {
+      "type": "enumeration",
+      "enum": ["orange", "red", "amber", "emerald"],
+      "default": "orange"
+    }
+  }
+}

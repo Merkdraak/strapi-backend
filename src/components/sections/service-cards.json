@@ -11,10 +11,21 @@
       "repeatable": true,
       "component": "shared.service-card"
     },
+    "variant": {
+      "type": "enumeration",
+      "enum": ["default", "large"],
+      "default": "large"
+    },
     "eyebrow": {
       "type": "string"
     },
     "heading": {
+      "type": "string"
+    },
+    "highlight": {
+      "type": "string"
+    },
+    "highlightColor": {
       "type": "string"
     },
     "intro": {

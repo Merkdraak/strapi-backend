@@ -6,8 +6,31 @@
   },
   "options": {},
   "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
     "heading": {
       "type": "string"
+    },
+    "highlight": {
+      "type": "string"
+    },
+    "highlightColor": {
+      "type": "string"
+    },
+    "moreLabel": {
+      "type": "string"
+    },
+    "moreHref": {
+      "type": "string"
+    },
+    "approachHeading": {
+      "type": "string"
+    },
+    "tabs": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.case-tab"
     },
     "caseKeys": {
       "type": "string"

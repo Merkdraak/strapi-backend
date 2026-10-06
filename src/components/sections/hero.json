@@ -16,6 +16,9 @@
     "highlight": {
       "type": "string"
     },
+    "highlightColor": {
+      "type": "string"
+    },
     "body": {
       "type": "text"
     },
