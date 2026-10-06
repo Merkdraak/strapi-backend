@@ -1393,10 +1393,25 @@ export interface SharedVacancy extends Struct.ComponentSchema {
     applyHref: Schema.Attribute.String;
     applyLabel: Schema.Attribute.String;
     body: Schema.Attribute.Text;
+    copy: Schema.Attribute.Component<'shared.vacancy-copy', true>;
     hours: Schema.Attribute.String;
     location: Schema.Attribute.String;
     text: Schema.Attribute.Text;
     title: Schema.Attribute.String;
+  };
+}
+
+export interface SharedVacancyCopy extends Struct.ComponentSchema {
+  collectionName: 'components_shared_vacancy_copies';
+  info: {
+    displayName: 'Vacature-dropdown';
+    icon: 'layer';
+  };
+  attributes: {
+    fontWeight: Schema.Attribute.String;
+    heading: Schema.Attribute.String;
+    headingLevel: Schema.Attribute.String;
+    text: Schema.Attribute.Text;
   };
 }
 
@@ -1469,6 +1484,7 @@ declare module '@strapi/strapi' {
       'shared.team-member': SharedTeamMember;
       'shared.text-item': SharedTextItem;
       'shared.vacancy': SharedVacancy;
+      'shared.vacancy-copy': SharedVacancyCopy;
     }
   }
 }

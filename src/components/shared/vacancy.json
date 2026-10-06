@@ -21,6 +21,11 @@
     "body": {
       "type": "text"
     },
+    "copy": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.vacancy-copy"
+    },
     "applyHref": {
       "type": "string"
     },
