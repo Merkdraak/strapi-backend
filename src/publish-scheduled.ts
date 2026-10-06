@@ -1,4 +1,5 @@
 import type { Core } from "@strapi/strapi";
+import { refreshFrontend } from "./refresh-frontend";
 
 let running = false;
 
@@ -27,14 +28,7 @@ export async function publishScheduledPages(strapi: Core.Strapi) {
       changed = true;
     }
     if (!changed) return;
-    const url = process.env.REVALIDATE_URL;
-    const secret = process.env.REVALIDATE_SECRET;
-    if (!url || !secret) return;
-    await fetch(url, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "page" }),
-    });
+    await refreshFrontend();
   } finally {
     running = false;
   }
