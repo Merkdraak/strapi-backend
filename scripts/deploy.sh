@@ -76,7 +76,7 @@ if ! docker buildx inspect merkdraak >/dev/null 2>&1; then
   docker buildx create --name merkdraak --driver docker-container --bootstrap >/dev/null
 fi
 docker buildx inspect merkdraak --bootstrap >/dev/null
-docker update --cpuset-cpus 0,1 --memory 2g --memory-swap 2g buildx_buildkit_merkdraak0 >/dev/null
+docker update --cpuset-cpus 0,1 --memory 3g --memory-swap 5g buildx_buildkit_merkdraak0 >/dev/null
 
 docker compose --project-directory "$APP_DIR" -f "$APP_DIR/docker-compose.yml" build --builder merkdraak
 built_image="$(docker image inspect -f '{{.Id}}' merkdraak-strapi:local)"
