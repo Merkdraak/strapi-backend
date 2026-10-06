@@ -1,11 +1,47 @@
 {
   "collectionName": "components_sections_reviews",
-  "info": { "displayName": "Reviews", "icon": "quote" },
+  "info": {
+    "displayName": "Reviews",
+    "icon": "quote"
+  },
   "options": {},
   "attributes": {
-    "heading": { "type": "string" },
-    "source": { "type": "enumeration", "enum": ["manual", "google"], "default": "manual" },
-    "items": { "type": "component", "repeatable": true, "component": "shared.review-item" },
-    "anchor": { "type": "string" }
+    "heading": {
+      "type": "string"
+    },
+    "source": {
+      "type": "enumeration",
+      "enum": [
+        "manual",
+        "google"
+      ],
+      "default": "manual"
+    },
+    "items": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.review-item"
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "spaceTop": {
+      "type": "string"
+    },
+    "spaceBottom": {
+      "type": "string"
+    },
+    "spaceTopTablet": {
+      "type": "string"
+    },
+    "spaceBottomTablet": {
+      "type": "string"
+    },
+    "spaceTopMobile": {
+      "type": "string"
+    },
+    "spaceBottomMobile": {
+      "type": "string"
+    }
   }
 }

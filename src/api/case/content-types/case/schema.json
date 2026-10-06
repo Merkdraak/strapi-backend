@@ -1,0 +1,163 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cases",
+  "info": {
+    "singularName": "case",
+    "pluralName": "cases",
+    "displayName": "Case",
+    "description": "Cases worden in Puck bewerkt. Sectielijst gelijk houden aan api::page.page."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": false
+    }
+  },
+  "attributes": {
+    "site": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::site.site"
+    },
+    "siteKey": {
+      "type": "string",
+      "required": true
+    },
+    "entryKey": {
+      "type": "string",
+      "required": true
+    },
+    "scopeKey": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "navLabel": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "string"
+    },
+    "cluster": {
+      "type": "string"
+    },
+    "phase": {
+      "type": "integer",
+      "default": 1
+    },
+    "visibility": {
+      "type": "enumeration",
+      "enum": ["planned", "concept", "published"],
+      "default": "planned",
+      "required": true
+    },
+    "publishAt": {
+      "type": "datetime"
+    },
+    "composed": {
+      "type": "boolean",
+      "default": true
+    },
+    "seoTitle": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "canonicalUrl": {
+      "type": "string"
+    },
+    "ogTitle": {
+      "type": "string"
+    },
+    "ogDescription": {
+      "type": "text"
+    },
+    "ogImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "nofollow": {
+      "type": "boolean",
+      "default": false
+    },
+    "intro": {
+      "type": "text"
+    },
+    "eyebrow": {
+      "type": "string"
+    },
+    "cta": {
+      "type": "enumeration",
+      "enum": ["marketingscan", "websitescan", "contact", "cases"],
+      "default": "marketingscan",
+      "required": true
+    },
+    "parent": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::page.page"
+    },
+    "related": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::page.page"
+    },
+    "sections": {
+      "type": "dynamiczone",
+      "components": [
+        "sections.hero",
+        "sections.client-logos",
+        "sections.service-cards",
+        "sections.results",
+        "sections.case-grid",
+        "sections.testimonial",
+        "sections.process",
+        "sections.why-us",
+        "sections.team",
+        "sections.contact-cta",
+        "sections.notice",
+        "sections.prose",
+        "sections.bullet-list",
+        "sections.numbered-steps",
+        "sections.faq",
+        "sections.price-factors",
+        "sections.case-story",
+        "sections.page-index",
+        "sections.link-list",
+        "sections.image-slider",
+        "sections.image",
+        "sections.video",
+        "sections.row",
+        "sections.heading",
+        "sections.button",
+        "sections.divider",
+        "sections.spacer",
+        "sections.split",
+        "sections.takeaways",
+        "sections.table",
+        "sections.columns",
+        "sections.cards",
+        "sections.accordion",
+        "sections.expert",
+        "sections.sources",
+        "sections.gallery",
+        "sections.before-after",
+        "sections.reviews",
+        "sections.location",
+        "sections.document",
+        "sections.button-row"
+      ]
+    }
+  }
+}

@@ -12,7 +12,7 @@
   },
   "pluginOptions": {
     "content-manager": {
-      "visible": false
+      "visible": true
     }
   },
   "attributes": {
@@ -79,7 +79,7 @@
     },
     "composed": {
       "type": "boolean",
-      "default": false
+      "default": true
     },
     "seoTitle": {
       "type": "string",
@@ -182,11 +182,13 @@
         "sections.heading",
         "sections.button",
         "sections.divider",
+        "sections.spacer",
         "sections.split",
         "sections.takeaways",
         "sections.table",
         "sections.columns",
         "sections.cards",
+        "sections.vacancies",
         "sections.accordion",
         "sections.expert",
         "sections.sources",

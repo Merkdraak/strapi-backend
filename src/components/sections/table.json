@@ -1,10 +1,39 @@
 {
   "collectionName": "components_sections_tables",
-  "info": { "displayName": "Tabel", "icon": "table" },
+  "info": {
+    "displayName": "Tabel",
+    "icon": "table"
+  },
   "options": {},
   "attributes": {
-    "heading": { "type": "string" },
-    "rows": { "type": "component", "repeatable": true, "component": "shared.table-row" },
-    "anchor": { "type": "string" }
+    "heading": {
+      "type": "string"
+    },
+    "rows": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.table-row"
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "spaceTop": {
+      "type": "string"
+    },
+    "spaceBottom": {
+      "type": "string"
+    },
+    "spaceTopTablet": {
+      "type": "string"
+    },
+    "spaceBottomTablet": {
+      "type": "string"
+    },
+    "spaceTopMobile": {
+      "type": "string"
+    },
+    "spaceBottomMobile": {
+      "type": "string"
+    }
   }
 }

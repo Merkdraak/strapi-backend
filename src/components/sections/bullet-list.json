@@ -9,6 +9,12 @@
     "heading": {
       "type": "string"
     },
+    "headingLevel": {
+      "type": "string"
+    },
+    "fontWeight": {
+      "type": "string"
+    },
     "variant": {
       "type": "enumeration",
       "enum": [
@@ -36,7 +42,8 @@
       "type": "enumeration",
       "enum": [
         "left",
-        "center"
+        "center",
+        "right"
       ],
       "default": "left"
     },
@@ -56,6 +63,24 @@
       "type": "string"
     },
     "anchor": {
+      "type": "string"
+    },
+    "spaceTop": {
+      "type": "string"
+    },
+    "spaceBottom": {
+      "type": "string"
+    },
+    "spaceTopTablet": {
+      "type": "string"
+    },
+    "spaceBottomTablet": {
+      "type": "string"
+    },
+    "spaceTopMobile": {
+      "type": "string"
+    },
+    "spaceBottomMobile": {
       "type": "string"
     }
   }

@@ -1,14 +1,27 @@
 import type { Core } from "@strapi/strapi";
 import { backfillMenu, normalizePrefix, syncArticlePrefix } from "./knowledge";
+import { registerPageBlocksTool } from "./page-blocks-mcp";
 import { publishScheduledPages } from "./publish-scheduled";
 
 // Webhook events that refresh the public site when content is saved.
 const events = ["entry.create", "entry.update", "entry.delete", "entry.publish", "entry.unpublish"];
+let scheduledTimer: ReturnType<typeof setInterval> | undefined;
+
+function siteKeyFrom(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80);
+}
 
 
 
 export default {
   register({ strapi }: { strapi: Core.Strapi }) {
+    registerPageBlocksTool(strapi);
     const routes = strapi.admin.routes.admin.routes as unknown[];
     const adminOnly = { policies: ["admin::isAuthenticatedAdmin"] };
     routes.push({
@@ -34,6 +47,55 @@ export default {
       config: adminOnly,
     });
     routes.push({
+      method: "POST",
+      path: "/merkdraak-editor/sites",
+      handler: async (ctx: { request: { body: Record<string, unknown> }; body: unknown; status: number }) => {
+        const body = ctx.request.body ?? {};
+        const name = String(body.name ?? "").trim();
+        const key = siteKeyFrom(String(body.key ?? "") || name);
+        const domain = String(body.domain ?? "")
+          .trim()
+          .replace(/^https?:\/\//i, "")
+          .replace(/\/$/, "");
+        if (!name || !key) {
+          ctx.status = 400;
+          ctx.body = { error: "Vul een naam en een key in." };
+          return;
+        }
+        const existing = await strapi.documents("api::site.site").findFirst({
+          filters: { key },
+        });
+        if (existing) {
+          ctx.status = 409;
+          ctx.body = { error: "Deze key bestaat al." };
+          return;
+        }
+        const site = await strapi.documents("api::site.site").create({
+          data: { name, key, domain },
+          status: "published",
+        });
+        await strapi.documents("api::navigation.navigation").create({
+          data: {
+            site: site.documentId,
+            siteKey: key,
+            items: [],
+            footerServices: [],
+            footerOrganization: [],
+          },
+          status: "published",
+        });
+        ctx.body = {
+          site: {
+            key,
+            name: site.name ?? name,
+            domain: site.domain ?? domain,
+            editorUrl: site.editorUrl ?? "",
+          },
+        };
+      },
+      config: adminOnly,
+    });
+    routes.push({
       method: "GET",
       path: "/merkdraak-editor/pages",
       handler: async (ctx: { query: { siteKey?: string }; body: unknown }) => {
@@ -48,8 +110,15 @@ export default {
         }
         const pages = await strapi.documents("api::page.page").findMany({
           status: "draft",
-          filters: { siteKey },
+          filters: { siteKey, pageType: { $ne: "case" } },
           fields: ["title", "slug", "visibility", "pageType"],
+          sort: ["title:asc"],
+          pagination: { pageSize: 200 },
+        });
+        const cases = await strapi.documents("api::case.case").findMany({
+          status: "draft",
+          filters: { siteKey },
+          fields: ["title", "slug", "visibility"],
           sort: ["title:asc"],
           pagination: { pageSize: 200 },
         });
@@ -60,6 +129,15 @@ export default {
             slug: page.slug ?? "",
             visibility: page.visibility ?? "",
             pageType: page.pageType ?? "",
+            kind: "page",
+          })),
+          cases: cases.map((item) => ({
+            documentId: item.documentId,
+            title: item.title ?? "",
+            slug: item.slug ?? "",
+            visibility: item.visibility ?? "",
+            pageType: "case",
+            kind: "case",
           })),
         };
       },
@@ -215,15 +293,27 @@ export default {
         });
       }
     }
-    setInterval(() => {
+    if (scheduledTimer) clearInterval(scheduledTimer);
+    scheduledTimer = setInterval(() => {
       publishScheduledPages(strapi).catch((error: unknown) => {
+        if (error instanceof ReferenceError || error instanceof TypeError) return;
         strapi.log.error(error);
       });
     }, 60_000);
-    await publishScheduledPages(strapi);
-    await backfillMenu(strapi).catch((error: unknown) => {
+    scheduledTimer.unref();
+    void publishScheduledPages(strapi).catch((error: unknown) => {
+      if (error instanceof ReferenceError || error instanceof TypeError) return;
       strapi.log.error(error);
     });
+    void backfillMenu(strapi).catch((error: unknown) => {
+      strapi.log.error(error);
+    });
+  },
+  destroy() {
+    if (scheduledTimer) {
+      clearInterval(scheduledTimer);
+      scheduledTimer = undefined;
+    }
   },
 };
 

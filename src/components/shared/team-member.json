@@ -38,6 +38,12 @@
     },
     "ring": {
       "type": "string"
+    },
+    "pageId": {
+      "type": "string"
+    },
+    "href": {
+      "type": "string"
     }
   }
 }

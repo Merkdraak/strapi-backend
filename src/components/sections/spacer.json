@@ -1,0 +1,11 @@
+{
+  "collectionName": "components_sections_spacers",
+  "info": { "displayName": "Afstand", "icon": "layer" },
+  "options": {},
+  "attributes": {
+    "height": { "type": "integer", "default": 64 },
+    "heightTablet": { "type": "integer" },
+    "heightMobile": { "type": "integer" },
+    "anchor": { "type": "string" }
+  }
+}

@@ -6,25 +6,70 @@
   },
   "options": {},
   "attributes": {
-    "heading": { "type": "string" },
-    "url": { "type": "string" },
-    "caption": { "type": "string" },
-    "transcript": { "type": "text" },
-    "anchor": { "type": "string" },
+    "heading": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    },
+    "caption": {
+      "type": "string"
+    },
+    "transcript": {
+      "type": "text"
+    },
+    "anchor": {
+      "type": "string"
+    },
     "appearance": {
       "type": "enumeration",
-      "enum": ["dark", "light", "accent"],
+      "enum": [
+        "dark",
+        "light",
+        "accent"
+      ],
       "default": "dark"
     },
     "align": {
       "type": "enumeration",
-      "enum": ["left", "center"],
+      "enum": [
+        "left",
+        "center"
+      ],
       "default": "left"
     },
-    "backgroundColor": { "type": "string" },
-    "textColor": { "type": "string" },
-    "accentColor": { "type": "string" },
-    "space": { "type": "string" },
-    "fontSize": { "type": "string" }
+    "backgroundColor": {
+      "type": "string"
+    },
+    "textColor": {
+      "type": "string"
+    },
+    "accentColor": {
+      "type": "string"
+    },
+    "space": {
+      "type": "string"
+    },
+    "fontSize": {
+      "type": "string"
+    },
+    "spaceTop": {
+      "type": "string"
+    },
+    "spaceBottom": {
+      "type": "string"
+    },
+    "spaceTopTablet": {
+      "type": "string"
+    },
+    "spaceBottomTablet": {
+      "type": "string"
+    },
+    "spaceTopMobile": {
+      "type": "string"
+    },
+    "spaceBottomMobile": {
+      "type": "string"
+    }
   }
 }

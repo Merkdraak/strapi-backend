@@ -1,55 +1,13 @@
 import { factories } from "@strapi/strapi";
 import { applyKnowledgeSlug, normalizePrefix, rememberRedirect } from "../../../knowledge";
+import { sectionPopulate } from "../../../editor-populate";
+import { EditorSaveError, errorPayload, saveResponse } from "../editor-errors";
+import { saveEditorPage } from "../editor-save";
 
 function authorized(ctx: { request: { header: { authorization?: string } } }) {
   const secret = process.env.EDITOR_SECRET;
   return Boolean(secret) && ctx.request.header.authorization === `Bearer ${secret}`;
 }
-
-const sectionPopulate = {
-  on: {
-    "sections.hero": { populate: ["stats", "image"] },
-    "sections.client-logos": { populate: { clients: { populate: ["image"] } } },
-    "sections.results": { populate: ["stats"] },
-    "sections.process": { populate: ["steps"] },
-    "sections.why-us": { populate: ["pillars"] },
-    "sections.team": { populate: { members: { populate: ["image"] } } },
-    "sections.bullet-list": { populate: ["items"] },
-    "sections.numbered-steps": { populate: ["steps"] },
-    "sections.faq": { populate: ["items"] },
-    "sections.price-factors": { populate: ["items"] },
-    "sections.service-cards": { populate: { cards: { populate: ["items"] } } },
-    "sections.case-story": { populate: ["approach", "metrics", "image"] },
-    "sections.prose": { populate: "*" },
-    "sections.notice": { populate: "*" },
-    "sections.testimonial": { populate: "*" },
-    "sections.contact-cta": { populate: "*" },
-    "sections.case-grid": { populate: "*" },
-    "sections.row": { populate: "*" },
-    "sections.page-index": { populate: ["articleTypes"] },
-    "sections.link-list": { populate: ["items"] },
-    "sections.image-slider": { populate: { slides: { populate: ["image"] } } },
-    "sections.image": { populate: ["image"] },
-    "sections.video": { populate: "*" },
-    "sections.heading": { populate: "*" },
-    "sections.button": { populate: "*" },
-    "sections.divider": { populate: "*" },
-    "sections.split": { populate: ["image"] },
-    "sections.takeaways": { populate: ["items"] },
-    "sections.table": { populate: ["rows"] },
-    "sections.columns": { populate: "*" },
-    "sections.cards": { populate: { cards: { populate: ["image"] } } },
-    "sections.accordion": { populate: ["items"] },
-    "sections.expert": { populate: ["image"] },
-    "sections.sources": { populate: ["items"] },
-    "sections.gallery": { populate: { items: { populate: ["image"] } } },
-    "sections.before-after": { populate: ["before", "after"] },
-    "sections.reviews": { populate: ["items"] },
-    "sections.location": { populate: "*" },
-    "sections.document": { populate: ["file"] },
-    "sections.button-row": { populate: "*" },
-  },
-};
 
 async function knownSite(siteKey: string) {
   if (!siteKey) return null;
@@ -66,7 +24,7 @@ export default factories.createCoreController("api::page.page", ({ strapi }) => 
     if (!(await knownSite(siteKey))) return ctx.notFound();
     const pages = await strapi.documents("api::page.page").findMany({
       status: "draft",
-      filters: { siteKey },
+      filters: { siteKey, pageType: { $ne: "case" } },
       fields: ["title", "slug", "visibility", "navLabel", "entryKey", "pageType"],
       sort: ["title:asc"],
       pagination: { pageSize: 200 },
@@ -94,76 +52,43 @@ export default factories.createCoreController("api::page.page", ({ strapi }) => 
   },
 
   async editorSave(ctx) {
-    if (!authorized(ctx)) return ctx.unauthorized();
-    const body = ctx.request.body as {
-      documentId?: string;
-      siteKey?: string;
-      data?: Record<string, unknown>;
-    };
-    const data = body.data;
-    if (!data || typeof data !== "object") return ctx.badRequest("data ontbreekt");
-    const siteKey = String(body.siteKey ?? data.siteKey ?? "");
-    const site = await knownSite(siteKey);
-    if (!site) return ctx.notFound();
-    data.siteKey = siteKey;
-    let previousSlug = "";
-    if (body.documentId) {
-      const current = await strapi.documents("api::page.page").findOne({
-        documentId: body.documentId,
-        status: "draft",
-        fields: ["slug"],
+    if (!authorized(ctx)) {
+      ctx.status = 401;
+      ctx.body = saveResponse({
+        success: false,
+        error: { code: "UNAUTHORIZED", message: "Je hebt geen toestemming om op te slaan." },
       });
-      previousSlug = current?.slug ?? "";
+      return;
     }
-    applyKnowledgeSlug(data, normalizePrefix(site.articlePrefix));
-    if (!data.publishedOn) data.publishedOn = null;
-    data.showInMenu = data.showInMenu === true || data.showInMenu === "true";
-    const nextSlug = typeof data.slug === "string" ? data.slug : "";
-    if (previousSlug && nextSlug && previousSlug !== nextSlug) {
-      await rememberRedirect(strapi, siteKey, `/${previousSlug}`, `/${nextSlug}`);
-    }
-
-    const parentKey = typeof data.parentKey === "string" ? data.parentKey : "";
-    const relatedKeys = Array.isArray(data.relatedKeys) ? data.relatedKeys.filter((item) => typeof item === "string") : [];
-    delete data.parentKey;
-    delete data.relatedKeys;
-    if (parentKey) {
-      const parent = await strapi.documents("api::page.page").findFirst({
-        filters: { entryKey: parentKey, siteKey },
-        status: "draft",
+    try {
+      const result = await saveEditorPage(strapi, ctx.request.body as { documentId?: string; siteKey?: string; kind?: string; data?: Record<string, unknown> }, {
+        knownSite,
+        applyKnowledgeSlug,
+        normalizePrefix,
+        rememberRedirect,
       });
-      if (parent?.documentId) data.parent = parent.documentId;
-    }
-    if (relatedKeys.length) {
-      const related = await strapi.documents("api::page.page").findMany({
-        filters: { entryKey: { $in: relatedKeys }, siteKey },
-        status: "draft",
-        fields: ["entryKey"],
-        pagination: { pageSize: 50 },
+      ctx.status = result.status;
+      ctx.body = result.body;
+    } catch (error) {
+      const mapped =
+        error instanceof EditorSaveError || (error instanceof Error && error.name === "EditorSaveError" && "status" in error)
+          ? (error as EditorSaveError)
+          : null;
+      if (mapped) {
+        ctx.status = mapped.status;
+        ctx.body = saveResponse({
+          success: false,
+          error: errorPayload(mapped),
+        });
+        return;
+      }
+      strapi.log.error("editorSave unexpected error", error);
+      ctx.status = 500;
+      ctx.body = saveResponse({
+        success: false,
+        error: { code: "UNKNOWN_ERROR", message: "Opslaan is mislukt door een onverwachte fout." },
       });
-      data.related = related.map((item) => item.documentId);
     }
-
-    const publishAt = typeof data.publishAt === "string" ? Date.parse(data.publishAt) : Number.NaN;
-    const scheduled = Number.isFinite(publishAt) && publishAt > Date.now();
-    if (!data.publishAt) data.publishAt = null;
-    if (scheduled) data.visibility = "planned";
-    const pageData = data as never;
-    const visibility = String(data.visibility ?? "planned");
-    let documentId = body.documentId;
-    if (documentId) {
-      await strapi.documents("api::page.page").update({ documentId, data: pageData, status: "draft" });
-    } else {
-      const created = await strapi.documents("api::page.page").create({ data: pageData, status: "draft" });
-      documentId = created.documentId;
-    }
-    if (!documentId) return ctx.badRequest("opslaan mislukt");
-    if (visibility === "planned") {
-      await strapi.documents("api::page.page").unpublish({ documentId });
-    } else {
-      await strapi.documents("api::page.page").publish({ documentId });
-    }
-    ctx.body = { ok: true, documentId };
   },
 
   async editorMedia(ctx) {
@@ -171,12 +96,17 @@ export default factories.createCoreController("api::page.page", ({ strapi }) => 
     if (ctx.method === "POST") {
       const uploaded = ctx.request.files?.files ?? ctx.request.files?.file;
       if (!uploaded) return ctx.badRequest("Geen bestand");
-      const created = await strapi.plugin("upload").service("upload").upload({
-        data: {},
-        files: uploaded,
-      });
-      const file = Array.isArray(created) ? created[0] : created;
-      ctx.body = { file: file ? { id: file.id, url: file.url, name: file.name } : null };
+      try {
+        const created = await strapi.plugin("upload").service("upload").upload({
+          data: {},
+          files: uploaded,
+        });
+        const file = Array.isArray(created) ? created[0] : created;
+        ctx.body = { file: file ? { id: file.id, url: file.url, name: file.name } : null };
+      } catch (error) {
+        strapi.log.error(error);
+        return ctx.badRequest("Upload mislukt");
+      }
       return;
     }
     const files = await strapi.db.query("plugin::upload.file").findMany({

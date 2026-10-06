@@ -1,10 +1,39 @@
 {
   "collectionName": "components_sections_cards",
-  "info": { "displayName": "Kaarten", "icon": "grid" },
+  "info": {
+    "displayName": "Kaarten",
+    "icon": "grid"
+  },
   "options": {},
   "attributes": {
-    "heading": { "type": "string" },
-    "cards": { "type": "component", "repeatable": true, "component": "shared.content-card" },
-    "anchor": { "type": "string" }
+    "heading": {
+      "type": "string"
+    },
+    "cards": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.content-card"
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "spaceTop": {
+      "type": "string"
+    },
+    "spaceBottom": {
+      "type": "string"
+    },
+    "spaceTopTablet": {
+      "type": "string"
+    },
+    "spaceBottomTablet": {
+      "type": "string"
+    },
+    "spaceTopMobile": {
+      "type": "string"
+    },
+    "spaceBottomMobile": {
+      "type": "string"
+    }
   }
 }

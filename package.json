@@ -12,6 +12,7 @@
     "start": "strapi start",
     "strapi": "strapi",
     "seed": "node scripts/seed.cjs",
+    "migrate:cases": "node scripts/migrate-cases.cjs",
     "upgrade": "npx @strapi/upgrade latest",
     "upgrade:dry": "npx @strapi/upgrade latest --dry"
   },
@@ -41,9 +42,10 @@
     "installId": "c3a6c2261cd1c307ce61a375d7510ed838c0b17cb63c885ade64f7af3201049d"
   },
   "allowScripts": {
+    "@swc/core@1.16.2": true,
     "better-sqlite3@12.8.0": true,
+    "core-js-pure@3.50.0": true,
     "esbuild@0.28.2": true,
-    "esbuild@0.21.5": true,
-    "@swc/core@1.16.2": true
+    "esbuild@0.21.5": true
   }
 }
