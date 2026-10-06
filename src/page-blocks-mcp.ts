@@ -1,3 +1,4 @@
+import { createRequire } from "module";
 import type { Core } from "@strapi/strapi";
 import { z } from "@strapi/utils";
 
@@ -86,14 +87,62 @@ function componentFields(strapi: Core.Strapi, uid: string): FieldInfo[] {
   return fieldList(component?.attributes, nested);
 }
 
+const wrapped: unique symbol = Symbol.for("merkdraak.page-section-schema");
+
+type DataSchemaModule = {
+  buildDataSchema: (
+    strapi: Core.Strapi,
+    schema: { uid?: string },
+    attributes: Record<string, { components?: string[] }>,
+    permittedFields: Set<string> | null | undefined,
+  ) => z.ZodObject<z.ZodRawShape>;
+  buildComponentInputSchema: (strapi: Core.Strapi, uid: string) => z.ZodObject<z.ZodRawShape>;
+};
+
+function pageSectionsSchema(app: Core.Strapi, components: string[], schemas: DataSchemaModule) {
+  const options = components.map((uid) =>
+    schemas.buildComponentInputSchema(app, uid).extend({
+      __component: z.literal(uid),
+    }),
+  );
+  if (options.length < 2) return undefined;
+  const section = z.discriminatedUnion("__component", options as [(typeof options)[0], ...typeof options]);
+  return z
+    .array(section)
+    .optional()
+    .describe(
+      "Blokken van de pagina. Alleen deze bestaande onderdelen, dezelfde als in de Puck-editor. Mediavelden zijn het numerieke id van een bestaand bestand.",
+    );
+}
+
+function installPageSectionSchema() {
+  const schemas = createRequire(require.resolve("@strapi/content-manager/package.json"))(
+    "./dist/server/mcp/schemas/data-schema.js",
+  ) as DataSchemaModule & {
+    [wrapped]?: true;
+  };
+  if (schemas[wrapped]) return;
+  const original = schemas.buildDataSchema;
+  const buildDataSchema: DataSchemaModule["buildDataSchema"] = (app, schema, attributes, permittedFields) => {
+    const built = original(app, schema, attributes, permittedFields);
+    if (schema.uid !== "api::page.page" || !built.shape.sections) return built;
+    const sections = pageSectionsSchema(app, attributes.sections?.components ?? [], schemas);
+    if (!sections) return built;
+    return z.object({ ...built.shape, sections }).strict();
+  };
+  schemas.buildDataSchema = buildDataSchema;
+  schemas[wrapped] = true;
+}
+
 export function registerPageBlocksTool(strapi: Core.Strapi) {
   if (strapi.ai.mcp.isEnabled() !== true) return;
+  installPageSectionSchema();
 
   strapi.ai.mcp.registerTool({
     name: "describe_page_blocks",
     title: "Pagina-blokken",
     description:
-      "Beschrijft het bestaande content type api::page.page en de sectieblokken die de site en de Puck-editor gebruiken. Maak geen nieuw content type. Schrijf pagina's met de page-create tool. Zet elk blok in sections als { __component, ...velden }. Mediavelden zijn het numerieke id van een bestaand bestand.",
+      "Optioneel overzicht van de paginablokken. create_page en update_page accepteren alleen die bestaande blokken. Geen nieuw content type aanmaken.",
     resolveOutputSchema: () => outputSchema,
     auth: {
       policies: [{ action: "plugin::content-manager.explorer.read", subject: "api::page.page" }],
@@ -118,7 +167,7 @@ export function registerPageBlocksTool(strapi: Core.Strapi) {
       const result = {
         contentType: "api::page.page",
         instructions:
-          "Gebruik de bestaande page-create tool. Verplichte velden: siteKey, title, navLabel, entryKey, scopeKey (siteKey:entryKey), pageType, visibility, seoTitle, description, cta. Blokken horen in sections met __component, bijvoorbeeld sections.hero. Dat zijn dezelfde blokken als in de Puck-editor. Publiceer daarna met de page-publish tool. Maak geen nieuw content type.",
+          "Een verzoek om een pagina te maken gaat via create_page op api::page.page. sections bevat alleen bestaande blokken zoals sections.hero. Verplichte velden: siteKey, title, navLabel, entryKey, scopeKey (siteKey:entryKey), pageType, visibility, seoTitle, description en cta. Dat zijn dezelfde blokken als in de Puck-editor.",
         pageFields,
         blocks,
       };

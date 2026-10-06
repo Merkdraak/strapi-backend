@@ -79,7 +79,7 @@
     },
     "composed": {
       "type": "boolean",
-      "default": false
+      "default": true
     },
     "seoTitle": {
       "type": "string",
