@@ -9,6 +9,9 @@
     "heading": {
       "type": "string"
     },
+    "headingLevel": {
+      "type": "string"
+    },
     "variant": {
       "type": "enumeration",
       "enum": [

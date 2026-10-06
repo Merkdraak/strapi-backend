@@ -160,6 +160,7 @@ export interface SectionsBulletList extends Struct.ComponentSchema {
     backgroundColor: Schema.Attribute.String;
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
+    headingLevel: Schema.Attribute.String;
     items: Schema.Attribute.Component<'shared.text-item', true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
