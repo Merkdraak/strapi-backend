@@ -64,7 +64,6 @@ const blockLabel: Record<string, string> = {
   "sections.table": "Tabel",
   "sections.columns": "TweeKolommen",
   "sections.cards": "Kaarten",
-  "sections.vacancies": "Vacatures",
   "sections.accordion": "Uitklap",
   "sections.expert": "Expert",
   "sections.sources": "Bronnen",

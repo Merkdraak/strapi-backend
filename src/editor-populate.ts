@@ -31,7 +31,6 @@ export const sectionPopulate = {
     "sections.table": { populate: ["rows"] },
     "sections.columns": { populate: "*" },
     "sections.cards": { populate: { cards: { populate: ["image"] } } },
-    "sections.vacancies": { populate: { items: { populate: ["copy"] } } },
     "sections.accordion": { populate: ["items"] },
     "sections.expert": { populate: ["image"] },
     "sections.sources": { populate: ["items"] },

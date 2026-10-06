@@ -720,7 +720,6 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.table',
         'sections.columns',
         'sections.cards',
-        'sections.vacancies',
         'sections.accordion',
         'sections.expert',
         'sections.sources',
