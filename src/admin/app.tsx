@@ -6,8 +6,13 @@ function isContentManagerPath(path: string | undefined) {
 }
 
 function EditorRedirect() {
-  const page = useLocation().pathname.match(/collection-types\/api::page\.page\/([^/]+)/);
-  const documentId = page?.[1];
+  const path = useLocation().pathname;
+  const page = path.match(/collection-types\/api::page\.page\/([^/]+)/);
+  const caseDoc = path.match(/collection-types\/api::case\.case\/([^/]+)/);
+  const documentId = page?.[1] ?? caseDoc?.[1];
+  if (caseDoc && documentId === "create") {
+    return <Navigate to="/merkdraak-editor?siteKey=merkdraak&documentId=case-nieuw" replace />;
+  }
   if (documentId === "create") {
     return <Navigate to="/merkdraak-editor?siteKey=merkdraak&documentId=nieuw" replace />;
   }

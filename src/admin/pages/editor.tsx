@@ -22,7 +22,7 @@ import { ArrowLeft, ArrowRight, ChevronDown, ChevronRight, Cog, Globe, Plus } fr
 import { EmptyDocuments } from "@strapi/icons/symbols";
 
 type SiteRow = { key: string; name: string; domain: string; editorUrl: string };
-type PageRow = { documentId: string; title: string; slug: string; visibility: string; pageType: string };
+type PageRow = { documentId: string; title: string; slug: string; visibility: string; pageType: string; kind?: "page" | "case" };
 type LinkRow = { label?: string; href?: string };
 type SiteEditor = {
   contact: { phoneDisplay: string; email: string; address: string };
@@ -182,8 +182,8 @@ export default function MerkdraakEditor() {
     if (!siteKey) return;
     setLoadingPages(true);
     get(`/admin/merkdraak-editor/pages?siteKey=${encodeURIComponent(siteKey)}`)
-      .then((response: { data?: { pages?: PageRow[] } }) => {
-        setPages(response.data?.pages ?? []);
+      .then((response: { data?: { pages?: PageRow[]; cases?: PageRow[] } }) => {
+        setPages([...(response.data?.pages ?? []), ...(response.data?.cases ?? [])]);
         setError("");
       })
       .catch(() => setError("Pagina's konden niet worden geladen."))
@@ -195,7 +195,15 @@ export default function MerkdraakEditor() {
       setSrc("");
       return;
     }
-    const next = documentId === "nieuw" ? "/editor/nieuw" : `/editor/${documentId}`;
+    if (documentId !== "nieuw" && documentId !== "case-nieuw" && pages.length === 0) return;
+    const next =
+      documentId === "nieuw"
+        ? "/editor/nieuw"
+        : documentId === "case-nieuw"
+          ? "/editor/cases/nieuw"
+          : pages.find((item) => item.documentId === documentId)?.kind === "case" || pages.find((item) => item.documentId === documentId)?.pageType === "case"
+            ? `/editor/cases/${documentId}`
+            : `/editor/${documentId}`;
     get(`/admin/merkdraak-editor/open?siteKey=${encodeURIComponent(siteKey)}&next=${encodeURIComponent(next)}`)
       .then((response: { data?: { url?: string } }) => {
         if (!response.data?.url) {
@@ -207,7 +215,7 @@ export default function MerkdraakEditor() {
         setSrc(response.data.url);
       })
       .catch(() => setError("De editor kon niet worden geopend."));
-  }, [get, siteKey, documentId]);
+  }, [get, siteKey, documentId, pages]);
 
   useEffect(() => {
     if (documentId !== "site" || !siteKey) return;
@@ -451,9 +459,14 @@ export default function MerkdraakEditor() {
             </Button>
           }
           primaryAction={
-            <Button startIcon={<Plus />} onClick={() => remember(siteKey, "nieuw")}>
-              Nieuwe pagina
-            </Button>
+            <Flex gap={2}>
+              <Button variant="secondary" startIcon={<Plus />} onClick={() => remember(siteKey, "case-nieuw")}>
+                Nieuwe case
+              </Button>
+              <Button startIcon={<Plus />} onClick={() => remember(siteKey, "nieuw")}>
+                Nieuwe pagina
+              </Button>
+            </Flex>
           }
         />
         <Layouts.Action
@@ -758,7 +771,7 @@ export default function MerkdraakEditor() {
   }
 
   const page = pages.find((item) => item.documentId === documentId);
-  const title = documentId === "nieuw" ? "Nieuwe pagina" : (page?.title ?? "Pagina");
+  const title = documentId === "nieuw" ? "Nieuwe pagina" : documentId === "case-nieuw" ? "Nieuwe case" : (page?.title ?? "Pagina");
 
   return (
     <Flex direction="column" alignItems="stretch" height="100dvh" background="neutral0">
@@ -791,7 +804,7 @@ export default function MerkdraakEditor() {
       ) : null}
       {src ? (
         <Box flex="1" position="relative" minHeight={0}>
-          <iframe title="Bewerk pagina" src={src} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0, background: "#fff" }} />
+          <iframe title="Bewerk in Puck" src={src} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0, background: "#fff" }} />
         </Box>
       ) : (
         <Flex flex="1" justifyContent="center" alignItems="center">
