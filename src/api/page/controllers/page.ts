@@ -25,6 +25,7 @@ const sectionPopulate = {
     "sections.testimonial": { populate: "*" },
     "sections.contact-cta": { populate: "*" },
     "sections.case-grid": { populate: "*" },
+    "sections.row": { populate: "*" },
     "sections.page-index": { populate: ["articleTypes"] },
     "sections.link-list": { populate: ["items"] },
     "sections.image-slider": { populate: { slides: { populate: ["image"] } } },
