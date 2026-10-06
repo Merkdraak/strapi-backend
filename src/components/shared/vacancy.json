@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_shared_vacancies",
+  "info": {
+    "displayName": "Vacature",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "text": {
+      "type": "text"
+    },
+    "hours": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "body": {
+      "type": "text"
+    },
+    "applyHref": {
+      "type": "string"
+    },
+    "applyLabel": {
+      "type": "string"
+    }
+  }
+}
