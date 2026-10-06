@@ -1,6 +1,12 @@
 import path from 'path';
 import type { Core } from '@strapi/strapi';
-import { isDatabaseClientKind } from '@strapi/database';
+
+const DATABASE_CLIENTS = ['mysql', 'postgres', 'sqlite'] as const;
+
+const isDatabaseClientKind = (
+  client: string
+): client is (typeof DATABASE_CLIENTS)[number] =>
+  (DATABASE_CLIENTS as readonly string[]).includes(client);
 
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Database => {
   const client = env('DATABASE_CLIENT', 'sqlite');

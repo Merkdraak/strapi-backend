@@ -296,12 +296,13 @@ export default {
     if (scheduledTimer) clearInterval(scheduledTimer);
     scheduledTimer = setInterval(() => {
       publishScheduledPages(strapi).catch((error: unknown) => {
-        if (error instanceof ReferenceError) return;
+        if (error instanceof ReferenceError || error instanceof TypeError) return;
         strapi.log.error(error);
       });
     }, 60_000);
     scheduledTimer.unref();
     void publishScheduledPages(strapi).catch((error: unknown) => {
+      if (error instanceof ReferenceError || error instanceof TypeError) return;
       strapi.log.error(error);
     });
     void backfillMenu(strapi).catch((error: unknown) => {

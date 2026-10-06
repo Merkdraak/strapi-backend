@@ -68,7 +68,19 @@ if [[ "$branch" != "main" ]]; then
   exit 1
 fi
 
-docker compose --project-directory "$APP_DIR" -f "$APP_DIR/docker-compose.yml" up -d --build
+BUILD_LOCK=/run/lock/merkdraak-image-build.lock
+exec 8>"$BUILD_LOCK"
+echo "waiting for the image build slot"
+flock 8
+
+if ! docker buildx inspect merkdraak >/dev/null 2>&1; then
+  docker buildx create --name merkdraak --driver docker-container --bootstrap >/dev/null
+fi
+docker buildx inspect merkdraak --bootstrap >/dev/null
+docker update --cpuset-cpus 0 --memory 1600m --memory-swap 1600m buildx_buildkit_merkdraak0 >/dev/null
+
+docker compose --project-directory "$APP_DIR" -f "$APP_DIR/docker-compose.yml" build --builder merkdraak
+docker compose --project-directory "$APP_DIR" -f "$APP_DIR/docker-compose.yml" up -d --no-build
 
 ok=0
 for _ in $(seq 1 30); do
