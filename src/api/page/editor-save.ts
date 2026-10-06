@@ -102,8 +102,10 @@ export async function saveEditorPage(
     helpers.applyKnowledgeSlug(data, helpers.normalizePrefix(site.articlePrefix));
     data.showInMenu = data.showInMenu === true || data.showInMenu === "true";
     if (!data.publishedOn) data.publishedOn = null;
+    if (String(data.pageType) !== "home" && !String(data.slug ?? "").trim()) {
+      data.slug = slugify(String(data.title ?? data.entryKey ?? "pagina"));
+    }
   }
-
   const nextSlug = typeof data.slug === "string" ? data.slug : "";
   if (previousSlug && nextSlug && previousSlug !== nextSlug) {
     await helpers.rememberRedirect(strapi, siteKey, `/${previousSlug}`, `/${nextSlug}`);
