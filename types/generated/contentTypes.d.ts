@@ -533,7 +533,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
   };
   pluginOptions: {
     'content-manager': {
-      visible: false;
+      visible: true;
     };
   };
   attributes: {

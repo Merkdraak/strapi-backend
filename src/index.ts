@@ -1,5 +1,6 @@
 import type { Core } from "@strapi/strapi";
 import { backfillMenu, normalizePrefix, syncArticlePrefix } from "./knowledge";
+import { registerPageBlocksTool } from "./page-blocks-mcp";
 import { publishScheduledPages } from "./publish-scheduled";
 
 // Webhook events that refresh the public site when content is saved.
@@ -9,6 +10,7 @@ const events = ["entry.create", "entry.update", "entry.delete", "entry.publish",
 
 export default {
   register({ strapi }: { strapi: Core.Strapi }) {
+    registerPageBlocksTool(strapi);
     const routes = strapi.admin.routes.admin.routes as unknown[];
     const adminOnly = { policies: ["admin::isAuthenticatedAdmin"] };
     routes.push({
