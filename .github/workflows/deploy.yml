@@ -38,6 +38,8 @@ jobs:
             -o BatchMode=yes \
             -o IdentitiesOnly=yes \
             -o StrictHostKeyChecking=yes \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=20 \
             -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
             "${KOEKJE_SSH_USER}@${KOEKJE_SSH_HOST}" \
             sudo -n /usr/local/bin/merkdraak-strapi-deploy
