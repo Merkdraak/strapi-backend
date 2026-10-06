@@ -8,7 +8,7 @@ Pushes to `main` deploy Strapi on `koekje` via GitHub Actions.
 2. That account has no password, no shell, and is not in the `docker` group.
 3. `sudo` allows only `/usr/local/bin/merkdraak-strapi-deploy`, with no arguments.
 4. The script runs as root, fast-forward pulls `origin/main` in `/opt/merkdraak-strapi`, and ignores git hooks.
-5. `docker compose up -d --build` recreates `merkdraak-strapi` and waits until `/_health` responds.
+5. The image build waits until the frontend build is finished, then runs in a BuildKit container pinned to one CPU and 1600 MB. `docker compose up -d --no-build` recreates `merkdraak-strapi` and waits until `/_health` responds.
 6. Named volumes `strapi_data` and `strapi_uploads` and the server `.env` are not replaced.
 
 The origin URL is pinned to `https://github.com/Merkdraak/strapi-backend.git`. A deploy refuses to run when another deploy still holds the lock.
