@@ -12,6 +12,9 @@
     "headingLevel": {
       "type": "string"
     },
+    "fontWeight": {
+      "type": "string"
+    },
     "variant": {
       "type": "enumeration",
       "enum": [
@@ -39,7 +42,8 @@
       "type": "enumeration",
       "enum": [
         "left",
-        "center"
+        "center",
+        "right"
       ],
       "default": "left"
     },

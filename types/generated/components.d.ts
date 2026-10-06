@@ -152,13 +152,14 @@ export interface SectionsBulletList extends Struct.ComponentSchema {
   };
   attributes: {
     accentColor: Schema.Attribute.String;
-    align: Schema.Attribute.Enumeration<['left', 'center']> &
+    align: Schema.Attribute.Enumeration<['left', 'center', 'right']> &
       Schema.Attribute.DefaultTo<'left'>;
     anchor: Schema.Attribute.String;
     appearance: Schema.Attribute.Enumeration<['dark', 'light', 'accent']> &
       Schema.Attribute.DefaultTo<'dark'>;
     backgroundColor: Schema.Attribute.String;
     fontSize: Schema.Attribute.String;
+    fontWeight: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     headingLevel: Schema.Attribute.String;
     items: Schema.Attribute.Component<'shared.text-item', true>;
