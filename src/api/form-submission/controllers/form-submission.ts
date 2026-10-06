@@ -24,10 +24,10 @@ function tooMany(key: string) {
   return false;
 }
 
-function clientKey(ctx: { request: { ip?: string; header: { "x-forwarded-for"?: string } } }, email: string) {
-  const forwarded = String(ctx.request.header["x-forwarded-for"] ?? "").split(",")[0].trim();
-  const ip = forwarded || String(ctx.request.ip ?? "unknown");
-  return `${ip}:${email.toLowerCase()}`;
+function clientKey(ip: unknown, forwarded: unknown, email: string) {
+  const fromHeader = String(Array.isArray(forwarded) ? forwarded[0] : forwarded ?? "").split(",")[0].trim();
+  const resolved = fromHeader || String(ip ?? "unknown");
+  return `${resolved}:${email.toLowerCase()}`;
 }
 
 function validStarted(value: unknown) {
@@ -100,7 +100,7 @@ export default factories.createCoreController("api::form-submission.form-submiss
     if (!validStarted(body.started)) {
       return ctx.badRequest("Het formulier kon niet worden verzonden. Probeer het opnieuw.");
     }
-    if (tooMany(clientKey(ctx, email))) {
+    if (tooMany(clientKey(ctx.request.ip, ctx.request.header["x-forwarded-for"], email))) {
       ctx.status = 429;
       ctx.body = { error: { message: "Je hebt dit formulier te vaak verzonden. Probeer het later opnieuw." } };
       return;
