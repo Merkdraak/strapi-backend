@@ -140,7 +140,7 @@ export function isUniqueScopeKeyError(error: unknown) {
   const unique = /unique|duplicate|constraint/.test(text);
   if (!unique) return false;
   if (text.includes("scopekey")) return true;
-  return /unique constraint failed/.test(text) && text.includes("pages");
+  return /unique constraint failed/.test(text) && (text.includes("pages") || text.includes("cases"));
 }
 
 export function isValidationError(error: unknown) {

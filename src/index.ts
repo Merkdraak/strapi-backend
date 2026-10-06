@@ -6,6 +6,8 @@ import { publishScheduledPages } from "./publish-scheduled";
 // Webhook events that refresh the public site when content is saved.
 const events = ["entry.create", "entry.update", "entry.delete", "entry.publish", "entry.unpublish"];
 
+let scheduledPublishTimer: ReturnType<typeof setInterval> | undefined;
+
 
 
 export default {
@@ -50,8 +52,15 @@ export default {
         }
         const pages = await strapi.documents("api::page.page").findMany({
           status: "draft",
-          filters: { siteKey },
+          filters: { siteKey, pageType: { $ne: "case" } },
           fields: ["title", "slug", "visibility", "pageType"],
+          sort: ["title:asc"],
+          pagination: { pageSize: 200 },
+        });
+        const cases = await strapi.documents("api::case.case").findMany({
+          status: "draft",
+          filters: { siteKey },
+          fields: ["title", "slug", "visibility"],
           sort: ["title:asc"],
           pagination: { pageSize: 200 },
         });
@@ -62,6 +71,15 @@ export default {
             slug: page.slug ?? "",
             visibility: page.visibility ?? "",
             pageType: page.pageType ?? "",
+            kind: "page",
+          })),
+          cases: cases.map((item) => ({
+            documentId: item.documentId,
+            title: item.title ?? "",
+            slug: item.slug ?? "",
+            visibility: item.visibility ?? "",
+            pageType: "case",
+            kind: "case",
           })),
         };
       },
@@ -217,8 +235,10 @@ export default {
         });
       }
     }
-    setInterval(() => {
+    if (scheduledPublishTimer) clearInterval(scheduledPublishTimer);
+    scheduledPublishTimer = setInterval(() => {
       publishScheduledPages(strapi).catch((error: unknown) => {
+        if (error instanceof ReferenceError) return;
         strapi.log.error(error);
       });
     }, 60_000);
@@ -226,6 +246,12 @@ export default {
     await backfillMenu(strapi).catch((error: unknown) => {
       strapi.log.error(error);
     });
+  },
+  destroy() {
+    if (scheduledPublishTimer) {
+      clearInterval(scheduledPublishTimer);
+      scheduledPublishTimer = undefined;
+    }
   },
 };
 

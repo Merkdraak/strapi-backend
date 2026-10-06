@@ -74,8 +74,11 @@ async function main() {
     status: "published",
   });
 
+  const pages = seed.pages.filter((page) => page.pageType !== "case");
+  const caseEntries = seed.cases ?? seed.pages.filter((page) => page.pageType === "case");
+
   const ids = new Map();
-  for (const page of seed.pages) {
+  for (const page of pages) {
     const created = await app.documents("api::page.page").create({
       data: {
         ...clean(page),
@@ -89,7 +92,28 @@ async function main() {
     ids.set(page.entryKey, created.documentId);
   }
 
-  for (const page of seed.pages) {
+  const caseIds = new Map();
+  for (const item of caseEntries) {
+    const created = await app.documents("api::case.case").create({
+      data: (() => {
+        const data = clean(item);
+        delete data.pageType;
+        return {
+          ...data,
+          site: site.documentId,
+          siteKey,
+          scopeKey: `${siteKey}:${item.entryKey}`,
+          composed: true,
+          sections: clean(item.sections),
+        };
+      })(),
+      status: "draft",
+    });
+    caseIds.set(item.entryKey, created.documentId);
+    ids.set(item.entryKey, created.documentId);
+  }
+
+  for (const page of pages) {
     const data = {};
     if (page.parentKey && ids.has(page.parentKey)) data.parent = ids.get(page.parentKey);
     if (page.relatedKeys?.length) {
@@ -104,6 +128,24 @@ async function main() {
     }
     if (page.visibility !== "planned") {
       await app.documents("api::page.page").publish({ documentId: ids.get(page.entryKey) });
+    }
+  }
+
+  for (const item of caseEntries) {
+    const data = {};
+    if (item.parentKey && ids.has(item.parentKey)) data.parent = ids.get(item.parentKey);
+    if (item.relatedKeys?.length) {
+      data.related = item.relatedKeys.map((key) => ids.get(key)).filter(Boolean);
+    }
+    if (Object.keys(data).length) {
+      await app.documents("api::case.case").update({
+        documentId: caseIds.get(item.entryKey),
+        data,
+        status: "draft",
+      });
+    }
+    if (item.visibility !== "planned") {
+      await app.documents("api::case.case").publish({ documentId: caseIds.get(item.entryKey) });
     }
   }
 
@@ -129,6 +171,8 @@ async function main() {
     permissions: [
       "api::page.page.find",
       "api::page.page.findOne",
+      "api::case.case.find",
+      "api::case.case.findOne",
       "api::site.site.find",
       "api::site.site.findOne",
       "api::navigation.navigation.find",

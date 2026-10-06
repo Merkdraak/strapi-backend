@@ -125,7 +125,8 @@ function installPageSectionSchema() {
   const original = schemas.buildDataSchema;
   const buildDataSchema: DataSchemaModule["buildDataSchema"] = (app, schema, attributes, permittedFields) => {
     const built = original(app, schema, attributes, permittedFields);
-    if (schema.uid !== "api::page.page" || !built.shape.sections) return built;
+    const uid = schema.uid;
+    if ((uid !== "api::page.page" && uid !== "api::case.case") || !built.shape.sections) return built;
     const sections = pageSectionsSchema(app, attributes.sections?.components ?? [], schemas);
     if (!sections) return built;
     return z.object({ ...built.shape, sections }).strict();
@@ -142,7 +143,7 @@ export function registerPageBlocksTool(strapi: Core.Strapi) {
     name: "describe_page_blocks",
     title: "Pagina-blokken",
     description:
-      "Optioneel overzicht van de paginablokken. create_page en update_page accepteren alleen die bestaande blokken. Geen nieuw content type aanmaken.",
+      "Optioneel overzicht van de paginablokken. create_page en update_page op api::page.page, create_case en update_case op api::case.case. Alleen bestaande blokken. Redactie gebeurt in Puck, niet via een nieuw content type.",
     resolveOutputSchema: () => outputSchema,
     auth: {
       policies: [{ action: "plugin::content-manager.explorer.read", subject: "api::page.page" }],
@@ -167,7 +168,47 @@ export function registerPageBlocksTool(strapi: Core.Strapi) {
       const result = {
         contentType: "api::page.page",
         instructions:
-          "Een verzoek om een pagina te maken gaat via create_page op api::page.page. sections bevat alleen bestaande blokken zoals sections.hero. Verplichte velden: siteKey, title, navLabel, entryKey, scopeKey (siteKey:entryKey), pageType, visibility, seoTitle, description en cta. Dat zijn dezelfde blokken als in de Puck-editor.",
+          "Pagina's: create_page op api::page.page. Cases: create_case op api::case.case, zelfde blokken, slug altijd cases/{naam}. Verplichte paginavelden: siteKey, title, navLabel, entryKey, scopeKey (siteKey:entryKey), pageType, visibility, seoTitle, description en cta. Cases hebben geen pageType. Redactie gebeurt in de Puck-editor.",
+        pageFields,
+        blocks,
+      };
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(result) }],
+        structuredContent: result,
+      };
+    },
+  });
+
+  strapi.ai.mcp.registerTool({
+    name: "describe_case_blocks",
+    title: "Case-blokken",
+    description:
+      "Blokken voor api::case.case. create_case en update_case gebruiken dezelfde Puck-blokken als pagina's. Slug is cases/{naam}.",
+    resolveOutputSchema: () => outputSchema,
+    auth: {
+      policies: [{ action: "plugin::content-manager.explorer.read", subject: "api::case.case" }],
+    },
+    createHandler: (app) => async () => {
+      const entry = app.contentTypes["api::case.case"] as {
+        attributes?: Record<string, SchemaAttr & { components?: string[] }>;
+      };
+      const sectionUids = entry.attributes?.sections?.components ?? [];
+      const blocks = sectionUids.flatMap((uid) => {
+        const component = componentByUid(app, uid);
+        if (!component) return [];
+        return [
+          {
+            component: uid,
+            displayName: component.info?.displayName ?? uid,
+            fields: componentFields(app, uid),
+          },
+        ];
+      });
+      const pageFields = fieldList(entry.attributes, new Map()).filter((field) => field.name !== "sections");
+      const result = {
+        contentType: "api::case.case",
+        instructions:
+          "Een case maken gaat via create_case op api::case.case. sections bevat alleen bestaande Puck-blokken. Verplichte velden: siteKey, title, navLabel, entryKey, scopeKey (siteKey:entryKey), visibility, seoTitle, description en cta. slug wordt cases/{naam}. composed is altijd true. Redactie gebeurt in Puck.",
         pageFields,
         blocks,
       };

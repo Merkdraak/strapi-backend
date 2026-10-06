@@ -443,6 +443,115 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiCaseCase extends Struct.CollectionTypeSchema {
+  collectionName: 'cases';
+  info: {
+    description: 'Cases worden in Puck bewerkt. Sectielijst gelijk houden aan api::page.page.';
+    displayName: 'Case';
+    pluralName: 'cases';
+    singularName: 'case';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    'content-manager': {
+      visible: false;
+    };
+  };
+  attributes: {
+    canonicalUrl: Schema.Attribute.String;
+    cluster: Schema.Attribute.String;
+    composed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    cta: Schema.Attribute.Enumeration<
+      ['marketingscan', 'websitescan', 'contact', 'cases']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'marketingscan'>;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
+    entryKey: Schema.Attribute.String & Schema.Attribute.Required;
+    eyebrow: Schema.Attribute.String;
+    intro: Schema.Attribute.Text;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::case.case'> &
+      Schema.Attribute.Private;
+    navLabel: Schema.Attribute.String & Schema.Attribute.Required;
+    nofollow: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    ogDescription: Schema.Attribute.Text;
+    ogImage: Schema.Attribute.Media<'images'>;
+    ogTitle: Schema.Attribute.String;
+    parent: Schema.Attribute.Relation<'manyToOne', 'api::page.page'>;
+    phase: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
+    publishAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    related: Schema.Attribute.Relation<'oneToMany', 'api::page.page'>;
+    scopeKey: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    sections: Schema.Attribute.DynamicZone<
+      [
+        'sections.hero',
+        'sections.client-logos',
+        'sections.service-cards',
+        'sections.results',
+        'sections.case-grid',
+        'sections.testimonial',
+        'sections.process',
+        'sections.why-us',
+        'sections.team',
+        'sections.contact-cta',
+        'sections.notice',
+        'sections.prose',
+        'sections.bullet-list',
+        'sections.numbered-steps',
+        'sections.faq',
+        'sections.price-factors',
+        'sections.case-story',
+        'sections.page-index',
+        'sections.link-list',
+        'sections.image-slider',
+        'sections.image',
+        'sections.video',
+        'sections.row',
+        'sections.heading',
+        'sections.button',
+        'sections.divider',
+        'sections.spacer',
+        'sections.split',
+        'sections.takeaways',
+        'sections.table',
+        'sections.columns',
+        'sections.cards',
+        'sections.accordion',
+        'sections.expert',
+        'sections.sources',
+        'sections.gallery',
+        'sections.before-after',
+        'sections.reviews',
+        'sections.location',
+        'sections.document',
+        'sections.button-row',
+      ]
+    >;
+    seoTitle: Schema.Attribute.String & Schema.Attribute.Required;
+    site: Schema.Attribute.Relation<'manyToOne', 'api::site.site'>;
+    siteKey: Schema.Attribute.String & Schema.Attribute.Required;
+    slug: Schema.Attribute.String;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    visibility: Schema.Attribute.Enumeration<
+      ['planned', 'concept', 'published']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'planned'>;
+  };
+}
+
 export interface ApiFormSubmissionFormSubmission
   extends Struct.CollectionTypeSchema {
   collectionName: 'form_submissions';
@@ -540,7 +649,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     authorName: Schema.Attribute.String;
     canonicalUrl: Schema.Attribute.String;
     cluster: Schema.Attribute.String;
-    composed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    composed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1236,6 +1345,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::case.case': ApiCaseCase;
       'api::form-submission.form-submission': ApiFormSubmissionFormSubmission;
       'api::navigation.navigation': ApiNavigationNavigation;
       'api::page.page': ApiPagePage;
