@@ -1,0 +1,45 @@
+{
+  "collectionName": "components_sections_contact_forms",
+  "info": {
+    "displayName": "Formulier",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string"
+    },
+    "note": {
+      "type": "text"
+    },
+    "submitLabel": {
+      "type": "string"
+    },
+    "appearance": {
+      "type": "enumeration",
+      "enum": ["dark", "light", "accent"],
+      "default": "dark"
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "spaceTop": {
+      "type": "string"
+    },
+    "spaceBottom": {
+      "type": "string"
+    },
+    "spaceTopTablet": {
+      "type": "string"
+    },
+    "spaceBottomTablet": {
+      "type": "string"
+    },
+    "spaceTopMobile": {
+      "type": "string"
+    },
+    "spaceBottomMobile": {
+      "type": "string"
+    }
+  }
+}
