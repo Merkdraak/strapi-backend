@@ -5,6 +5,7 @@ import { publishScheduledPages } from "./publish-scheduled";
 
 // Webhook events that refresh the public site when content is saved.
 const events = ["entry.create", "entry.update", "entry.delete", "entry.publish", "entry.unpublish"];
+let scheduledTimer: ReturnType<typeof setInterval> | undefined;
 
 
 
@@ -217,15 +218,25 @@ export default {
         });
       }
     }
-    setInterval(() => {
+    if (scheduledTimer) clearInterval(scheduledTimer);
+    scheduledTimer = setInterval(() => {
       publishScheduledPages(strapi).catch((error: unknown) => {
         strapi.log.error(error);
       });
     }, 60_000);
-    await publishScheduledPages(strapi);
-    await backfillMenu(strapi).catch((error: unknown) => {
+    scheduledTimer.unref();
+    void publishScheduledPages(strapi).catch((error: unknown) => {
       strapi.log.error(error);
     });
+    void backfillMenu(strapi).catch((error: unknown) => {
+      strapi.log.error(error);
+    });
+  },
+  destroy() {
+    if (scheduledTimer) {
+      clearInterval(scheduledTimer);
+      scheduledTimer = undefined;
+    }
   },
 };
 
