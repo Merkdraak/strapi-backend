@@ -8,6 +8,7 @@ import {
   slugify,
   type EditorSaveBody,
 } from "./editor-errors";
+import { refreshFrontend } from "../../refresh-frontend";
 
 type SaveInput = {
   documentId?: string;
@@ -192,6 +193,9 @@ export async function saveEditorPage(
     const message = wantPublished
       ? "De wijzigingen zijn opgeslagen als concept, maar publiceren is mislukt."
       : "De wijzigingen zijn opgeslagen, maar het offline halen van de pagina is mislukt.";
+    void refreshFrontend({ slug: nextSlug, siteKey }).catch((revalidateError: unknown) => {
+      strapi.log.warn("editorSave frontend revalidate failed", revalidateError);
+    });
     return {
       status: 200,
       body: saveResponse({
@@ -206,6 +210,10 @@ export async function saveEditorPage(
       }),
     };
   }
+
+  void refreshFrontend({ slug: nextSlug, siteKey }).catch((error: unknown) => {
+    strapi.log.warn("editorSave frontend revalidate failed", error);
+  });
 
   return {
     status: 200,
