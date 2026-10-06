@@ -5,25 +5,33 @@ let running = false;
 
 type ScheduledUid = "api::page.page" | "api::case.case";
 
+function modelReady(strapi: Core.Strapi, uid: ScheduledUid) {
+  try {
+    return Boolean(strapi.getModel(uid));
+  } catch {
+    return false;
+  }
+}
+
 async function publishDue(strapi: Core.Strapi, uid: ScheduledUid) {
-  const due = await strapi.documents(uid).findMany({
-    status: "draft",
-    filters: {
+  if (!modelReady(strapi, uid)) return false;
+  const due = await strapi.db.query(uid).findMany({
+    where: {
       visibility: "planned",
-      publishAt: { $notNull: true, $lte: new Date().toISOString() },
+      publishAt: { $notNull: true, $lte: new Date() },
     },
-    fields: ["documentId", "siteKey", "slug"],
-    pagination: { pageSize: 50 },
+    limit: 50,
   });
   let changed = false;
   for (const item of due) {
-    if (!item.documentId) continue;
+    const documentId = (item as { documentId?: string }).documentId;
+    if (!documentId) continue;
     await strapi.documents(uid).update({
-      documentId: item.documentId,
+      documentId,
       data: { visibility: "published" },
       status: "draft",
     });
-    await strapi.documents(uid).publish({ documentId: item.documentId });
+    await strapi.documents(uid).publish({ documentId });
     changed = true;
   }
   return changed;
@@ -38,7 +46,7 @@ export async function publishScheduledPages(strapi: Core.Strapi) {
     if (!pagesChanged && !casesChanged) return;
     await refreshFrontend();
   } catch (error) {
-    if (error instanceof ReferenceError) return;
+    if (error instanceof ReferenceError || error instanceof TypeError) return;
     throw error;
   } finally {
     running = false;
