@@ -41,6 +41,7 @@ export const sectionPopulate = {
     "sections.before-after": { populate: ["before", "after"] },
     "sections.reviews": { populate: ["items"] },
     "sections.location": { populate: "*" },
+    "sections.map-embed": { populate: "*" },
     "sections.document": { populate: ["file"] },
     "sections.button-row": { populate: "*" },
   },

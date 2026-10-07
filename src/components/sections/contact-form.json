@@ -24,8 +24,15 @@
     "websitescanBody": {
       "type": "text"
     },
+    "contactText": {
+      "type": "text"
+    },
     "disclaimer": {
       "type": "text"
+    },
+    "recipientEmail": {
+      "type": "email",
+      "default": "mike@merkdraak.nl"
     },
     "showSiteDetails": {
       "type": "boolean",

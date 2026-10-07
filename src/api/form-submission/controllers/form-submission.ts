@@ -9,6 +9,12 @@ function authorized(ctx: { request: { header: { authorization?: string } } }) {
   return Boolean(secret) && ctx.request.header.authorization === `Bearer ${secret}`;
 }
 
+function notifyAddress(value: unknown) {
+  const email = clip(value, 200);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "";
+  return email;
+}
+
 export default factories.createCoreController("api::form-submission.form-submission", ({ strapi }) => ({
   async submit(ctx) {
     if (!authorized(ctx)) return ctx.unauthorized();
@@ -19,6 +25,7 @@ export default factories.createCoreController("api::form-submission.form-submiss
     const phone = clip(body.phone, 40);
     const message = clip(body.message, 4000);
     const interest = clip(body.interest, 120);
+    const to = notifyAddress(body.to) || "mike@merkdraak.nl";
     if (!siteKey || !name || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return ctx.badRequest("Vul naam, een geldig e-mailadres en een bericht in.");
     }
@@ -30,6 +37,25 @@ export default factories.createCoreController("api::form-submission.form-submiss
     await strapi.documents("api::form-submission.form-submission").create({
       data: { siteKey, name, email, phone, message, interest },
     });
+    try {
+      await strapi.plugin("email").service("email").send({
+        to,
+        subject: interest ? `Contactformulier: ${interest}` : "Nieuw contactformulier",
+        text: [
+          `Naam: ${name}`,
+          `E-mail: ${email}`,
+          phone ? `Telefoon: ${phone}` : "",
+          interest ? `Interesse: ${interest}` : "",
+          "",
+          message,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+        replyTo: email,
+      });
+    } catch (error) {
+      strapi.log.error(error);
+    }
     ctx.body = { ok: true };
   },
 }));
