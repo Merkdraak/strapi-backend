@@ -2,6 +2,16 @@
 
 Pushes to `main` deploy Strapi on `koekje` via GitHub Actions.
 
+## Zelf deployen via pull request
+
+1. Werk op je eigen branch.
+2. Open een **pull request naar `main`**.
+3. Merge de PR.
+4. Actions start automatisch de Strapi-deploy op koekje.
+
+**Merge naar `main` = deploy.** Geen extra handmatige stap nodig.
+Handmatig: Actions → Deploy-workflow → Run workflow.
+
 ## What happens
 
 1. Actions SSHs as user `deploy` with a key that can only start the deploy.
