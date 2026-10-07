@@ -1201,6 +1201,7 @@ export interface SectionsWhyUs extends Struct.ComponentSchema {
     highlight: Schema.Attribute.String;
     highlightColor: Schema.Attribute.String;
     intro: Schema.Attribute.Text;
+    note: Schema.Attribute.Text;
     pillars: Schema.Attribute.Component<'shared.pillar', true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
