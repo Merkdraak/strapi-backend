@@ -2,6 +2,7 @@ import type { Core } from "@strapi/strapi";
 import { backfillMenu, normalizePrefix, syncArticlePrefix } from "./knowledge";
 import { registerPageBlocksTool } from "./page-blocks-mcp";
 import { publishScheduledPages } from "./publish-scheduled";
+import { syncContactPageBuilder } from "./sync-contact-page";
 
 // Webhook events that refresh the public site when content is saved.
 const events = ["entry.create", "entry.update", "entry.delete", "entry.publish", "entry.unpublish"];
@@ -461,6 +462,9 @@ export default {
       strapi.log.error(error);
     });
     void backfillMenu(strapi).catch((error: unknown) => {
+      strapi.log.error(error);
+    });
+    void syncContactPageBuilder(strapi).catch((error: unknown) => {
       strapi.log.error(error);
     });
   },

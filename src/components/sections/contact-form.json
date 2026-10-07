@@ -1,0 +1,56 @@
+{
+  "collectionName": "components_sections_contact_forms",
+  "info": {
+    "displayName": "Contactformulier",
+    "icon": "envelop"
+  },
+  "options": {},
+  "attributes": {
+    "body": {
+      "type": "text"
+    },
+    "asideHeading": {
+      "type": "string"
+    },
+    "marketingscanLabel": {
+      "type": "string"
+    },
+    "marketingscanBody": {
+      "type": "text"
+    },
+    "websitescanLabel": {
+      "type": "string"
+    },
+    "websitescanBody": {
+      "type": "text"
+    },
+    "disclaimer": {
+      "type": "text"
+    },
+    "showSiteDetails": {
+      "type": "boolean",
+      "default": true
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "spaceTop": {
+      "type": "string"
+    },
+    "spaceBottom": {
+      "type": "string"
+    },
+    "spaceTopTablet": {
+      "type": "string"
+    },
+    "spaceBottomTablet": {
+      "type": "string"
+    },
+    "spaceTopMobile": {
+      "type": "string"
+    },
+    "spaceBottomMobile": {
+      "type": "string"
+    }
+  }
+}
