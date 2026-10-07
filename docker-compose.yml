@@ -1,6 +1,9 @@
 services:
   strapi:
-    build: .
+    build:
+      context: .
+      additional_contexts:
+        dockersock: /var/run
     image: merkdraak-strapi:local
     container_name: merkdraak-strapi
     restart: unless-stopped
