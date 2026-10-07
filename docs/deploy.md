@@ -1,6 +1,6 @@
-# Deploy (koekje)
+# Deploy (koekje / cms.merkdraak.nl)
 
-Pushes to `main` deploy Strapi on `koekje` via GitHub Actions.
+Pushes to `main` deploy Strapi on koekje via GitHub Actions → **https://cms.merkdraak.nl**.
 
 ## Zelf deployen via pull request
 
@@ -11,6 +11,15 @@ Pushes to `main` deploy Strapi on `koekje` via GitHub Actions.
 
 **Merge naar `main` = deploy.** Geen extra handmatige stap nodig.
 Handmatig: Actions → Deploy-workflow → Run workflow.
+
+## Wat je waar ziet
+
+| Repo | Push naar `main` | Zichtbaar op |
+| --- | --- | --- |
+| `strapi-backend` | CMS / API / schema | https://cms.merkdraak.nl |
+| `merkdraak-frontend` | Site + pagebuilder UI | https://test.merkdraak.nl |
+
+De pagebuilder in het CMS is een iframe van de frontend. Op de server moet `FRONTEND_URL=https://test.merkdraak.nl` staan (en idealiter `REVALIDATE_URL=https://test.merkdraak.nl/api/revalidate`). Bij start sync’t Strapi `Site.editorUrl` daarmee, zodat editor-wijzigingen na een frontend-deploy in het CMS zichtbaar zijn.
 
 ## What happens
 

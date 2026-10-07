@@ -4,6 +4,7 @@ import { registerPageBlocksTool } from "./page-blocks-mcp";
 import { publishScheduledPages } from "./publish-scheduled";
 import { syncComposedPages } from "./sync-composed-pages";
 import { syncContactPageBuilder } from "./sync-contact-page";
+import { syncEditorUrl } from "./sync-editor-url";
 
 // Webhook events that refresh the public site when content is saved.
 const events = ["entry.create", "entry.update", "entry.delete", "entry.publish", "entry.unpublish"];
@@ -417,6 +418,9 @@ export default {
     });
   },
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    await syncEditorUrl(strapi).catch((error: unknown) => {
+      strapi.log.error(error);
+    });
     const merkdraak = await strapi.documents("api::site.site").findFirst({
       filters: { key: "merkdraak" },
       status: "published",
