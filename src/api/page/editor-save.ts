@@ -151,11 +151,14 @@ export async function saveEditorPage(
   }
   data.scopeKey = `${siteKey}:${String(data.entryKey).trim()}`;
 
-  // Contact (and any page with builder blocks) must stay on the sections renderer.
+  // Contact always uses the pagebuilder. Other pages keep the editor "Opbouw" choice,
+  // but never leave composed unset when blocks are present (defaults to pagebuilder).
   if (String(data.entryKey) === "contact") {
     data.composed = true;
-  } else if (Array.isArray(data.sections) && data.sections.length > 0 && data.composed == null) {
+  } else if (data.composed == null && Array.isArray(data.sections) && data.sections.length > 0) {
     data.composed = true;
+  } else if (typeof data.composed === "string") {
+    data.composed = data.composed === "true";
   }
 
   const existing = await otherWithScopeKey(strapi, String(data.scopeKey), input.documentId);
