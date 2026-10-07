@@ -533,6 +533,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
         'sections.before-after',
         'sections.reviews',
         'sections.location',
+        'sections.map-embed',
         'sections.document',
         'sections.button-row',
       ]
@@ -763,6 +764,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.before-after',
         'sections.reviews',
         'sections.location',
+        'sections.map-embed',
         'sections.document',
         'sections.button-row',
       ]

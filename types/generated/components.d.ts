@@ -393,9 +393,12 @@ export interface SectionsContactForm extends Struct.ComponentSchema {
     anchor: Schema.Attribute.String;
     asideHeading: Schema.Attribute.String;
     body: Schema.Attribute.Text;
+    contactText: Schema.Attribute.Text;
     disclaimer: Schema.Attribute.Text;
     marketingscanBody: Schema.Attribute.Text;
     marketingscanLabel: Schema.Attribute.String;
+    recipientEmail: Schema.Attribute.Email &
+      Schema.Attribute.DefaultTo<'mike@merkdraak.nl'>;
     showSiteDetails: Schema.Attribute.Boolean &
       Schema.Attribute.DefaultTo<true>;
     spaceBottom: Schema.Attribute.String;
@@ -686,6 +689,25 @@ export interface SectionsLocation extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsMapEmbed extends Struct.ComponentSchema {
+  collectionName: 'components_sections_map_embeds';
+  info: {
+    displayName: 'Kaart';
+    icon: 'pinMap';
+  };
+  attributes: {
+    anchor: Schema.Attribute.String;
+    embedUrl: Schema.Attribute.Text & Schema.Attribute.Required;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
+    title: Schema.Attribute.String;
+  };
+}
+
 export interface SectionsNotice extends Struct.ComponentSchema {
   collectionName: 'components_sections_notices';
   info: {
@@ -869,13 +891,20 @@ export interface SectionsResults extends Struct.ComponentSchema {
     accentColor: Schema.Attribute.String;
     anchor: Schema.Attribute.String;
     backgroundColor: Schema.Attribute.String;
+    benchmarkLabel: Schema.Attribute.String;
+    chartCta: Schema.Attribute.String;
+    chartCtaHref: Schema.Attribute.String;
+    chartHeading: Schema.Attribute.String;
+    chartIntro: Schema.Attribute.String;
     chartLabels: Schema.Attribute.JSON;
+    chartNote: Schema.Attribute.Text;
     eyebrow: Schema.Attribute.String;
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     highlight: Schema.Attribute.String;
     highlightColor: Schema.Attribute.String;
     intro: Schema.Attribute.Text;
+    seriesLabel: Schema.Attribute.String;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -1525,6 +1554,7 @@ declare module '@strapi/strapi' {
       'sections.image-slider': SectionsImageSlider;
       'sections.link-list': SectionsLinkList;
       'sections.location': SectionsLocation;
+      'sections.map-embed': SectionsMapEmbed;
       'sections.notice': SectionsNotice;
       'sections.numbered-steps': SectionsNumberedSteps;
       'sections.page-index': SectionsPageIndex;

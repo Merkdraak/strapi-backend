@@ -72,6 +72,7 @@ const blockLabel: Record<string, string> = {
   "sections.before-after": "VoorNa",
   "sections.reviews": "Reviews",
   "sections.location": "Locatie",
+  "sections.map-embed": "Kaart",
   "sections.document": "Document",
   "sections.button-row": "Knoppen",
 };
