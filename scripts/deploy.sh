@@ -72,6 +72,12 @@ exec 8>"$BUILD_LOCK"
 echo "waiting for the image build slot"
 flock 8
 
+# Free disk before build; previous images often fill the koekje host.
+echo "pruning unused docker data"
+docker container prune -f >/dev/null
+docker image prune -af >/dev/null
+docker builder prune -af >/dev/null || true
+
 if ! docker buildx inspect merkdraak >/dev/null 2>&1; then
   docker buildx create --name merkdraak --driver docker-container --bootstrap >/dev/null
 fi

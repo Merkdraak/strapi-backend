@@ -12,6 +12,23 @@ Pushes to `main` deploy Strapi on koekje via GitHub Actions → **https://cms.me
 **Merge naar `main` = deploy.** Geen extra handmatige stap nodig.
 Handmatig: Actions → Deploy-workflow → Run workflow.
 
+Een groene run eindigt met `deploy ok <short-sha>`. Rood = cms.merkdraak.nl draait nog de vorige image.
+
+## Als main wel updated is maar cms.merkdraak.nl niet
+
+1. Open **Actions → Deploy to koekje** voor de commit op `main`.
+2. Bekijk de log. Veelvoorkomende oorzaken:
+   - `no space left on device` tijdens image export → schijf op koekje vol.
+   - Build/admin compile errors → fix in de feature branch, opnieuw mergen.
+3. Disk opruimen op de server (root), daarna Actions opnieuw:
+   ```
+   docker container prune -f
+   docker image prune -af
+   docker builder prune -af
+   df -h /
+   ```
+4. `/usr/local/bin/merkdraak-strapi-deploy` is de live deploy-hook. Wijzigingen in `scripts/deploy.sh` gelden pas nadat die file daarheen is gekopieerd (eenmalig door iemand met root).
+
 ## Wat je waar ziet
 
 | Repo | Push naar `main` | Zichtbaar op |
