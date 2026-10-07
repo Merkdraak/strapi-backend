@@ -553,6 +553,39 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiEditorPresetEditorPreset
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'editor_presets';
+  info: {
+    description: 'Favoriete blokken voor de pagina-editor. Niet openbaar op de site.';
+    displayName: 'Editorpreset';
+    pluralName: 'editor-presets';
+    singularName: 'editor-preset';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::editor-preset.editor-preset'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    payload: Schema.Attribute.JSON & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    puckType: Schema.Attribute.String & Schema.Attribute.Required;
+    siteKey: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiFormSubmissionFormSubmission
   extends Struct.CollectionTypeSchema {
   collectionName: 'form_submissions';
@@ -1349,6 +1382,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::case.case': ApiCaseCase;
+      'api::editor-preset.editor-preset': ApiEditorPresetEditorPreset;
       'api::form-submission.form-submission': ApiFormSubmissionFormSubmission;
       'api::navigation.navigation': ApiNavigationNavigation;
       'api::page.page': ApiPagePage;
