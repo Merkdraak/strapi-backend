@@ -26,6 +26,9 @@
     "intro": {
       "type": "text"
     },
+    "note": {
+      "type": "text"
+    },
     "backgroundColor": {
       "type": "string"
     },
