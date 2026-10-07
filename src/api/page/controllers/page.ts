@@ -117,4 +117,72 @@ export default factories.createCoreController("api::page.page", ({ strapi }) => 
       files: files.map((file) => ({ id: file.id, url: file.url, name: file.name })),
     };
   },
+
+  async editorPresets(ctx) {
+    if (!authorized(ctx)) return ctx.unauthorized();
+    const siteKey = String(ctx.query.siteKey ?? ctx.request.body?.siteKey ?? "").trim();
+    if (!(await knownSite(siteKey))) return ctx.notFound();
+    const uid = "api::editor-preset.editor-preset" as const;
+
+    try {
+      if (ctx.method === "GET") {
+        const rows = await strapi.documents(uid).findMany({
+          filters: { siteKey },
+          fields: ["name", "puckType", "payload"],
+          sort: ["updatedAt:desc"],
+          pagination: { pageSize: 200 },
+        });
+        ctx.body = {
+          presets: rows.map((row) => ({
+            documentId: row.documentId,
+            name: row.name,
+            puckType: row.puckType,
+            payload: row.payload && typeof row.payload === "object" && !Array.isArray(row.payload) ? row.payload : {},
+          })),
+        };
+        return;
+      }
+
+      if (ctx.method === "DELETE") {
+        const documentId = String(ctx.query.documentId ?? ctx.request.body?.documentId ?? "").trim();
+        if (!documentId) return ctx.badRequest("documentId ontbreekt");
+        const existing = await strapi.documents(uid).findOne({ documentId });
+        if (!existing || existing.siteKey !== siteKey) return ctx.notFound();
+        await strapi.documents(uid).delete({ documentId });
+        ctx.body = { ok: true };
+        return;
+      }
+
+      const body = (ctx.request.body ?? {}) as Record<string, unknown>;
+      const name = String(body.name ?? "").trim().slice(0, 120);
+      const puckType = String(body.puckType ?? "").trim();
+      const payload = body.payload;
+      if (!name || !/^[A-Za-z][A-Za-z0-9]{0,79}$/.test(puckType)) {
+        return ctx.badRequest("Naam of bloktype ontbreekt");
+      }
+      if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+        return ctx.badRequest("Inhoud ontbreekt");
+      }
+      if (JSON.stringify(payload).length > 500000) return ctx.badRequest("Blok is te groot om te bewaren");
+      const created = await strapi.documents(uid).create({
+        data: {
+          siteKey,
+          name,
+          puckType,
+          payload: JSON.parse(JSON.stringify(payload)) as never,
+        },
+      });
+      ctx.body = {
+        preset: {
+          documentId: created.documentId,
+          name: created.name,
+          puckType: created.puckType,
+          payload: created.payload,
+        },
+      };
+    } catch (error) {
+      strapi.log.error(error);
+      return ctx.badRequest("Favoriet opslaan of laden is mislukt.");
+    }
+  },
 }));

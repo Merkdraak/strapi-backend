@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "editor_presets",
+  "info": {
+    "singularName": "editor-preset",
+    "pluralName": "editor-presets",
+    "displayName": "Editorpreset",
+    "description": "Favoriete blokken voor de pagina-editor. Niet openbaar op de site."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "siteKey": {
+      "type": "string",
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "puckType": {
+      "type": "string",
+      "required": true
+    },
+    "payload": {
+      "type": "json",
+      "required": true
+    }
+  }
+}

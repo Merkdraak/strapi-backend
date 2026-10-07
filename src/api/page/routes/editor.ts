@@ -30,5 +30,23 @@ export default {
       handler: "page.editorMedia",
       config: { auth: false },
     },
+    {
+      method: "GET",
+      path: "/editor/presets",
+      handler: "page.editorPresets",
+      config: { auth: false },
+    },
+    {
+      method: "POST",
+      path: "/editor/presets",
+      handler: "page.editorPresets",
+      config: { auth: false },
+    },
+    {
+      method: "DELETE",
+      path: "/editor/presets",
+      handler: "page.editorPresets",
+      config: { auth: false },
+    },
   ],
 };
