@@ -105,6 +105,9 @@ export async function saveEditorPage(
     if (String(data.pageType) !== "home" && !String(data.slug ?? "").trim()) {
       data.slug = slugify(String(data.title ?? data.entryKey ?? "pagina"));
     }
+    if (String(data.pageType) !== "home" && !String(data.slug ?? "").trim()) {
+      throw new EditorSaveError(400, "VALIDATION_ERROR", "Vul een geldige URL-slug in voordat je opslaat.", { field: "slug" });
+    }
   }
   const nextSlug = typeof data.slug === "string" ? data.slug : "";
   if (previousSlug && nextSlug && previousSlug !== nextSlug) {
@@ -147,6 +150,13 @@ export async function saveEditorPage(
     data.entryKey = isCase ? slugify(`case-${source}`) || `case-${Date.now()}` : slugify(source) || `pagina-${Date.now()}`;
   }
   data.scopeKey = `${siteKey}:${String(data.entryKey).trim()}`;
+
+  // Contact (and any page with builder blocks) must stay on the sections renderer.
+  if (String(data.entryKey) === "contact") {
+    data.composed = true;
+  } else if (Array.isArray(data.sections) && data.sections.length > 0 && data.composed == null) {
+    data.composed = true;
+  }
 
   const existing = await otherWithScopeKey(strapi, String(data.scopeKey), input.documentId);
   if (existing) {

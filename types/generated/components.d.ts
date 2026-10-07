@@ -383,6 +383,32 @@ export interface SectionsContactCta extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsContactForm extends Struct.ComponentSchema {
+  collectionName: 'components_sections_contact_forms';
+  info: {
+    displayName: 'Contactformulier';
+    icon: 'envelop';
+  };
+  attributes: {
+    anchor: Schema.Attribute.String;
+    asideHeading: Schema.Attribute.String;
+    body: Schema.Attribute.Text;
+    disclaimer: Schema.Attribute.Text;
+    marketingscanBody: Schema.Attribute.Text;
+    marketingscanLabel: Schema.Attribute.String;
+    showSiteDetails: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
+    websitescanBody: Schema.Attribute.Text;
+    websitescanLabel: Schema.Attribute.String;
+  };
+}
+
 export interface SectionsDivider extends Struct.ComponentSchema {
   collectionName: 'components_sections_dividers';
   info: {
@@ -1487,6 +1513,7 @@ declare module '@strapi/strapi' {
       'sections.client-logos': SectionsClientLogos;
       'sections.columns': SectionsColumns;
       'sections.contact-cta': SectionsContactCta;
+      'sections.contact-form': SectionsContactForm;
       'sections.divider': SectionsDivider;
       'sections.document': SectionsDocument;
       'sections.expert': SectionsExpert;

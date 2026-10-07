@@ -503,6 +503,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
         'sections.why-us',
         'sections.team',
         'sections.contact-cta',
+        'sections.contact-form',
         'sections.notice',
         'sections.prose',
         'sections.bullet-list',
@@ -731,6 +732,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.why-us',
         'sections.team',
         'sections.contact-cta',
+        'sections.contact-form',
         'sections.notice',
         'sections.prose',
         'sections.bullet-list',
@@ -846,7 +848,7 @@ export interface ApiSiteSite extends Struct.CollectionTypeSchema {
     editorUrl: Schema.Attribute.String;
     email: Schema.Attribute.String;
     emailHref: Schema.Attribute.String;
-    footerDisclaimer: Schema.Attribute.String;
+    footerDisclaimer: Schema.Attribute.Text;
     footerText: Schema.Attribute.Text;
     formWebhook: Schema.Attribute.String;
     googlePlaceId: Schema.Attribute.String;
