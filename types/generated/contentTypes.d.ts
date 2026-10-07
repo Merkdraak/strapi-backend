@@ -813,7 +813,7 @@ export interface ApiSiteSite extends Struct.CollectionTypeSchema {
     editorUrl: Schema.Attribute.String;
     email: Schema.Attribute.String;
     emailHref: Schema.Attribute.String;
-    footerDisclaimer: Schema.Attribute.String;
+    footerDisclaimer: Schema.Attribute.Text;
     footerText: Schema.Attribute.Text;
     formWebhook: Schema.Attribute.String;
     googlePlaceId: Schema.Attribute.String;
