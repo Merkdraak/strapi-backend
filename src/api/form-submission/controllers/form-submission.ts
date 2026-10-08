@@ -1,9 +1,10 @@
 import { factories } from "@strapi/strapi";
+import { loadEmailSettings, sendFormEmails } from "../../../services/email";
 
 const scanRequests = {
-  seo: { label: "SEO-scan", pageLabel: "SEO", path: "/online-marketing/seo" },
-  sea: { label: "SEA-scan", pageLabel: "SEA", path: "/online-marketing/sea" },
-  cro: { label: "CRO-scan", pageLabel: "CRO", path: "/online-marketing/conversieoptimalisatie" },
+  seo: { label: "SEO-scan", pageLabel: "SEO", path: "/online-marketing/seo", requestType: "seo" as const },
+  sea: { label: "SEA-scan", pageLabel: "SEA", path: "/online-marketing/sea", requestType: "sea" as const },
+  cro: { label: "CRO-scan", pageLabel: "CRO", path: "/online-marketing/conversieoptimalisatie", requestType: "cro" as const },
 } as const;
 
 type ScanType = keyof typeof scanRequests;
@@ -80,25 +81,6 @@ function toE164(value: string) {
   return "";
 }
 
-function plain(value: string) {
-  return value.replace(/[\r\n]+/g, " ").trim();
-}
-
-async function sendMail(
-  strapi: {
-    plugin: (name: string) => { service: (name: string) => { send: (payload: Record<string, string>) => Promise<unknown> } };
-  },
-  payload: { to: string; subject: string; text: string; replyTo?: string },
-) {
-  if (!payload.to) return;
-  await strapi.plugin("email").service("email").send({
-    to: payload.to,
-    subject: payload.subject,
-    text: payload.text,
-    ...(payload.replyTo ? { replyTo: payload.replyTo } : {}),
-  });
-}
-
 async function sendSms(to: string, body: string) {
   const sid = String(process.env.TWILIO_ACCOUNT_SID ?? "").trim();
   const token = String(process.env.TWILIO_AUTH_TOKEN ?? "").trim();
@@ -130,8 +112,9 @@ export default factories.createCoreController("api::form-submission.form-submiss
     const message = clip(body.message, 4000);
     const scanType = normalizeScanType(body.scanType);
     const scan = scanType ? scanRequests[scanType] : null;
-    // Labels/paths come from the server map when scanType is valid — never trust free-form client copy.
     const interest = scan ? scan.label : clip(body.interest, 120);
+    const requestType = scan ? scan.requestType : "contact";
+    const sourcePath = scan ? scan.path : clip(body.sourcePath, 200) || "/contact";
     if (!siteKey || !name || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return ctx.badRequest("Vul naam, een geldig e-mailadres en een bericht in.");
     }
@@ -141,7 +124,6 @@ export default factories.createCoreController("api::form-submission.form-submiss
     if (!validPhone(phone)) {
       return ctx.badRequest("Vul een geldig telefoonnummer in.");
     }
-    // Contact forms always send `started`. Scan forms may omit it until the frontend catches up.
     const hasStarted = body.started != null && String(body.started).trim() !== "";
     if ((!scan && !validStarted(body.started)) || (scan && hasStarted && !validStarted(body.started))) {
       return ctx.badRequest("Even geduld. Wacht een paar seconden en verstuur het formulier opnieuw.");
@@ -156,48 +138,56 @@ export default factories.createCoreController("api::form-submission.form-submiss
       status: "published",
     });
     if (!site) return ctx.notFound();
-    await strapi.documents("api::form-submission.form-submission").create({
-      data: { siteKey, name, email, phone, message, interest },
-    });
 
+    const settings = await loadEmailSettings(strapi);
     const staff =
       notifyAddress(body.notifyEmail) ||
       notifyAddress(body.to) ||
-      notifyAddress(site.email);
-    const topic = interest || "contact";
-    const sourceUrl = scan ? `${publicOrigin()}${scan.path}` : "";
-    try {
-      if (staff) {
-        await sendMail(strapi, {
-          to: staff,
-          subject: scan
-            ? `Nieuwe aanvraag ${scan.label} – ${site.name ?? siteKey}`
-            : `Nieuw bericht via ${site.name ?? siteKey}: ${plain(topic)}`,
-          text: scan
-            ? [
-                `Type aanvraag: ${scan.label}`,
-                `Pagina: ${scan.pageLabel}`,
-                `Bron-URL: ${sourceUrl}`,
-                "",
-                `Naam: ${name}`,
-                `E-mail: ${email}`,
-                `Telefoon: ${phone || "-"}`,
-                "",
-                "Bericht:",
-                message,
-              ].join("\n")
-            : `Naam: ${name}\nE-mail: ${email}\nTelefoon: ${phone || "-"}\nInteresse: ${topic}\n\n${message}`,
-          replyTo: email,
-        });
-      }
-      await sendMail(strapi, {
-        to: email,
-        subject: `We hebben je bericht ontvangen${site.name ? ` — ${site.name}` : ""}`,
-        text: `Hallo ${name},\n\nBedankt voor je bericht${interest ? ` over ${interest}` : ""}. We hebben het ontvangen en nemen contact met je op.\n\nMet vriendelijke groet,\n${site.name ?? "Merkdraak"}`,
+      (scan ? "" : notifyAddress(site.email)) ||
+      notifyAddress(settings.defaultRecipient);
+
+    const created = await strapi.documents("api::form-submission.form-submission").create({
+      data: {
+        siteKey,
+        name,
+        email,
+        phone,
+        message,
+        interest,
+        requestType,
+        sourcePath,
+        status: "nieuw",
+        teamMailStatus: "pending",
+        visitorMailStatus: "pending",
+        mailError: "",
+      },
+    });
+
+    const mail = await sendFormEmails(strapi, {
+      staffTo: staff,
+      visitorTo: email,
+      visitorReplyTo: email,
+      ctx: {
+        type: interest || (scan ? scan.label : "Contact"),
+        name,
+        email,
+        phone,
+        message,
+        site: String(site.name ?? siteKey),
+        sourcePath,
+        sourceUrl: `${publicOrigin()}${sourcePath}`,
+      },
+    });
+
+    if (created?.documentId) {
+      await strapi.documents("api::form-submission.form-submission").update({
+        documentId: created.documentId,
+        data: {
+          teamMailStatus: mail.teamMailStatus,
+          visitorMailStatus: mail.visitorMailStatus,
+          mailError: mail.mailError,
+        },
       });
-    } catch (error) {
-      strapi.log.warn("form confirmation email failed");
-      strapi.log.warn(error);
     }
 
     const mobile = toE164(phone);
