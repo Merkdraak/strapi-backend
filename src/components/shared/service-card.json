@@ -35,6 +35,17 @@
         "emerald"
       ],
       "default": "orange"
+    },
+    "icon": {
+      "type": "string",
+      "default": ""
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
     }
   }
 }

@@ -18,6 +18,10 @@
     "href": {
       "type": "string"
     },
+    "showCta": {
+      "type": "boolean",
+      "default": true
+    },
     "image": {
       "type": "media",
       "multiple": false,
