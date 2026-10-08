@@ -189,7 +189,7 @@ export interface SectionsButton extends Struct.ComponentSchema {
       Schema.Attribute.DefaultTo<'left'>;
     anchor: Schema.Attribute.String;
     href: Schema.Attribute.String;
-    label: Schema.Attribute.String & Schema.Attribute.Required;
+    label: Schema.Attribute.String;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -538,7 +538,7 @@ export interface SectionsHeading extends Struct.ComponentSchema {
       Schema.Attribute.DefaultTo<'dark'>;
     backgroundColor: Schema.Attribute.String;
     fontSize: Schema.Attribute.String;
-    heading: Schema.Attribute.String & Schema.Attribute.Required;
+    heading: Schema.Attribute.String;
     headingLevel: Schema.Attribute.String;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
@@ -580,7 +580,7 @@ export interface SectionsHero extends Struct.ComponentSchema {
     spaceTopTablet: Schema.Attribute.String;
     stats: Schema.Attribute.Component<'shared.stat', true>;
     textColor: Schema.Attribute.String;
-    title: Schema.Attribute.String & Schema.Attribute.Required;
+    title: Schema.Attribute.String;
   };
 }
 
@@ -697,7 +697,7 @@ export interface SectionsMapEmbed extends Struct.ComponentSchema {
   };
   attributes: {
     anchor: Schema.Attribute.String;
-    embedUrl: Schema.Attribute.Text & Schema.Attribute.Required;
+    embedUrl: Schema.Attribute.Text;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
     spaceBottomTablet: Schema.Attribute.String;
@@ -722,7 +722,7 @@ export interface SectionsNotice extends Struct.ComponentSchema {
     appearance: Schema.Attribute.Enumeration<['dark', 'light', 'accent']> &
       Schema.Attribute.DefaultTo<'dark'>;
     backgroundColor: Schema.Attribute.String;
-    body: Schema.Attribute.Text & Schema.Attribute.Required;
+    body: Schema.Attribute.Text;
     fontSize: Schema.Attribute.String;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
@@ -866,7 +866,7 @@ export interface SectionsProse extends Struct.ComponentSchema {
     appearance: Schema.Attribute.Enumeration<['dark', 'light', 'accent']> &
       Schema.Attribute.DefaultTo<'dark'>;
     backgroundColor: Schema.Attribute.String;
-    body: Schema.Attribute.Text & Schema.Attribute.Required;
+    body: Schema.Attribute.Text;
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     headingLevel: Schema.Attribute.String;
@@ -1140,8 +1140,8 @@ export interface SectionsTestimonial extends Struct.ComponentSchema {
     anchor: Schema.Attribute.String;
     backgroundColor: Schema.Attribute.String;
     fontSize: Schema.Attribute.String;
-    name: Schema.Attribute.String & Schema.Attribute.Required;
-    quote: Schema.Attribute.Text & Schema.Attribute.Required;
+    name: Schema.Attribute.String;
+    quote: Schema.Attribute.Text;
     role: Schema.Attribute.String;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
@@ -1262,8 +1262,8 @@ export interface SharedArticleType extends Struct.ComponentSchema {
     icon: 'layer';
   };
   attributes: {
-    example: Schema.Attribute.String & Schema.Attribute.Required;
-    title: Schema.Attribute.String & Schema.Attribute.Required;
+    example: Schema.Attribute.String;
+    title: Schema.Attribute.String;
   };
 }
 
@@ -1316,8 +1316,8 @@ export interface SharedFaqItem extends Struct.ComponentSchema {
     icon: 'layer';
   };
   attributes: {
-    answer: Schema.Attribute.Text & Schema.Attribute.Required;
-    question: Schema.Attribute.String & Schema.Attribute.Required;
+    answer: Schema.Attribute.Text;
+    question: Schema.Attribute.String;
   };
 }
 
@@ -1331,7 +1331,7 @@ export interface SharedNamedItem extends Struct.ComponentSchema {
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
     itemId: Schema.Attribute.String;
-    name: Schema.Attribute.String & Schema.Attribute.Required;
+    name: Schema.Attribute.String;
   };
 }
 
@@ -1346,8 +1346,8 @@ export interface SharedPillar extends Struct.ComponentSchema {
       ['orange', 'red', 'amber', 'emerald']
     > &
       Schema.Attribute.DefaultTo<'orange'>;
-    description: Schema.Attribute.Text & Schema.Attribute.Required;
-    title: Schema.Attribute.String & Schema.Attribute.Required;
+    description: Schema.Attribute.Text;
+    title: Schema.Attribute.String;
   };
 }
 
@@ -1377,11 +1377,11 @@ export interface SharedServiceCard extends Struct.ComponentSchema {
     > &
       Schema.Attribute.DefaultTo<'orange'>;
     cardId: Schema.Attribute.String;
-    description: Schema.Attribute.Text & Schema.Attribute.Required;
+    description: Schema.Attribute.Text;
     href: Schema.Attribute.String;
     items: Schema.Attribute.Component<'shared.text-item', true>;
     pageId: Schema.Attribute.String;
-    title: Schema.Attribute.String & Schema.Attribute.Required;
+    title: Schema.Attribute.String;
   };
 }
 
@@ -1421,10 +1421,10 @@ export interface SharedStat extends Struct.ComponentSchema {
     badge: Schema.Attribute.String;
     detail: Schema.Attribute.String;
     emphasize: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
-    label: Schema.Attribute.String & Schema.Attribute.Required;
+    label: Schema.Attribute.String;
     note: Schema.Attribute.String;
     trend: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
-    value: Schema.Attribute.String & Schema.Attribute.Required;
+    value: Schema.Attribute.String;
   };
 }
 
@@ -1437,7 +1437,7 @@ export interface SharedStep extends Struct.ComponentSchema {
   attributes: {
     number: Schema.Attribute.String;
     text: Schema.Attribute.Text;
-    title: Schema.Attribute.String & Schema.Attribute.Required;
+    title: Schema.Attribute.String;
     tone: Schema.Attribute.String;
   };
 }
@@ -1469,10 +1469,10 @@ export interface SharedTeamMember extends Struct.ComponentSchema {
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
     initials: Schema.Attribute.String;
-    name: Schema.Attribute.String & Schema.Attribute.Required;
+    name: Schema.Attribute.String;
     pageId: Schema.Attribute.String;
     ring: Schema.Attribute.String;
-    role: Schema.Attribute.String & Schema.Attribute.Required;
+    role: Schema.Attribute.String;
   };
 }
 
@@ -1485,7 +1485,7 @@ export interface SharedTextItem extends Struct.ComponentSchema {
   attributes: {
     href: Schema.Attribute.String;
     pageId: Schema.Attribute.String;
-    text: Schema.Attribute.Text & Schema.Attribute.Required;
+    text: Schema.Attribute.Text;
   };
 }
 

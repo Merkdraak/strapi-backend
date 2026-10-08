@@ -7,12 +7,10 @@
   "options": {},
   "attributes": {
     "title": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "example": {
-      "type": "string",
-      "required": true
+      "type": "string"
     }
   }
 }
