@@ -57,7 +57,7 @@ function normalizeSections(sections: unknown) {
         continue;
       }
       const name = typeof person.name === "string" ? person.name : "";
-      person.initials = initialsFromName(name) || "NN";
+      person.initials = initialsFromName(name);
     }
   }
 }
@@ -172,7 +172,20 @@ export async function saveEditorPage(
       fields: ["entryKey"],
       pagination: { pageSize: 50 },
     });
-    data.related = related.map((item) => item.documentId);
+    const relatedRows = related as Array<{ documentId?: string; entryKey?: string }>;
+    const found = new Set(relatedRows.map((item) => String(item.entryKey ?? "")));
+    const missing = relatedKeys.filter((key) => !found.has(key));
+    if (missing.length) {
+      throw new EditorSaveError(
+        400,
+        "VALIDATION_ERROR",
+        missing.length === 1
+          ? `Gerelateerde pagina '${missing[0]}' bestaat niet.`
+          : `Gerelateerde pagina's bestaan niet: ${missing.join(", ")}.`,
+        { field: "relatedKeys", details: { missing } },
+      );
+    }
+    data.related = relatedRows.map((item) => item.documentId);
   } else {
     data.related = [];
   }

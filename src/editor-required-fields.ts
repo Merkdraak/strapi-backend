@@ -1,8 +1,14 @@
 import type { Core } from "@strapi/strapi";
 
+export type EditorArrayRequired = {
+  component: string;
+  fields: string[];
+  arrays?: Record<string, EditorArrayRequired>;
+};
+
 export type EditorBlockRequired = {
   fields: string[];
-  arrays?: Record<string, { component: string; fields: string[] }>;
+  arrays?: Record<string, EditorArrayRequired>;
 };
 
 export type EditorRequiredFields = {
@@ -32,6 +38,8 @@ const SKIP_ROOT = new Set([
   "localizations",
 ]);
 
+// Media/json/relation are intentionally skipped (R2/R3): soft arrays stay unvalidated
+// when they have no scalar required leaves; row JSON slots are out of required-sync scope.
 const SKIP_ATTR_TYPES = new Set(["relation", "media", "dynamiczone", "json", "password", "uid"]);
 
 type Attr = {
@@ -68,18 +76,40 @@ function requiredLeaves(strapi: Core.Strapi, uid: string): string[] {
   return fields.sort();
 }
 
+function nestedArrays(strapi: Core.Strapi, uid: string, depth: number): Record<string, EditorArrayRequired> {
+  if (depth <= 0) return {};
+  const model = modelOf(strapi, uid);
+  if (!model?.attributes) return {};
+  const arrays: Record<string, EditorArrayRequired> = {};
+  for (const [name, attr] of Object.entries(model.attributes)) {
+    if (!attr || typeof attr !== "object") continue;
+    if (attr.type !== "component" || !attr.component || !attr.repeatable) continue;
+    const fields = requiredLeaves(strapi, attr.component);
+    const childArrays = nestedArrays(strapi, attr.component, depth - 1);
+    if (!fields.length && !Object.keys(childArrays).length) continue;
+    const entry: EditorArrayRequired = { component: attr.component, fields };
+    if (Object.keys(childArrays).length) entry.arrays = childArrays;
+    arrays[name] = entry;
+  }
+  return arrays;
+}
+
 function blockRequired(strapi: Core.Strapi, uid: string): EditorBlockRequired | null {
   const model = modelOf(strapi, uid);
   if (!model?.attributes) return null;
   const fields: string[] = [];
-  const arrays: Record<string, { component: string; fields: string[] }> = {};
+  const arrays: Record<string, EditorArrayRequired> = {};
   for (const [name, attr] of Object.entries(model.attributes)) {
     if (!attr || typeof attr !== "object") continue;
     if (attr.type === "component" && attr.component) {
       if (!attr.repeatable) continue;
       const nested = requiredLeaves(strapi, attr.component);
-      if (!nested.length) continue;
-      arrays[name] = { component: attr.component, fields: nested };
+      // Depth 2: service-card.items, case-tab.approach/metrics, etc.
+      const childArrays = nestedArrays(strapi, attr.component, 1);
+      if (!nested.length && !Object.keys(childArrays).length) continue;
+      const entry: EditorArrayRequired = { component: attr.component, fields: nested };
+      if (Object.keys(childArrays).length) entry.arrays = childArrays;
+      arrays[name] = entry;
       continue;
     }
     if (SKIP_ATTR_TYPES.has(String(attr.type ?? ""))) continue;
