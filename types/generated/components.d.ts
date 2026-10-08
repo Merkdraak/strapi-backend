@@ -1468,7 +1468,7 @@ export interface SharedTeamMember extends Struct.ComponentSchema {
     bio: Schema.Attribute.Text;
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
-    initials: Schema.Attribute.String & Schema.Attribute.Required;
+    initials: Schema.Attribute.String;
     name: Schema.Attribute.String & Schema.Attribute.Required;
     pageId: Schema.Attribute.String;
     ring: Schema.Attribute.String;
