@@ -31,6 +31,37 @@ function docs(strapi: Core.Strapi, uid: "api::page.page" | "api::case.case") {
   return strapi.documents(uid) as unknown as Documents;
 }
 
+function initialsFromName(name: string) {
+  const parts = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!parts.length) return "";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0] ?? ""}${parts[parts.length - 1][0] ?? ""}`.toUpperCase();
+}
+
+/** Fill required-looking nested fields so draft→publish does not fail on incomplete CMS data. */
+function normalizeSections(sections: unknown) {
+  if (!Array.isArray(sections)) return;
+  for (const section of sections) {
+    if (!section || typeof section !== "object") continue;
+    const record = section as Record<string, unknown>;
+    if (record.__component !== "sections.team" || !Array.isArray(record.members)) continue;
+    for (const member of record.members) {
+      if (!member || typeof member !== "object") continue;
+      const person = member as Record<string, unknown>;
+      const initials = typeof person.initials === "string" ? person.initials.trim() : "";
+      if (initials) {
+        person.initials = initials;
+        continue;
+      }
+      const name = typeof person.name === "string" ? person.name : "";
+      person.initials = initialsFromName(name) || "NN";
+    }
+  }
+}
+
 async function otherWithScopeKey(strapi: Core.Strapi, scopeKey: string, documentId?: string) {
   const uids = ["api::page.page", "api::case.case"] as const;
   const statuses = ["draft", "published"] as const;
@@ -179,6 +210,8 @@ export async function saveEditorPage(
     });
   }
 
+  normalizeSections(data.sections);
+
   const visibility = String(data.visibility ?? "planned");
   let documentId = input.documentId;
   try {
@@ -223,9 +256,10 @@ export async function saveEditorPage(
     );
     const mapped = fromStrapiError(error, data.sections);
     const code = wantPublished ? "PUBLISH_FAILED" : "UNPUBLISH_FAILED";
+    const reason = mapped.message && mapped.code !== "UNKNOWN_ERROR" ? ` ${mapped.message}` : "";
     const message = wantPublished
-      ? "De wijzigingen zijn opgeslagen als concept, maar publiceren is mislukt."
-      : "De wijzigingen zijn opgeslagen, maar het offline halen van de pagina is mislukt.";
+      ? `De wijzigingen zijn opgeslagen als concept, maar publiceren is mislukt.${reason}`
+      : `De wijzigingen zijn opgeslagen, maar het offline halen van de pagina is mislukt.${reason}`;
     void refreshFrontend({ slug: nextSlug, siteKey }).catch((revalidateError: unknown) => {
       strapi.log.warn("editorSave frontend revalidate failed", revalidateError);
     });
@@ -238,7 +272,12 @@ export async function saveEditorPage(
         published: false,
         unpublished: false,
         documentId,
-        warning: { code, message, details: mapped.details },
+        warning: {
+          code,
+          message,
+          field: mapped.field,
+          details: { ...(mapped.details ?? {}), cause: mapped.code },
+        },
       }),
     };
   }

@@ -201,7 +201,13 @@ export function fromStrapiError(error: unknown, sections: unknown): EditorSaveEr
     const component = String(section?.__component ?? "");
     const label = blockLabel[component] || component || "onbekend blok";
     const field = path.replace(/^sections(?:\.|\[)\d+\]?\.?/, "") || undefined;
-    return new EditorSaveError(400, "INVALID_BLOCK", `Het blok '${label}' bevat ongeldige gegevens.`, {
+    const fieldHint =
+      field && /initials/i.test(field)
+        ? " Vul initialen in voor elk teamlid (of laat de naam staan zodat die automatisch worden afgeleid)."
+        : field
+          ? ` Controleer het veld '${field}'.`
+          : "";
+    return new EditorSaveError(400, "INVALID_BLOCK", `Het blok '${label}' bevat ongeldige gegevens.${fieldHint}`, {
       field,
       details: {
         blockType: component,
