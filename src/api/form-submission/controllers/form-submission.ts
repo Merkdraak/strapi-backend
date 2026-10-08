@@ -43,6 +43,17 @@ function notifyAddress(value: string) {
   return email;
 }
 
+function validPhone(value: string) {
+  const phone = value.trim();
+  if (!phone) return true;
+  if (!/^[+\d(][\d\s()./-]*$/.test(phone)) return false;
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 8 || digits.length > 15) return false;
+  if (digits.startsWith("06") && digits.length !== 10) return false;
+  if (digits.startsWith("316") && digits.length !== 11) return false;
+  return true;
+}
+
 function toE164(value: string) {
   const raw = value.replace(/[^\d+]/g, "");
   if (raw.startsWith("+") && raw.length >= 11 && raw.length <= 16) return raw;
@@ -97,8 +108,11 @@ export default factories.createCoreController("api::form-submission.form-submiss
     if (!siteKey || !name || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return ctx.badRequest("Vul naam, een geldig e-mailadres en een bericht in.");
     }
+    if (!validPhone(phone)) {
+      return ctx.badRequest("Vul een geldig telefoonnummer in.");
+    }
     if (!validStarted(body.started)) {
-      return ctx.badRequest("Het formulier kon niet worden verzonden. Probeer het opnieuw.");
+      return ctx.badRequest("Even geduld. Wacht een paar seconden en verstuur het formulier opnieuw.");
     }
     if (tooMany(clientKey(ctx.request.ip, ctx.request.header["x-forwarded-for"], email))) {
       ctx.status = 429;
