@@ -72,7 +72,7 @@ export async function saveEditorPage(
   const site = await helpers.knownSite(siteKey);
   if (!site) throw new EditorSaveError(404, "NOT_FOUND", "Deze website is niet gevonden.");
   data.siteKey = siteKey;
-  data.site = site.id ?? site.documentId;
+  data.site = site.documentId ?? site.id;
 
   let previousSlug = "";
   if (input.documentId) {
@@ -110,9 +110,6 @@ export async function saveEditorPage(
     }
   }
   const nextSlug = typeof data.slug === "string" ? data.slug : "";
-  if (previousSlug && nextSlug && previousSlug !== nextSlug) {
-    await helpers.rememberRedirect(strapi, siteKey, `/${previousSlug}`, `/${nextSlug}`);
-  }
 
   const parentKey = typeof data.parentKey === "string" ? data.parentKey : "";
   const relatedKeys = Array.isArray(data.relatedKeys) ? data.relatedKeys.filter((item) => typeof item === "string") : [];
@@ -124,7 +121,18 @@ export async function saveEditorPage(
       filters: { entryKey: parentKey, siteKey },
       status: "draft",
     });
-    if (parent?.documentId) data.parent = parent.documentId;
+    if (parent?.documentId) {
+      data.parent = parent.documentId;
+    } else if (isCase && parentKey === "cases") {
+      data.parent = null;
+    } else {
+      throw new EditorSaveError(400, "VALIDATION_ERROR", "De gekozen bovenliggende pagina bestaat niet.", {
+        field: "parentKey",
+        details: { parentKey },
+      });
+    }
+  } else {
+    data.parent = null;
   }
   if (relatedKeys.length) {
     const related = await pages.findMany({
@@ -134,6 +142,8 @@ export async function saveEditorPage(
       pagination: { pageSize: 50 },
     });
     data.related = related.map((item) => item.documentId);
+  } else {
+    data.related = [];
   }
 
   const publishAt = typeof data.publishAt === "string" ? Date.parse(data.publishAt) : Number.NaN;
@@ -187,6 +197,14 @@ export async function saveEditorPage(
     throw new EditorSaveError(500, "DRAFT_SAVE_FAILED", "Opslaan is mislukt door een onverwachte fout.");
   }
 
+  if (previousSlug && nextSlug && previousSlug !== nextSlug) {
+    try {
+      await helpers.rememberRedirect(strapi, siteKey, `/${previousSlug}`, `/${nextSlug}`);
+    } catch (error) {
+      strapi.log.warn(`editorSave redirect failed documentId=${documentId} from=/${previousSlug} to=/${nextSlug}`, error);
+    }
+  }
+
   const wantPublished = visibility !== "planned";
   try {
     if (wantPublished) {
@@ -221,7 +239,6 @@ export async function saveEditorPage(
         unpublished: false,
         documentId,
         warning: { code, message, details: mapped.details },
-        error: { code, message, details: mapped.details },
       }),
     };
   }
