@@ -1,5 +1,13 @@
 import { factories } from "@strapi/strapi";
 
+const scanRequests = {
+  seo: { label: "SEO-scan", pageLabel: "SEO", path: "/online-marketing/seo" },
+  sea: { label: "SEA-scan", pageLabel: "SEA", path: "/online-marketing/sea" },
+  cro: { label: "CRO-scan", pageLabel: "CRO", path: "/online-marketing/conversieoptimalisatie" },
+} as const;
+
+type ScanType = keyof typeof scanRequests;
+
 const hourly = new Map<string, number[]>();
 
 function clip(value: unknown, max: number) {
@@ -41,6 +49,16 @@ function notifyAddress(value: unknown) {
   const email = clip(value, 200);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "";
   return email;
+}
+
+function normalizeScanType(value: unknown): ScanType | null {
+  const key = clip(value, 20).toLowerCase();
+  return key in scanRequests ? (key as ScanType) : null;
+}
+
+function publicOrigin() {
+  const raw = String(process.env.FRONTEND_URL ?? process.env.EDITOR_PUBLIC_URL ?? "https://test.merkdraak.nl").trim();
+  return raw.replace(/\/+$/, "") || "https://test.merkdraak.nl";
 }
 
 function validPhone(value: string) {
@@ -110,14 +128,22 @@ export default factories.createCoreController("api::form-submission.form-submiss
     const email = clip(body.email, 200);
     const phone = clip(body.phone, 40);
     const message = clip(body.message, 4000);
-    const interest = clip(body.interest, 120);
+    const scanType = normalizeScanType(body.scanType);
+    const scan = scanType ? scanRequests[scanType] : null;
+    // Labels/paths come from the server map when scanType is valid — never trust free-form client copy.
+    const interest = scan ? scan.label : clip(body.interest, 120);
     if (!siteKey || !name || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return ctx.badRequest("Vul naam, een geldig e-mailadres en een bericht in.");
+    }
+    if (body.scanType != null && body.scanType !== "" && !scan) {
+      return ctx.badRequest("Ongeldig scantype.");
     }
     if (!validPhone(phone)) {
       return ctx.badRequest("Vul een geldig telefoonnummer in.");
     }
-    if (!validStarted(body.started)) {
+    // Contact forms always send `started`. Scan forms may omit it until the frontend catches up.
+    const hasStarted = body.started != null && String(body.started).trim() !== "";
+    if ((!scan && !validStarted(body.started)) || (scan && hasStarted && !validStarted(body.started))) {
       return ctx.badRequest("Even geduld. Wacht een paar seconden en verstuur het formulier opnieuw.");
     }
     if (tooMany(clientKey(ctx.request.ip, ctx.request.header["x-forwarded-for"], email))) {
@@ -136,15 +162,31 @@ export default factories.createCoreController("api::form-submission.form-submiss
 
     const staff =
       notifyAddress(body.notifyEmail) ||
-      notifyAddress(site.email) ||
-      notifyAddress(body.to);
+      notifyAddress(body.to) ||
+      notifyAddress(site.email);
     const topic = interest || "contact";
+    const sourceUrl = scan ? `${publicOrigin()}${scan.path}` : "";
     try {
       if (staff) {
         await sendMail(strapi, {
           to: staff,
-          subject: `Nieuw bericht via ${site.name ?? siteKey}: ${plain(topic)}`,
-          text: `Naam: ${name}\nE-mail: ${email}\nTelefoon: ${phone || "-"}\nInteresse: ${topic}\n\n${message}`,
+          subject: scan
+            ? `Nieuwe aanvraag ${scan.label} – ${site.name ?? siteKey}`
+            : `Nieuw bericht via ${site.name ?? siteKey}: ${plain(topic)}`,
+          text: scan
+            ? [
+                `Type aanvraag: ${scan.label}`,
+                `Pagina: ${scan.pageLabel}`,
+                `Bron-URL: ${sourceUrl}`,
+                "",
+                `Naam: ${name}`,
+                `E-mail: ${email}`,
+                `Telefoon: ${phone || "-"}`,
+                "",
+                "Bericht:",
+                message,
+              ].join("\n")
+            : `Naam: ${name}\nE-mail: ${email}\nTelefoon: ${phone || "-"}\nInteresse: ${topic}\n\n${message}`,
           replyTo: email,
         });
       }

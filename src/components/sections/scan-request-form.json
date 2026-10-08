@@ -1,33 +1,28 @@
 {
-  "collectionName": "components_sections_buttons",
+  "collectionName": "components_sections_scan_request_forms",
   "info": {
-    "displayName": "Knop",
-    "icon": "cursor"
+    "displayName": "Scanaanvraag",
+    "icon": "envelop"
   },
   "options": {},
   "attributes": {
-    "label": {
-      "type": "string"
-    },
-    "showCta": {
-      "type": "boolean",
-      "default": true
-    },
-    "href": {
-      "type": "string"
-    },
-    "align": {
+    "scanType": {
       "type": "enumeration",
-      "enum": [
-        "left",
-        "center"
-      ],
-      "default": "left"
+      "enum": ["seo", "sea", "cro"],
+      "required": true,
+      "default": "seo"
+    },
+    "heading": {
+      "type": "string"
+    },
+    "intro": {
+      "type": "text"
+    },
+    "recipientEmail": {
+      "type": "email",
+      "default": "mike@merkdraak.nl"
     },
     "anchor": {
-      "type": "string"
-    },
-    "space": {
       "type": "string"
     },
     "spaceTop": {

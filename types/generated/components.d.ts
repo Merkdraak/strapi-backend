@@ -190,6 +190,7 @@ export interface SectionsButton extends Struct.ComponentSchema {
     anchor: Schema.Attribute.String;
     href: Schema.Attribute.String;
     label: Schema.Attribute.String;
+    showCta: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -212,6 +213,8 @@ export interface SectionsButtonRow extends Struct.ComponentSchema {
     primaryLabel: Schema.Attribute.String;
     secondaryHref: Schema.Attribute.String;
     secondaryLabel: Schema.Attribute.String;
+    showPrimary: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    showSecondary: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
     spaceBottomTablet: Schema.Attribute.String;
@@ -371,6 +374,7 @@ export interface SectionsContactCta extends Struct.ComponentSchema {
     highlightColor: Schema.Attribute.String;
     href: Schema.Attribute.String;
     label: Schema.Attribute.String;
+    showCta: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -588,6 +592,8 @@ export interface SectionsHero extends Struct.ComponentSchema {
     primaryLabel: Schema.Attribute.String;
     secondaryHref: Schema.Attribute.String;
     secondaryLabel: Schema.Attribute.String;
+    showPrimary: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    showSecondary: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -1014,6 +1020,30 @@ export interface SectionsRow extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsScanRequestForm extends Struct.ComponentSchema {
+  collectionName: 'components_sections_scan_request_forms';
+  info: {
+    displayName: 'Scanaanvraag';
+    icon: 'envelop';
+  };
+  attributes: {
+    anchor: Schema.Attribute.String;
+    heading: Schema.Attribute.String;
+    intro: Schema.Attribute.Text;
+    recipientEmail: Schema.Attribute.Email &
+      Schema.Attribute.DefaultTo<'mike@merkdraak.nl'>;
+    scanType: Schema.Attribute.Enumeration<['seo', 'sea', 'cro']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'seo'>;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
+  };
+}
+
 export interface SectionsServiceCards extends Struct.ComponentSchema {
   collectionName: 'components_sections_service_cards';
   info: {
@@ -1098,6 +1128,7 @@ export interface SectionsSplit extends Struct.ComponentSchema {
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
     label: Schema.Attribute.String;
+    showCta: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     side: Schema.Attribute.String;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
@@ -1165,6 +1196,7 @@ export interface SectionsTeam extends Struct.ComponentSchema {
     highlightColor: Schema.Attribute.String;
     members: Schema.Attribute.Component<'shared.team-member', true>;
     note: Schema.Attribute.Text;
+    showNote: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -1281,6 +1313,7 @@ export interface SectionsWhyUs extends Struct.ComponentSchema {
     intro: Schema.Attribute.Text;
     note: Schema.Attribute.Text;
     pillars: Schema.Attribute.Component<'shared.pillar', true>;
+    showNote: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -1453,6 +1486,8 @@ export interface SharedServiceCard extends Struct.ComponentSchema {
     cardId: Schema.Attribute.String;
     description: Schema.Attribute.Text;
     href: Schema.Attribute.String;
+    icon: Schema.Attribute.String & Schema.Attribute.DefaultTo<''>;
+    image: Schema.Attribute.Media<'images'>;
     items: Schema.Attribute.Component<'shared.text-item', true>;
     pageId: Schema.Attribute.String;
     title: Schema.Attribute.String;
@@ -1639,6 +1674,7 @@ declare module '@strapi/strapi' {
       'sections.results': SectionsResults;
       'sections.reviews': SectionsReviews;
       'sections.row': SectionsRow;
+      'sections.scan-request-form': SectionsScanRequestForm;
       'sections.service-cards': SectionsServiceCards;
       'sections.sources': SectionsSources;
       'sections.spacer': SectionsSpacer;
