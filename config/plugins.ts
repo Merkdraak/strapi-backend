@@ -34,6 +34,9 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
   },
   upload: {
     config: {
+      // Keep responsive formats + mild compression; prefer uploading sources ≥1600px wide for cases/heroes.
+      sizeOptimization: true,
+      responsiveDimensions: true,
       security: {
         allowedTypes: allowedMediaTypes,
         deniedTypes,
