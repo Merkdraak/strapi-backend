@@ -82,13 +82,54 @@ docker image prune -af >/dev/null
 docker builder prune -af >/dev/null || true
 df -h / | tail -n 1 || true
 
-if ! docker buildx inspect merkdraak >/dev/null 2>&1; then
-  docker buildx create --name merkdraak --driver docker-container --bootstrap >/dev/null
+# Own builder: the frontend deploy caps the shared `merkdraak` builder at 2GB with swap disabled,
+# which SIGKILLs the Strapi admin build.
+BUILDER=merkdraak-strapi
+if ! docker buildx inspect "$BUILDER" >/dev/null 2>&1; then
+  docker buildx create --name "$BUILDER" --driver docker-container --bootstrap >/dev/null
 fi
-docker buildx inspect merkdraak --bootstrap >/dev/null
-docker update --cpuset-cpus 0,1 --memory 3g --memory-swap 5g buildx_buildkit_merkdraak0 >/dev/null
+docker buildx inspect "$BUILDER" --bootstrap >/dev/null
 
-docker compose --project-directory "$APP_DIR" -f "$APP_DIR/docker-compose.yml" build --builder merkdraak
+# Host swap is 2GB and already partly used. Add another 2GB so the 3GB build cgroup can page out.
+swap_kb="$(awk '/^SwapTotal:/ {print $2}' /proc/meminfo)"
+if [[ "$swap_kb" -lt 4194304 && ! -f /swapfile-build ]]; then
+  avail_kb="$(df -Pk / | awk 'NR==2 {print $4}')"
+  if [[ "$avail_kb" -lt 2621440 ]]; then
+    echo "not enough disk for extra swap (${avail_kb}kB free)" >&2
+    exit 1
+  fi
+  echo "adding 2G swap at /swapfile-build"
+  if ! fallocate -l 2G /swapfile-build; then
+    dd if=/dev/zero of=/swapfile-build bs=1M count=2048 status=none
+  fi
+  chmod 600 /swapfile-build
+  mkswap /swapfile-build >/dev/null
+fi
+if [[ -f /swapfile-build ]] && ! swapon --show=NAME --noheadings | grep -qx /swapfile-build; then
+  if ! swapon /swapfile-build; then
+    swapoff /swapfile-build 2>/dev/null || true
+    rm -f /swapfile-build
+    dd if=/dev/zero of=/swapfile-build bs=1M count=2048 status=none
+    chmod 600 /swapfile-build
+    mkswap /swapfile-build >/dev/null
+    swapon /swapfile-build
+  fi
+fi
+if [[ -f /swapfile-build ]] && ! grep -qE '^/swapfile-build[[:space:]]' /etc/fstab; then
+  echo '/swapfile-build none swap sw 0 0' >> /etc/fstab
+fi
+echo "swap $(awk '/^SwapTotal:/ {print $2}' /proc/meminfo)kB"
+
+builder_id="buildx_buildkit_${BUILDER}0"
+docker update --cpuset-cpus 0,1 --memory 3g --memory-swap 5g "$builder_id" >/dev/null
+builder_mem="$(docker inspect -f '{{.HostConfig.Memory}}' "$builder_id")"
+if [[ "$builder_mem" -lt 3000000000 ]]; then
+  echo "buildkit memory is ${builder_mem} bytes, need at least 3GiB" >&2
+  exit 1
+fi
+echo "buildkit memory ${builder_mem} bytes"
+
+docker compose --project-directory "$APP_DIR" -f "$APP_DIR/docker-compose.yml" build --builder "$BUILDER"
 built_image="$(docker image inspect -f '{{.Id}}' merkdraak-strapi:local)"
 docker compose --project-directory "$APP_DIR" -f "$APP_DIR/docker-compose.yml" up -d --no-build --force-recreate
 running_image="$(docker inspect -f '{{.Image}}' merkdraak-strapi)"
