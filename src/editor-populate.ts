@@ -17,6 +17,7 @@ export const sectionPopulate = {
     "sections.testimonial": { populate: "*" },
     "sections.contact-cta": { populate: "*" },
     "sections.contact-form": { populate: "*" },
+    "sections.scan-request-form": { populate: "*" },
     "sections.case-grid": { populate: { tabs: { populate: "*" } } },
     "sections.row": { populate: "*" },
     "sections.page-index": { populate: ["articleTypes"] },

@@ -5,6 +5,7 @@ import { publishScheduledPages } from "./publish-scheduled";
 import { syncComposedPages } from "./sync-composed-pages";
 import { syncContactPageBuilder } from "./sync-contact-page";
 import { syncEditorUrl } from "./sync-editor-url";
+import { syncScanRequestForms } from "./sync-scan-forms";
 
 // Webhook events that refresh the public site when content is saved.
 const events = ["entry.create", "entry.update", "entry.delete", "entry.publish", "entry.unpublish"];
