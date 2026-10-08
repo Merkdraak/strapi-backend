@@ -43,7 +43,7 @@ const blockLabel: Record<string, string> = {
   "sections.why-us": "WaaromWij",
   "sections.team": "Team",
   "sections.contact-cta": "Contact",
-  "sections.contact-form": "Contactformulier",
+  "sections.contact-form": "Formulier",
   "sections.notice": "Mededeling",
   "sections.prose": "Tekst",
   "sections.bullet-list": "Lijst",
