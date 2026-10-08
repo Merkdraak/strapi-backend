@@ -1388,6 +1388,8 @@ export interface SharedServiceCard extends Struct.ComponentSchema {
     cardId: Schema.Attribute.String;
     description: Schema.Attribute.Text & Schema.Attribute.Required;
     href: Schema.Attribute.String;
+    icon: Schema.Attribute.String & Schema.Attribute.DefaultTo<''>;
+    image: Schema.Attribute.Media<'images'>;
     items: Schema.Attribute.Component<'shared.text-item', true>;
     pageId: Schema.Attribute.String;
     title: Schema.Attribute.String & Schema.Attribute.Required;
