@@ -470,6 +470,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
       ['marketingscan', 'websitescan', 'contact', 'cases']
     > &
       Schema.Attribute.DefaultTo<'marketingscan'>;
+    ctaHref: Schema.Attribute.String;
     description: Schema.Attribute.Text;
     entryKey: Schema.Attribute.String & Schema.Attribute.Required;
     eyebrow: Schema.Attribute.String;
@@ -691,6 +692,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
       ['marketingscan', 'websitescan', 'contact', 'cases']
     > &
       Schema.Attribute.DefaultTo<'marketingscan'>;
+    ctaHref: Schema.Attribute.String;
     description: Schema.Attribute.Text;
     entryKey: Schema.Attribute.String & Schema.Attribute.Required;
     eyebrow: Schema.Attribute.String;

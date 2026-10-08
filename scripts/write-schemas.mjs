@@ -299,6 +299,7 @@ const page = {
       default: "marketingscan",
       required: true,
     },
+    ctaHref: { type: "string" },
     parent: { type: "relation", relation: "manyToOne", target: "api::page.page" },
     related: { type: "relation", relation: "oneToMany", target: "api::page.page" },
     sections: { type: "dynamiczone", components: sectionNames },

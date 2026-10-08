@@ -108,6 +108,9 @@
       ],
       "default": "marketingscan"
     },
+    "ctaHref": {
+      "type": "string"
+    },
     "parent": {
       "type": "relation",
       "relation": "manyToOne",
