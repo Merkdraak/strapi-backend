@@ -1016,7 +1016,6 @@ export interface SectionsRow extends Struct.ComponentSchema {
   };
 }
 
-
 export interface SectionsScanRequestForm extends Struct.ComponentSchema {
   collectionName: 'components_sections_scan_request_forms';
   info: {
