@@ -249,10 +249,16 @@ export interface SectionsCaseGrid extends Struct.ComponentSchema {
   attributes: {
     accentColor: Schema.Attribute.String;
     anchor: Schema.Attribute.String;
+    approachHeading: Schema.Attribute.String;
     backgroundColor: Schema.Attribute.String;
     caseKeys: Schema.Attribute.String;
+    eyebrow: Schema.Attribute.String;
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
+    highlight: Schema.Attribute.String;
+    highlightColor: Schema.Attribute.String;
+    moreHref: Schema.Attribute.String;
+    moreLabel: Schema.Attribute.String;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -260,6 +266,7 @@ export interface SectionsCaseGrid extends Struct.ComponentSchema {
     spaceTop: Schema.Attribute.String;
     spaceTopMobile: Schema.Attribute.String;
     spaceTopTablet: Schema.Attribute.String;
+    tabs: Schema.Attribute.Component<'shared.case-tab', true>;
     textColor: Schema.Attribute.String;
   };
 }
@@ -360,6 +367,8 @@ export interface SectionsContactCta extends Struct.ComponentSchema {
     body: Schema.Attribute.Text;
     eyebrow: Schema.Attribute.String;
     fontSize: Schema.Attribute.String;
+    highlight: Schema.Attribute.String;
+    highlightColor: Schema.Attribute.String;
     href: Schema.Attribute.String;
     label: Schema.Attribute.String;
     space: Schema.Attribute.String;
@@ -573,6 +582,7 @@ export interface SectionsHero extends Struct.ComponentSchema {
     eyebrow: Schema.Attribute.String;
     fontSize: Schema.Attribute.String;
     highlight: Schema.Attribute.String;
+    highlightColor: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
     primaryHref: Schema.Attribute.String;
     primaryLabel: Schema.Attribute.String;
@@ -728,6 +738,25 @@ export interface SectionsLocation extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsMapEmbed extends Struct.ComponentSchema {
+  collectionName: 'components_sections_map_embeds';
+  info: {
+    displayName: 'Kaart';
+    icon: 'pinMap';
+  };
+  attributes: {
+    anchor: Schema.Attribute.String;
+    embedUrl: Schema.Attribute.Text & Schema.Attribute.Required;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
+    title: Schema.Attribute.String;
+  };
+}
+
 export interface SectionsNotice extends Struct.ComponentSchema {
   collectionName: 'components_sections_notices';
   info: {
@@ -857,6 +886,8 @@ export interface SectionsProcess extends Struct.ComponentSchema {
     eyebrow: Schema.Attribute.String;
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
+    highlight: Schema.Attribute.String;
+    highlightColor: Schema.Attribute.String;
     intro: Schema.Attribute.Text;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
@@ -909,11 +940,20 @@ export interface SectionsResults extends Struct.ComponentSchema {
     accentColor: Schema.Attribute.String;
     anchor: Schema.Attribute.String;
     backgroundColor: Schema.Attribute.String;
+    benchmarkLabel: Schema.Attribute.String;
+    chartCta: Schema.Attribute.String;
+    chartCtaHref: Schema.Attribute.String;
+    chartHeading: Schema.Attribute.String;
+    chartIntro: Schema.Attribute.String;
     chartLabels: Schema.Attribute.JSON;
+    chartNote: Schema.Attribute.Text;
     eyebrow: Schema.Attribute.String;
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
+    highlight: Schema.Attribute.String;
+    highlightColor: Schema.Attribute.String;
     intro: Schema.Attribute.Text;
+    seriesLabel: Schema.Attribute.String;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -988,6 +1028,8 @@ export interface SectionsServiceCards extends Struct.ComponentSchema {
     eyebrow: Schema.Attribute.String;
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
+    highlight: Schema.Attribute.String;
+    highlightColor: Schema.Attribute.String;
     intro: Schema.Attribute.Text;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
@@ -997,6 +1039,8 @@ export interface SectionsServiceCards extends Struct.ComponentSchema {
     spaceTopMobile: Schema.Attribute.String;
     spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
+    variant: Schema.Attribute.Enumeration<['default', 'large']> &
+      Schema.Attribute.DefaultTo<'large'>;
   };
 }
 
@@ -1117,6 +1161,8 @@ export interface SectionsTeam extends Struct.ComponentSchema {
     eyebrow: Schema.Attribute.String;
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
+    highlight: Schema.Attribute.String;
+    highlightColor: Schema.Attribute.String;
     members: Schema.Attribute.Component<'shared.team-member', true>;
     note: Schema.Attribute.Text;
     space: Schema.Attribute.String;
@@ -1127,6 +1173,8 @@ export interface SectionsTeam extends Struct.ComponentSchema {
     spaceTopMobile: Schema.Attribute.String;
     spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
+    variant: Schema.Attribute.Enumeration<['portrait', 'compact']> &
+      Schema.Attribute.DefaultTo<'portrait'>;
   };
 }
 
@@ -1228,7 +1276,10 @@ export interface SectionsWhyUs extends Struct.ComponentSchema {
     eyebrow: Schema.Attribute.String;
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
+    highlight: Schema.Attribute.String;
+    highlightColor: Schema.Attribute.String;
     intro: Schema.Attribute.Text;
+    note: Schema.Attribute.Text;
     pillars: Schema.Attribute.Component<'shared.pillar', true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
@@ -1262,6 +1313,32 @@ export interface SharedArticleType extends Struct.ComponentSchema {
   attributes: {
     example: Schema.Attribute.String & Schema.Attribute.Required;
     title: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
+export interface SharedCaseTab extends Struct.ComponentSchema {
+  collectionName: 'components_shared_case_tabs';
+  info: {
+    displayName: 'Case tab';
+    icon: 'layer';
+  };
+  attributes: {
+    accent: Schema.Attribute.Enumeration<
+      ['orange', 'red', 'amber', 'emerald']
+    > &
+      Schema.Attribute.DefaultTo<'orange'>;
+    approach: Schema.Attribute.Component<'shared.text-item', true>;
+    category: Schema.Attribute.String;
+    href: Schema.Attribute.String;
+    image: Schema.Attribute.Media<'images'>;
+    imageAlt: Schema.Attribute.String;
+    label: Schema.Attribute.String;
+    metrics: Schema.Attribute.Component<'shared.stat', true>;
+    sector: Schema.Attribute.String;
+    summary: Schema.Attribute.Text;
+    tabLabel: Schema.Attribute.String;
+    title: Schema.Attribute.String;
+    tools: Schema.Attribute.String;
   };
 }
 
@@ -1465,7 +1542,7 @@ export interface SharedTeamMember extends Struct.ComponentSchema {
     bio: Schema.Attribute.Text;
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
-    initials: Schema.Attribute.String & Schema.Attribute.Required;
+    initials: Schema.Attribute.String;
     name: Schema.Attribute.String & Schema.Attribute.Required;
     pageId: Schema.Attribute.String;
     ring: Schema.Attribute.String;
@@ -1552,6 +1629,7 @@ declare module '@strapi/strapi' {
       'sections.image-slider': SectionsImageSlider;
       'sections.link-list': SectionsLinkList;
       'sections.location': SectionsLocation;
+      'sections.map-embed': SectionsMapEmbed;
       'sections.notice': SectionsNotice;
       'sections.numbered-steps': SectionsNumberedSteps;
       'sections.page-index': SectionsPageIndex;
@@ -1574,6 +1652,7 @@ declare module '@strapi/strapi' {
       'sections.why-us': SectionsWhyUs;
       'shared.accordion-item': SharedAccordionItem;
       'shared.article-type': SharedArticleType;
+      'shared.case-tab': SharedCaseTab;
       'shared.content-card': SharedContentCard;
       'shared.faq-item': SharedFaqItem;
       'shared.form-field': SharedFormField;

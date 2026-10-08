@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+trap '' HUP
 
 if [[ "$(id -u)" -ne 0 ]]; then
   echo "merkdraak-strapi-deploy must run as root" >&2
@@ -25,10 +26,8 @@ REMOTE_URL=https://github.com/Merkdraak/strapi-backend.git
 LOCK=/run/lock/merkdraak-strapi-deploy.lock
 
 exec 9>"$LOCK"
-if ! flock -n 9; then
-  echo "another deploy is running" >&2
-  exit 1
-fi
+echo "waiting for the deploy lock"
+flock 9
 
 cd "$APP_DIR"
 
@@ -59,8 +58,8 @@ if [[ "$remote" != "$REMOTE_URL" ]]; then
 fi
 
 "${git_safe[@]}" fetch --prune origin main
-"${git_safe[@]}" checkout --quiet main
-"${git_safe[@]}" merge --ff-only origin/main
+"${git_safe[@]}" checkout --quiet --force main
+"${git_safe[@]}" reset --hard origin/main
 
 branch="$("${git_safe[@]}" branch --show-current)"
 if [[ "$branch" != "main" ]]; then
@@ -68,19 +67,35 @@ if [[ "$branch" != "main" ]]; then
   exit 1
 fi
 
+# Keep the root hook identical to the repo script for the next deploy.
+install -m 755 "$APP_DIR/scripts/deploy.sh" /usr/local/bin/merkdraak-strapi-deploy
+
 BUILD_LOCK=/run/lock/merkdraak-image-build.lock
 exec 8>"$BUILD_LOCK"
 echo "waiting for the image build slot"
 flock 8
 
+# Free disk before build; previous images often fill the koekje host.
+echo "pruning unused docker data"
+docker container prune -f >/dev/null
+docker image prune -af >/dev/null
+docker builder prune -af >/dev/null || true
+df -h / | tail -n 1 || true
+
 if ! docker buildx inspect merkdraak >/dev/null 2>&1; then
   docker buildx create --name merkdraak --driver docker-container --bootstrap >/dev/null
 fi
 docker buildx inspect merkdraak --bootstrap >/dev/null
-docker update --cpuset-cpus 0 --memory 1600m --memory-swap 1600m buildx_buildkit_merkdraak0 >/dev/null
+docker update --cpuset-cpus 0,1 --memory 3g --memory-swap 5g buildx_buildkit_merkdraak0 >/dev/null
 
 docker compose --project-directory "$APP_DIR" -f "$APP_DIR/docker-compose.yml" build --builder merkdraak
-docker compose --project-directory "$APP_DIR" -f "$APP_DIR/docker-compose.yml" up -d --no-build
+built_image="$(docker image inspect -f '{{.Id}}' merkdraak-strapi:local)"
+docker compose --project-directory "$APP_DIR" -f "$APP_DIR/docker-compose.yml" up -d --no-build --force-recreate
+running_image="$(docker inspect -f '{{.Image}}' merkdraak-strapi)"
+if [[ "$running_image" != "$built_image" ]]; then
+  echo "container merkdraak-strapi was not replaced with the new image" >&2
+  exit 1
+fi
 
 ok=0
 for _ in $(seq 1 30); do

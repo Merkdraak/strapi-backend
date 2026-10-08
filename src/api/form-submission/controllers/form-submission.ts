@@ -37,8 +37,8 @@ function validStarted(value: unknown) {
   return wait >= 2500 && wait <= 48 * 60 * 60 * 1000;
 }
 
-function notifyAddress(value: string) {
-  const email = value.trim();
+function notifyAddress(value: unknown) {
+  const email = clip(value, 200);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "";
   return email;
 }
@@ -66,12 +66,18 @@ function plain(value: string) {
   return value.replace(/[\r\n]+/g, " ").trim();
 }
 
-async function sendMail(strapi: { plugin: (name: string) => { service: (name: string) => { send: (payload: Record<string, string>) => Promise<unknown> } } }, payload: { to: string; subject: string; text: string }) {
+async function sendMail(
+  strapi: {
+    plugin: (name: string) => { service: (name: string) => { send: (payload: Record<string, string>) => Promise<unknown> } };
+  },
+  payload: { to: string; subject: string; text: string; replyTo?: string },
+) {
   if (!payload.to) return;
   await strapi.plugin("email").service("email").send({
     to: payload.to,
     subject: payload.subject,
     text: payload.text,
+    ...(payload.replyTo ? { replyTo: payload.replyTo } : {}),
   });
 }
 
@@ -128,7 +134,10 @@ export default factories.createCoreController("api::form-submission.form-submiss
       data: { siteKey, name, email, phone, message, interest },
     });
 
-    const staff = notifyAddress(String(body.notifyEmail ?? "")) || notifyAddress(String(site.email ?? ""));
+    const staff =
+      notifyAddress(body.notifyEmail) ||
+      notifyAddress(site.email) ||
+      notifyAddress(body.to);
     const topic = interest || "contact";
     try {
       if (staff) {
@@ -136,6 +145,7 @@ export default factories.createCoreController("api::form-submission.form-submiss
           to: staff,
           subject: `Nieuw bericht via ${site.name ?? siteKey}: ${plain(topic)}`,
           text: `Naam: ${name}\nE-mail: ${email}\nTelefoon: ${phone || "-"}\nInteresse: ${topic}\n\n${message}`,
+          replyTo: email,
         });
       }
       await sendMail(strapi, {

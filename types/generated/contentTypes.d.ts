@@ -503,6 +503,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
         'sections.why-us',
         'sections.team',
         'sections.contact-cta',
+        'sections.contact-form',
         'sections.notice',
         'sections.prose',
         'sections.bullet-list',
@@ -525,6 +526,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
         'sections.table',
         'sections.columns',
         'sections.cards',
+        'sections.vacancies',
         'sections.accordion',
         'sections.expert',
         'sections.sources',
@@ -532,6 +534,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
         'sections.before-after',
         'sections.reviews',
         'sections.location',
+        'sections.map-embed',
         'sections.document',
         'sections.button-row',
       ]
@@ -549,6 +552,39 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'planned'>;
+  };
+}
+
+export interface ApiEditorPresetEditorPreset
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'editor_presets';
+  info: {
+    description: 'Favoriete blokken voor de pagina-editor. Niet openbaar op de site.';
+    displayName: 'Editorpreset';
+    pluralName: 'editor-presets';
+    singularName: 'editor-preset';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::editor-preset.editor-preset'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    payload: Schema.Attribute.JSON & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    puckType: Schema.Attribute.String & Schema.Attribute.Required;
+    siteKey: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
   };
 }
 
@@ -729,6 +765,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.before-after',
         'sections.reviews',
         'sections.location',
+        'sections.map-embed',
         'sections.document',
         'sections.button-row',
       ]
@@ -814,7 +851,7 @@ export interface ApiSiteSite extends Struct.CollectionTypeSchema {
     editorUrl: Schema.Attribute.String;
     email: Schema.Attribute.String;
     emailHref: Schema.Attribute.String;
-    footerDisclaimer: Schema.Attribute.String;
+    footerDisclaimer: Schema.Attribute.Text;
     footerText: Schema.Attribute.Text;
     formWebhook: Schema.Attribute.String;
     googlePlaceId: Schema.Attribute.String;
@@ -1348,6 +1385,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::case.case': ApiCaseCase;
+      'api::editor-preset.editor-preset': ApiEditorPresetEditorPreset;
       'api::form-submission.form-submission': ApiFormSubmissionFormSubmission;
       'api::navigation.navigation': ApiNavigationNavigation;
       'api::page.page': ApiPagePage;

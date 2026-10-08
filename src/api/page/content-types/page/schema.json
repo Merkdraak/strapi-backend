@@ -197,6 +197,7 @@
         "sections.before-after",
         "sections.reviews",
         "sections.location",
+        "sections.map-embed",
         "sections.document",
         "sections.button-row"
       ]

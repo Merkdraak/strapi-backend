@@ -34,10 +34,28 @@ jobs:
           printf '%s\n' "$KOEKJE_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
           printf '%s\n' "$KOEKJE_SSH_KEY" > "$HOME/.ssh/id_ed25519"
           chmod 600 "$HOME/.ssh/id_ed25519" "$HOME/.ssh/known_hosts"
-          ssh -i "$HOME/.ssh/id_ed25519" \
-            -o BatchMode=yes \
-            -o IdentitiesOnly=yes \
-            -o StrictHostKeyChecking=yes \
-            -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
-            "${KOEKJE_SSH_USER}@${KOEKJE_SSH_HOST}" \
-            sudo -n /usr/local/bin/merkdraak-strapi-deploy
+
+          SSH=(ssh -i "$HOME/.ssh/id_ed25519"
+            -o BatchMode=yes
+            -o IdentitiesOnly=yes
+            -o StrictHostKeyChecking=yes
+            -o ServerAliveInterval=30
+            -o ServerAliveCountMax=20
+            -o UserKnownHostsFile="$HOME/.ssh/known_hosts"
+            "${KOEKJE_SSH_USER}@${KOEKJE_SSH_HOST}")
+
+          # Best-effort: free disk + sync hook from last git checkout in /opt.
+          "${SSH[@]}" sudo -n /bin/sh -c '
+            set -e
+            if [ -f /opt/merkdraak-strapi/scripts/deploy.sh ]; then
+              cp /opt/merkdraak-strapi/scripts/deploy.sh /usr/local/bin/merkdraak-strapi-deploy
+              chmod 755 /usr/local/bin/merkdraak-strapi-deploy
+              echo "synced strapi deploy hook from /opt"
+            fi
+            docker container prune -f >/dev/null || true
+            docker image prune -af >/dev/null || true
+            docker builder prune -af >/dev/null || true
+            df -h / | tail -n 1
+          ' || echo "pre-clean skipped (sudo restricted to deploy hook only)"
+
+          "${SSH[@]}" sudo -n /usr/local/bin/merkdraak-strapi-deploy

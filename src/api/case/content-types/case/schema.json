@@ -126,6 +126,7 @@
         "sections.why-us",
         "sections.team",
         "sections.contact-cta",
+        "sections.contact-form",
         "sections.notice",
         "sections.prose",
         "sections.bullet-list",
@@ -148,6 +149,7 @@
         "sections.table",
         "sections.columns",
         "sections.cards",
+        "sections.vacancies",
         "sections.accordion",
         "sections.expert",
         "sections.sources",
@@ -155,6 +157,7 @@
         "sections.before-after",
         "sections.reviews",
         "sections.location",
+        "sections.map-embed",
         "sections.document",
         "sections.button-row"
       ]

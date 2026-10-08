@@ -25,7 +25,16 @@ type SiteRow = { key: string; name: string; domain: string; editorUrl: string };
 type PageRow = { documentId: string; title: string; slug: string; visibility: string; pageType: string; kind?: "page" | "case" };
 type LinkRow = { label?: string; href?: string };
 type SiteEditor = {
-  contact: { phoneDisplay: string; email: string; address: string };
+  contact: {
+    phoneDisplay: string;
+    email: string;
+    address: string;
+    kvk: string;
+    btw: string;
+    hours: string;
+    footerText: string;
+    footerDisclaimer: string;
+  };
   settings: { articlePrefix: string; googlePlaceId: string; formWebhook: string };
   footerServices: LinkRow[];
   footerOrganization: LinkRow[];
@@ -228,6 +237,16 @@ export default function MerkdraakEditor() {
         }
         setNav({
           ...data,
+          contact: {
+            phoneDisplay: data.contact?.phoneDisplay ?? "",
+            email: data.contact?.email ?? "",
+            address: data.contact?.address ?? "",
+            kvk: data.contact?.kvk ?? "",
+            btw: data.contact?.btw ?? "",
+            hours: data.contact?.hours ?? "",
+            footerText: data.contact?.footerText ?? "",
+            footerDisclaimer: data.contact?.footerDisclaimer ?? "",
+          },
           settings: {
             articlePrefix: data.settings?.articlePrefix || "kennisbank",
             googlePlaceId: data.settings?.googlePlaceId ?? "",
@@ -635,15 +654,32 @@ export default function MerkdraakEditor() {
         </Page.Main>
       );
     }
+    function saveError(error: unknown) {
+      const err = error as { response?: { data?: { error?: string; ok?: boolean } }; data?: { error?: string; ok?: boolean } };
+      return err.response?.data?.error || err.data?.error || "De site kon niet worden opgeslagen.";
+    }
     function saveSite() {
-      post(`/admin/merkdraak-editor/navigation`, { siteKey, ...nav })
-        .then(() => {
+      post(`/admin/merkdraak-editor/navigation`, {
+        siteKey,
+        contact: nav.contact,
+        settings: nav.settings,
+        footerServices: nav.footerServices,
+        footerOrganization: nav.footerOrganization,
+      })
+        .then((response: { data?: { ok?: boolean; error?: string } }) => {
+          if (response.data && response.data.ok === false) {
+            const message = saveError(response);
+            setError(message);
+            toggleNotification({ type: "danger", message });
+            return;
+          }
           setError("");
           toggleNotification({ type: "success", message: "Menu en footer opgeslagen." });
         })
-        .catch(() => {
-          setError("De site kon niet worden opgeslagen.");
-          toggleNotification({ type: "danger", message: "De site kon niet worden opgeslagen." });
+        .catch((error: unknown) => {
+          const message = saveError(error);
+          setError(message);
+          toggleNotification({ type: "danger", message });
         });
     }
     function textField(name: string, label: string, value: string, onChange: (value: string) => void) {
@@ -688,7 +724,7 @@ export default function MerkdraakEditor() {
           title="Menu en footer"
           subtitle={site?.name ?? siteKey}
           navigationAction={<BackLink href={pagesHref} label="Pagina's" onBack={() => remember(siteKey, "")} />}
-          primaryAction={<Button onClick={saveSite}>Opslaan</Button>}
+          primaryAction={<Button type="button" onClick={saveSite}>Opslaan</Button>}
         />
         <Layouts.Content>
           {error ? (
@@ -699,14 +735,19 @@ export default function MerkdraakEditor() {
             </Box>
           ) : null}
           <Box background="neutral0" hasRadius shadow="filterShadow" padding={6}>
-            <Typography variant="delta" tag="h2">Contact</Typography>
+            <Typography variant="delta" tag="h2">Footer informatie</Typography>
             <Box paddingTop={1}>
-              <Typography variant="pi" textColor="neutral600">Dit staat in de footer.</Typography>
+              <Typography variant="pi" textColor="neutral600">Tekst, adres en bedrijfsgegevens links in de footer.</Typography>
             </Box>
             <Flex direction="column" alignItems="stretch" gap={4} paddingTop={4}>
+              {textField("footerText", "Footer tekst", nav.contact.footerText, (value) => setNav({ ...nav, contact: { ...nav.contact, footerText: value } }))}
+              {textField("address", "Hoofdkantoor", nav.contact.address, (value) => setNav({ ...nav, contact: { ...nav.contact, address: value } }))}
+              {textField("kvk", "KvK", nav.contact.kvk, (value) => setNav({ ...nav, contact: { ...nav.contact, kvk: value } }))}
+              {textField("btw", "BTW", nav.contact.btw, (value) => setNav({ ...nav, contact: { ...nav.contact, btw: value } }))}
               {textField("phone", "Telefoon", nav.contact.phoneDisplay, (value) => setNav({ ...nav, contact: { ...nav.contact, phoneDisplay: value } }))}
               {textField("email", "E-mail", nav.contact.email, (value) => setNav({ ...nav, contact: { ...nav.contact, email: value } }))}
-              {textField("address", "Adres", nav.contact.address, (value) => setNav({ ...nav, contact: { ...nav.contact, address: value } }))}
+              {textField("hours", "Openingstijden", nav.contact.hours, (value) => setNav({ ...nav, contact: { ...nav.contact, hours: value } }))}
+              {textField("footerDisclaimer", "Disclaimer", nav.contact.footerDisclaimer, (value) => setNav({ ...nav, contact: { ...nav.contact, footerDisclaimer: value } }))}
             </Flex>
             <Box paddingTop={6}>
               <Divider />

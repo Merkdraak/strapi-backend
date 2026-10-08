@@ -20,8 +20,35 @@
     "heading": {
       "type": "string"
     },
+    "highlight": {
+      "type": "string"
+    },
+    "highlightColor": {
+      "type": "string"
+    },
     "intro": {
       "type": "text"
+    },
+    "chartHeading": {
+      "type": "string"
+    },
+    "chartIntro": {
+      "type": "string"
+    },
+    "seriesLabel": {
+      "type": "string"
+    },
+    "benchmarkLabel": {
+      "type": "string"
+    },
+    "chartNote": {
+      "type": "text"
+    },
+    "chartCta": {
+      "type": "string"
+    },
+    "chartCtaHref": {
+      "type": "string"
     },
     "backgroundColor": {
       "type": "string"
