@@ -6,6 +6,7 @@ import { publishScheduledPages } from "./publish-scheduled";
 import { syncComposedPages } from "./sync-composed-pages";
 import { syncContactPageBuilder } from "./sync-contact-page";
 import { syncEditorUrl } from "./sync-editor-url";
+import { refreshFrontend } from "./refresh-frontend";
 import { syncScanRequestForms } from "./sync-scan-forms";
 
 // Webhook events that refresh the public site when content is saved.
@@ -392,6 +393,11 @@ export default {
             } catch (error) {
               strapi.log.error(error);
             }
+          }
+          try {
+            await refreshFrontend({ siteKey });
+          } catch (error) {
+            strapi.log.warn("site/menu save frontend revalidate failed", error);
           }
           ctx.body = { ok: true };
         } catch (error) {
