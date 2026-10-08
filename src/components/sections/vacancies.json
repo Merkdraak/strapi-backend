@@ -15,21 +15,6 @@
     "fontWeight": {
       "type": "string"
     },
-    "toggleLabel": {
-      "type": "string"
-    },
-    "dropdownSize": {
-      "type": "string"
-    },
-    "dropdownWeight": {
-      "type": "string"
-    },
-    "dropdownHeadingLevel": {
-      "type": "string"
-    },
-    "dropdownHeadingWeight": {
-      "type": "string"
-    },
     "items": {
       "type": "component",
       "repeatable": true,

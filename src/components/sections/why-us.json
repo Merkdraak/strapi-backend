@@ -29,6 +29,10 @@
     "note": {
       "type": "text"
     },
+    "showNote": {
+      "type": "boolean",
+      "default": true
+    },
     "backgroundColor": {
       "type": "string"
     },

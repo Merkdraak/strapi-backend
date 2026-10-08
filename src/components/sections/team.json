@@ -18,6 +18,10 @@
     "note": {
       "type": "text"
     },
+    "showNote": {
+      "type": "boolean",
+      "default": true
+    },
     "members": {
       "type": "component",
       "repeatable": true,

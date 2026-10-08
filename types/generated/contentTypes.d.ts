@@ -456,7 +456,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
   };
   pluginOptions: {
     'content-manager': {
-      visible: false;
+      visible: true;
     };
   };
   attributes: {
@@ -504,6 +504,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
         'sections.team',
         'sections.contact-cta',
         'sections.contact-form',
+        'sections.scan-request-form',
         'sections.notice',
         'sections.prose',
         'sections.bullet-list',
@@ -734,6 +735,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.team',
         'sections.contact-cta',
         'sections.contact-form',
+        'sections.scan-request-form',
         'sections.notice',
         'sections.prose',
         'sections.bullet-list',

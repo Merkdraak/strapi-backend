@@ -108,7 +108,17 @@ export default factories.createCoreController("api::page.page", ({ strapi }) => 
           files: uploaded,
         });
         const file = Array.isArray(created) ? created[0] : created;
-        ctx.body = { file: file ? { id: file.id, url: file.url, name: file.name } : null };
+        ctx.body = {
+          file: file
+            ? {
+                id: file.id,
+                url: file.url,
+                name: file.name,
+                width: file.width ?? null,
+                height: file.height ?? null,
+              }
+            : null,
+        };
       } catch (error) {
         strapi.log.error(error);
         return ctx.badRequest("Upload mislukt");
@@ -120,7 +130,13 @@ export default factories.createCoreController("api::page.page", ({ strapi }) => 
       orderBy: { name: "asc" },
     });
     ctx.body = {
-      files: files.map((file) => ({ id: file.id, url: file.url, name: file.name })),
+      files: files.map((file) => ({
+        id: file.id,
+        url: file.url,
+        name: file.name,
+        width: file.width ?? null,
+        height: file.height ?? null,
+      })),
     };
   },
 
