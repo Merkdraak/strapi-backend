@@ -189,7 +189,7 @@ export interface SectionsButton extends Struct.ComponentSchema {
       Schema.Attribute.DefaultTo<'left'>;
     anchor: Schema.Attribute.String;
     href: Schema.Attribute.String;
-    label: Schema.Attribute.String & Schema.Attribute.Required;
+    label: Schema.Attribute.String;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -371,6 +371,8 @@ export interface SectionsContactCta extends Struct.ComponentSchema {
     highlightColor: Schema.Attribute.String;
     href: Schema.Attribute.String;
     label: Schema.Attribute.String;
+    showCta: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -386,29 +388,46 @@ export interface SectionsContactCta extends Struct.ComponentSchema {
 export interface SectionsContactForm extends Struct.ComponentSchema {
   collectionName: 'components_sections_contact_forms';
   info: {
-    displayName: 'Contactformulier';
-    icon: 'envelop';
+    displayName: 'Formulier';
+    icon: 'layer';
   };
   attributes: {
+    accentColor: Schema.Attribute.String;
+    align: Schema.Attribute.Enumeration<['left', 'center', 'right']> &
+      Schema.Attribute.DefaultTo<'left'>;
     anchor: Schema.Attribute.String;
-    asideHeading: Schema.Attribute.String;
-    body: Schema.Attribute.Text;
-    contactText: Schema.Attribute.Text;
-    disclaimer: Schema.Attribute.Text;
-    marketingscanBody: Schema.Attribute.Text;
-    marketingscanLabel: Schema.Attribute.String;
-    recipientEmail: Schema.Attribute.Email &
-      Schema.Attribute.DefaultTo<'mike@merkdraak.nl'>;
-    showSiteDetails: Schema.Attribute.Boolean &
-      Schema.Attribute.DefaultTo<true>;
+    appearance: Schema.Attribute.Enumeration<['dark', 'light', 'accent']> &
+      Schema.Attribute.DefaultTo<'dark'>;
+    backgroundColor: Schema.Attribute.String;
+    emailLabel: Schema.Attribute.String;
+    emailPlaceholder: Schema.Attribute.String;
+    errorMessage: Schema.Attribute.Text;
+    fields: Schema.Attribute.Component<'shared.form-field', true>;
+    fontSize: Schema.Attribute.String;
+    fontWeight: Schema.Attribute.String;
+    formWidth: Schema.Attribute.Enumeration<['narrow', 'medium', 'wide']> &
+      Schema.Attribute.DefaultTo<'medium'>;
+    heading: Schema.Attribute.String;
+    headingLevel: Schema.Attribute.String;
+    interestLabel: Schema.Attribute.String;
+    messageLabel: Schema.Attribute.String;
+    messagePlaceholder: Schema.Attribute.String;
+    nameLabel: Schema.Attribute.String;
+    namePlaceholder: Schema.Attribute.String;
+    note: Schema.Attribute.Text;
+    pendingLabel: Schema.Attribute.String;
+    phoneLabel: Schema.Attribute.String;
+    phonePlaceholder: Schema.Attribute.String;
+    space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
     spaceBottomTablet: Schema.Attribute.String;
     spaceTop: Schema.Attribute.String;
     spaceTopMobile: Schema.Attribute.String;
     spaceTopTablet: Schema.Attribute.String;
-    websitescanBody: Schema.Attribute.Text;
-    websitescanLabel: Schema.Attribute.String;
+    submitLabel: Schema.Attribute.String;
+    textColor: Schema.Attribute.String;
+    thanks: Schema.Attribute.Text;
   };
 }
 
@@ -538,7 +557,7 @@ export interface SectionsHeading extends Struct.ComponentSchema {
       Schema.Attribute.DefaultTo<'dark'>;
     backgroundColor: Schema.Attribute.String;
     fontSize: Schema.Attribute.String;
-    heading: Schema.Attribute.String & Schema.Attribute.Required;
+    heading: Schema.Attribute.String;
     headingLevel: Schema.Attribute.String;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
@@ -580,7 +599,7 @@ export interface SectionsHero extends Struct.ComponentSchema {
     spaceTopTablet: Schema.Attribute.String;
     stats: Schema.Attribute.Component<'shared.stat', true>;
     textColor: Schema.Attribute.String;
-    title: Schema.Attribute.String & Schema.Attribute.Required;
+    title: Schema.Attribute.String;
   };
 }
 
@@ -671,14 +690,44 @@ export interface SectionsLocation extends Struct.ComponentSchema {
     icon: 'pinMap';
   };
   attributes: {
+    accentColor: Schema.Attribute.String;
+    addressLabel: Schema.Attribute.String;
+    align: Schema.Attribute.Enumeration<['left', 'center', 'right']> &
+      Schema.Attribute.DefaultTo<'left'>;
     anchor: Schema.Attribute.String;
+    appearance: Schema.Attribute.Enumeration<['dark', 'light', 'accent']> &
+      Schema.Attribute.DefaultTo<'dark'>;
+    backgroundColor: Schema.Attribute.String;
+    btw: Schema.Attribute.String;
     city: Schema.Attribute.String;
+    country: Schema.Attribute.String;
     email: Schema.Attribute.String;
+    emailButton: Schema.Attribute.String;
+    emailLabel: Schema.Attribute.String;
+    fontSize: Schema.Attribute.String;
+    fontWeight: Schema.Attribute.String;
     heading: Schema.Attribute.String;
+    headingLevel: Schema.Attribute.String;
+    hours: Schema.Attribute.Text;
+    hoursLabel: Schema.Attribute.String;
     href: Schema.Attribute.String;
+    kvk: Schema.Attribute.String;
+    kvkLabel: Schema.Attribute.String;
+    latitude: Schema.Attribute.String;
+    longitude: Schema.Attribute.String;
+    mapHeight: Schema.Attribute.Enumeration<['small', 'medium', 'large']> &
+      Schema.Attribute.DefaultTo<'medium'>;
+    mapQuery: Schema.Attribute.String;
+    mapTitle: Schema.Attribute.String;
     name: Schema.Attribute.String;
+    note: Schema.Attribute.Text;
     phone: Schema.Attribute.String;
+    phoneButton: Schema.Attribute.String;
     postalCode: Schema.Attribute.String;
+    routeLabel: Schema.Attribute.String;
+    showMap: Schema.Attribute.Enumeration<['true', 'false']> &
+      Schema.Attribute.DefaultTo<'true'>;
+    space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
     spaceBottomTablet: Schema.Attribute.String;
@@ -686,6 +735,8 @@ export interface SectionsLocation extends Struct.ComponentSchema {
     spaceTopMobile: Schema.Attribute.String;
     spaceTopTablet: Schema.Attribute.String;
     street: Schema.Attribute.String;
+    textColor: Schema.Attribute.String;
+    zoom: Schema.Attribute.String;
   };
 }
 
@@ -697,7 +748,7 @@ export interface SectionsMapEmbed extends Struct.ComponentSchema {
   };
   attributes: {
     anchor: Schema.Attribute.String;
-    embedUrl: Schema.Attribute.Text & Schema.Attribute.Required;
+    embedUrl: Schema.Attribute.Text;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
     spaceBottomTablet: Schema.Attribute.String;
@@ -722,7 +773,7 @@ export interface SectionsNotice extends Struct.ComponentSchema {
     appearance: Schema.Attribute.Enumeration<['dark', 'light', 'accent']> &
       Schema.Attribute.DefaultTo<'dark'>;
     backgroundColor: Schema.Attribute.String;
-    body: Schema.Attribute.Text & Schema.Attribute.Required;
+    body: Schema.Attribute.Text;
     fontSize: Schema.Attribute.String;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
@@ -866,7 +917,7 @@ export interface SectionsProse extends Struct.ComponentSchema {
     appearance: Schema.Attribute.Enumeration<['dark', 'light', 'accent']> &
       Schema.Attribute.DefaultTo<'dark'>;
     backgroundColor: Schema.Attribute.String;
-    body: Schema.Attribute.Text & Schema.Attribute.Required;
+    body: Schema.Attribute.Text;
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     headingLevel: Schema.Attribute.String;
@@ -962,6 +1013,31 @@ export interface SectionsRow extends Struct.ComponentSchema {
     spaceTopMobile: Schema.Attribute.String;
     spaceTopTablet: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
+  };
+}
+
+
+export interface SectionsScanRequestForm extends Struct.ComponentSchema {
+  collectionName: 'components_sections_scan_request_forms';
+  info: {
+    displayName: 'Scanaanvraag';
+    icon: 'envelop';
+  };
+  attributes: {
+    anchor: Schema.Attribute.String;
+    heading: Schema.Attribute.String;
+    intro: Schema.Attribute.Text;
+    recipientEmail: Schema.Attribute.Email &
+      Schema.Attribute.DefaultTo<'mike@merkdraak.nl'>;
+    scanType: Schema.Attribute.Enumeration<['seo', 'sea', 'cro']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'seo'>;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
   };
 }
 
@@ -1116,6 +1192,8 @@ export interface SectionsTeam extends Struct.ComponentSchema {
     highlightColor: Schema.Attribute.String;
     members: Schema.Attribute.Component<'shared.team-member', true>;
     note: Schema.Attribute.Text;
+    showNote: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -1140,8 +1218,8 @@ export interface SectionsTestimonial extends Struct.ComponentSchema {
     anchor: Schema.Attribute.String;
     backgroundColor: Schema.Attribute.String;
     fontSize: Schema.Attribute.String;
-    name: Schema.Attribute.String & Schema.Attribute.Required;
-    quote: Schema.Attribute.Text & Schema.Attribute.Required;
+    name: Schema.Attribute.String;
+    quote: Schema.Attribute.Text;
     role: Schema.Attribute.String;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
@@ -1231,6 +1309,8 @@ export interface SectionsWhyUs extends Struct.ComponentSchema {
     highlightColor: Schema.Attribute.String;
     intro: Schema.Attribute.Text;
     note: Schema.Attribute.Text;
+    showNote: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
     pillars: Schema.Attribute.Component<'shared.pillar', true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
@@ -1262,8 +1342,8 @@ export interface SharedArticleType extends Struct.ComponentSchema {
     icon: 'layer';
   };
   attributes: {
-    example: Schema.Attribute.String & Schema.Attribute.Required;
-    title: Schema.Attribute.String & Schema.Attribute.Required;
+    example: Schema.Attribute.String;
+    title: Schema.Attribute.String;
   };
 }
 
@@ -1316,8 +1396,33 @@ export interface SharedFaqItem extends Struct.ComponentSchema {
     icon: 'layer';
   };
   attributes: {
-    answer: Schema.Attribute.Text & Schema.Attribute.Required;
-    question: Schema.Attribute.String & Schema.Attribute.Required;
+    answer: Schema.Attribute.Text;
+    question: Schema.Attribute.String;
+  };
+}
+
+export interface SharedFormField extends Struct.ComponentSchema {
+  collectionName: 'components_shared_form_fields';
+  info: {
+    displayName: 'Formulierveld';
+    icon: 'layer';
+  };
+  attributes: {
+    autocomplete: Schema.Attribute.String;
+    fieldType: Schema.Attribute.Enumeration<
+      ['text', 'email', 'phone', 'textarea', 'select', 'checkbox']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'text'>;
+    helper: Schema.Attribute.String;
+    label: Schema.Attribute.String & Schema.Attribute.Required;
+    options: Schema.Attribute.Text;
+    placeholder: Schema.Attribute.String;
+    required: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    role: Schema.Attribute.Enumeration<
+      ['name', 'email', 'phone', 'message', 'extra']
+    > &
+      Schema.Attribute.DefaultTo<'extra'>;
   };
 }
 
@@ -1331,7 +1436,7 @@ export interface SharedNamedItem extends Struct.ComponentSchema {
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
     itemId: Schema.Attribute.String;
-    name: Schema.Attribute.String & Schema.Attribute.Required;
+    name: Schema.Attribute.String;
   };
 }
 
@@ -1346,8 +1451,8 @@ export interface SharedPillar extends Struct.ComponentSchema {
       ['orange', 'red', 'amber', 'emerald']
     > &
       Schema.Attribute.DefaultTo<'orange'>;
-    description: Schema.Attribute.Text & Schema.Attribute.Required;
-    title: Schema.Attribute.String & Schema.Attribute.Required;
+    description: Schema.Attribute.Text;
+    title: Schema.Attribute.String;
   };
 }
 
@@ -1377,11 +1482,11 @@ export interface SharedServiceCard extends Struct.ComponentSchema {
     > &
       Schema.Attribute.DefaultTo<'orange'>;
     cardId: Schema.Attribute.String;
-    description: Schema.Attribute.Text & Schema.Attribute.Required;
+    description: Schema.Attribute.Text;
     href: Schema.Attribute.String;
     items: Schema.Attribute.Component<'shared.text-item', true>;
     pageId: Schema.Attribute.String;
-    title: Schema.Attribute.String & Schema.Attribute.Required;
+    title: Schema.Attribute.String;
   };
 }
 
@@ -1421,10 +1526,10 @@ export interface SharedStat extends Struct.ComponentSchema {
     badge: Schema.Attribute.String;
     detail: Schema.Attribute.String;
     emphasize: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
-    label: Schema.Attribute.String & Schema.Attribute.Required;
+    label: Schema.Attribute.String;
     note: Schema.Attribute.String;
     trend: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
-    value: Schema.Attribute.String & Schema.Attribute.Required;
+    value: Schema.Attribute.String;
   };
 }
 
@@ -1437,7 +1542,7 @@ export interface SharedStep extends Struct.ComponentSchema {
   attributes: {
     number: Schema.Attribute.String;
     text: Schema.Attribute.Text;
-    title: Schema.Attribute.String & Schema.Attribute.Required;
+    title: Schema.Attribute.String;
     tone: Schema.Attribute.String;
   };
 }
@@ -1469,10 +1574,10 @@ export interface SharedTeamMember extends Struct.ComponentSchema {
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
     initials: Schema.Attribute.String;
-    name: Schema.Attribute.String & Schema.Attribute.Required;
+    name: Schema.Attribute.String;
     pageId: Schema.Attribute.String;
     ring: Schema.Attribute.String;
-    role: Schema.Attribute.String & Schema.Attribute.Required;
+    role: Schema.Attribute.String;
   };
 }
 
@@ -1485,7 +1590,7 @@ export interface SharedTextItem extends Struct.ComponentSchema {
   attributes: {
     href: Schema.Attribute.String;
     pageId: Schema.Attribute.String;
-    text: Schema.Attribute.Text & Schema.Attribute.Required;
+    text: Schema.Attribute.Text;
   };
 }
 
@@ -1565,6 +1670,7 @@ declare module '@strapi/strapi' {
       'sections.results': SectionsResults;
       'sections.reviews': SectionsReviews;
       'sections.row': SectionsRow;
+      'sections.scan-request-form': SectionsScanRequestForm;
       'sections.service-cards': SectionsServiceCards;
       'sections.sources': SectionsSources;
       'sections.spacer': SectionsSpacer;
@@ -1581,6 +1687,7 @@ declare module '@strapi/strapi' {
       'shared.case-tab': SharedCaseTab;
       'shared.content-card': SharedContentCard;
       'shared.faq-item': SharedFaqItem;
+      'shared.form-field': SharedFormField;
       'shared.named-item': SharedNamedItem;
       'shared.pillar': SharedPillar;
       'shared.review-item': SharedReviewItem;

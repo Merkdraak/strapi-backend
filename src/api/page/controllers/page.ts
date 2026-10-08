@@ -1,6 +1,7 @@
 import { factories } from "@strapi/strapi";
 import { applyKnowledgeSlug, normalizePrefix, rememberRedirect } from "../../../knowledge";
 import { sectionPopulate } from "../../../editor-populate";
+import { buildEditorRequiredFields } from "../../../editor-required-fields";
 import { EditorSaveError, errorPayload, saveResponse } from "../editor-errors";
 import { saveEditorPage } from "../editor-save";
 
@@ -89,6 +90,11 @@ export default factories.createCoreController("api::page.page", ({ strapi }) => 
         error: { code: "UNKNOWN_ERROR", message: "Opslaan is mislukt door een onverwachte fout." },
       });
     }
+  },
+
+  async editorRequiredFields(ctx) {
+    if (!authorized(ctx)) return ctx.unauthorized();
+    ctx.body = buildEditorRequiredFields(strapi);
   },
 
   async editorMedia(ctx) {

@@ -1,34 +1,26 @@
 {
-  "collectionName": "components_sections_testimonials",
+  "collectionName": "components_sections_scan_request_forms",
   "info": {
-    "displayName": "Citaat",
-    "icon": "layer"
+    "displayName": "Scanaanvraag",
+    "icon": "envelop"
   },
   "options": {},
   "attributes": {
-    "quote": {
+    "scanType": {
+      "type": "enumeration",
+      "enum": ["seo", "sea", "cro"],
+      "required": true,
+      "default": "seo"
+    },
+    "heading": {
+      "type": "string"
+    },
+    "intro": {
       "type": "text"
     },
-    "name": {
-      "type": "string"
-    },
-    "role": {
-      "type": "string"
-    },
-    "backgroundColor": {
-      "type": "string"
-    },
-    "textColor": {
-      "type": "string"
-    },
-    "accentColor": {
-      "type": "string"
-    },
-    "space": {
-      "type": "string"
-    },
-    "fontSize": {
-      "type": "string"
+    "recipientEmail": {
+      "type": "email",
+      "default": "mike@merkdraak.nl"
     },
     "anchor": {
       "type": "string"

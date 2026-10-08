@@ -35,12 +35,10 @@
       "unique": true
     },
     "title": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "navLabel": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "slug": {
       "type": "string"
@@ -54,9 +52,12 @@
     },
     "visibility": {
       "type": "enumeration",
-      "enum": ["planned", "concept", "published"],
-      "default": "planned",
-      "required": true
+      "enum": [
+        "planned",
+        "concept",
+        "published"
+      ],
+      "default": "planned"
     },
     "publishAt": {
       "type": "datetime"
@@ -66,12 +67,10 @@
       "default": true
     },
     "seoTitle": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "description": {
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     "canonicalUrl": {
       "type": "string"
@@ -85,7 +84,9 @@
     "ogImage": {
       "type": "media",
       "multiple": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
     },
     "nofollow": {
       "type": "boolean",
@@ -99,9 +100,13 @@
     },
     "cta": {
       "type": "enumeration",
-      "enum": ["marketingscan", "websitescan", "contact", "cases"],
-      "default": "marketingscan",
-      "required": true
+      "enum": [
+        "marketingscan",
+        "websitescan",
+        "contact",
+        "cases"
+      ],
+      "default": "marketingscan"
     },
     "parent": {
       "type": "relation",
@@ -150,6 +155,7 @@
         "sections.table",
         "sections.columns",
         "sections.cards",
+        "sections.vacancies",
         "sections.accordion",
         "sections.expert",
         "sections.sources",

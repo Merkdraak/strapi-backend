@@ -32,6 +32,12 @@ export default {
     },
     {
       method: "GET",
+      path: "/editor/required-fields",
+      handler: "page.editorRequiredFields",
+      config: { auth: false },
+    },
+    {
+      method: "GET",
       path: "/editor/presets",
       handler: "page.editorPresets",
       config: { auth: false },

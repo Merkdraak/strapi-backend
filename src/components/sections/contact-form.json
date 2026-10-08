@@ -1,42 +1,96 @@
 {
   "collectionName": "components_sections_contact_forms",
   "info": {
-    "displayName": "Contactformulier",
-    "icon": "envelop"
+    "displayName": "Formulier",
+    "icon": "layer"
   },
   "options": {},
   "attributes": {
-    "body": {
-      "type": "text"
-    },
-    "asideHeading": {
+    "heading": {
       "type": "string"
     },
-    "marketingscanLabel": {
+    "headingLevel": {
       "type": "string"
     },
-    "marketingscanBody": {
-      "type": "text"
-    },
-    "websitescanLabel": {
+    "fontWeight": {
       "type": "string"
     },
-    "websitescanBody": {
+    "note": {
       "type": "text"
     },
-    "contactText": {
+    "interestLabel": {
+      "type": "string"
+    },
+    "fields": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.form-field"
+    },
+    "nameLabel": {
+      "type": "string"
+    },
+    "namePlaceholder": {
+      "type": "string"
+    },
+    "emailLabel": {
+      "type": "string"
+    },
+    "emailPlaceholder": {
+      "type": "string"
+    },
+    "phoneLabel": {
+      "type": "string"
+    },
+    "phonePlaceholder": {
+      "type": "string"
+    },
+    "messageLabel": {
+      "type": "string"
+    },
+    "messagePlaceholder": {
+      "type": "string"
+    },
+    "submitLabel": {
+      "type": "string"
+    },
+    "pendingLabel": {
+      "type": "string"
+    },
+    "thanks": {
       "type": "text"
     },
-    "disclaimer": {
+    "errorMessage": {
       "type": "text"
     },
-    "recipientEmail": {
-      "type": "email",
-      "default": "mike@merkdraak.nl"
+    "formWidth": {
+      "type": "enumeration",
+      "enum": ["narrow", "medium", "wide"],
+      "default": "medium"
     },
-    "showSiteDetails": {
-      "type": "boolean",
-      "default": true
+    "appearance": {
+      "type": "enumeration",
+      "enum": ["dark", "light", "accent"],
+      "default": "dark"
+    },
+    "align": {
+      "type": "enumeration",
+      "enum": ["left", "center", "right"],
+      "default": "left"
+    },
+    "backgroundColor": {
+      "type": "string"
+    },
+    "textColor": {
+      "type": "string"
+    },
+    "accentColor": {
+      "type": "string"
+    },
+    "space": {
+      "type": "string"
+    },
+    "fontSize": {
+      "type": "string"
     },
     "anchor": {
       "type": "string"

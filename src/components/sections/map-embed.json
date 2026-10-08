@@ -10,8 +10,7 @@
       "type": "string"
     },
     "embedUrl": {
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     "anchor": {
       "type": "string"

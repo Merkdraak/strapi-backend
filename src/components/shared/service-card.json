@@ -7,15 +7,13 @@
   "options": {},
   "attributes": {
     "title": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "cardId": {
       "type": "string"
     },
     "description": {
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     "href": {
       "type": "string"
