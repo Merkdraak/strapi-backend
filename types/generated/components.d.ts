@@ -374,6 +374,28 @@ export interface SectionsContactCta extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsContactForm extends Struct.ComponentSchema {
+  collectionName: 'components_sections_contact_forms';
+  info: {
+    displayName: 'Formulier';
+    icon: 'layer';
+  };
+  attributes: {
+    anchor: Schema.Attribute.String;
+    appearance: Schema.Attribute.Enumeration<['dark', 'light', 'accent']> &
+      Schema.Attribute.DefaultTo<'dark'>;
+    heading: Schema.Attribute.String;
+    note: Schema.Attribute.Text;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
+    submitLabel: Schema.Attribute.String;
+  };
+}
+
 export interface SectionsDivider extends Struct.ComponentSchema {
   collectionName: 'components_sections_dividers';
   info: {
@@ -1089,10 +1111,6 @@ export interface SectionsVacancies extends Struct.ComponentSchema {
     anchor: Schema.Attribute.String;
     appearance: Schema.Attribute.Enumeration<['dark', 'light', 'accent']> &
       Schema.Attribute.DefaultTo<'dark'>;
-    dropdownHeadingLevel: Schema.Attribute.String;
-    dropdownHeadingWeight: Schema.Attribute.String;
-    dropdownSize: Schema.Attribute.String;
-    dropdownWeight: Schema.Attribute.String;
     fontWeight: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     headingLevel: Schema.Attribute.String;
@@ -1103,7 +1121,6 @@ export interface SectionsVacancies extends Struct.ComponentSchema {
     spaceTop: Schema.Attribute.String;
     spaceTopMobile: Schema.Attribute.String;
     spaceTopTablet: Schema.Attribute.String;
-    toggleLabel: Schema.Attribute.String;
   };
 }
 
@@ -1392,26 +1409,10 @@ export interface SharedVacancy extends Struct.ComponentSchema {
   attributes: {
     applyHref: Schema.Attribute.String;
     applyLabel: Schema.Attribute.String;
-    body: Schema.Attribute.Text;
-    copy: Schema.Attribute.Component<'shared.vacancy-copy', true>;
     hours: Schema.Attribute.String;
     location: Schema.Attribute.String;
     text: Schema.Attribute.Text;
     title: Schema.Attribute.String;
-  };
-}
-
-export interface SharedVacancyCopy extends Struct.ComponentSchema {
-  collectionName: 'components_shared_vacancy_copies';
-  info: {
-    displayName: 'Vacature-dropdown';
-    icon: 'layer';
-  };
-  attributes: {
-    fontWeight: Schema.Attribute.String;
-    heading: Schema.Attribute.String;
-    headingLevel: Schema.Attribute.String;
-    text: Schema.Attribute.Text;
   };
 }
 
@@ -1437,6 +1438,7 @@ declare module '@strapi/strapi' {
       'sections.client-logos': SectionsClientLogos;
       'sections.columns': SectionsColumns;
       'sections.contact-cta': SectionsContactCta;
+      'sections.contact-form': SectionsContactForm;
       'sections.divider': SectionsDivider;
       'sections.document': SectionsDocument;
       'sections.expert': SectionsExpert;
@@ -1484,7 +1486,6 @@ declare module '@strapi/strapi' {
       'shared.team-member': SharedTeamMember;
       'shared.text-item': SharedTextItem;
       'shared.vacancy': SharedVacancy;
-      'shared.vacancy-copy': SharedVacancyCopy;
     }
   }
 }

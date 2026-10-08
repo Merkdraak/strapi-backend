@@ -1,7 +1,7 @@
 {
-  "collectionName": "components_sections_vacancies",
+  "collectionName": "components_sections_contact_forms",
   "info": {
-    "displayName": "Vacatures",
+    "displayName": "Formulier",
     "icon": "layer"
   },
   "options": {},
@@ -9,26 +9,16 @@
     "heading": {
       "type": "string"
     },
-    "headingLevel": {
-      "type": "string"
+    "note": {
+      "type": "text"
     },
-    "fontWeight": {
+    "submitLabel": {
       "type": "string"
-    },
-    "items": {
-      "type": "component",
-      "repeatable": true,
-      "component": "shared.vacancy"
     },
     "appearance": {
       "type": "enumeration",
       "enum": ["dark", "light", "accent"],
       "default": "dark"
-    },
-    "align": {
-      "type": "enumeration",
-      "enum": ["left", "center", "right"],
-      "default": "left"
     },
     "anchor": {
       "type": "string"
