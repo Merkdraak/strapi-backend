@@ -965,6 +965,30 @@ export interface SectionsRow extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsScanRequestForm extends Struct.ComponentSchema {
+  collectionName: 'components_sections_scan_request_forms';
+  info: {
+    displayName: 'Scanaanvraag';
+    icon: 'envelop';
+  };
+  attributes: {
+    anchor: Schema.Attribute.String;
+    heading: Schema.Attribute.String;
+    intro: Schema.Attribute.Text;
+    recipientEmail: Schema.Attribute.Email &
+      Schema.Attribute.DefaultTo<'mike@merkdraak.nl'>;
+    scanType: Schema.Attribute.Enumeration<['seo', 'sea', 'cro']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'seo'>;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
+  };
+}
+
 export interface SectionsServiceCards extends Struct.ComponentSchema {
   collectionName: 'components_sections_service_cards';
   info: {
@@ -1565,6 +1589,7 @@ declare module '@strapi/strapi' {
       'sections.results': SectionsResults;
       'sections.reviews': SectionsReviews;
       'sections.row': SectionsRow;
+      'sections.scan-request-form': SectionsScanRequestForm;
       'sections.service-cards': SectionsServiceCards;
       'sections.sources': SectionsSources;
       'sections.spacer': SectionsSpacer;
