@@ -34,6 +34,14 @@
     "secondaryHref": {
       "type": "string"
     },
+    "showPrimary": {
+      "type": "boolean",
+      "default": true
+    },
+    "showSecondary": {
+      "type": "boolean",
+      "default": true
+    },
     "stats": {
       "type": "component",
       "repeatable": true,

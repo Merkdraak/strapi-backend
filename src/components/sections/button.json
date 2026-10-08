@@ -10,6 +10,10 @@
       "type": "string",
       "required": true
     },
+    "showCta": {
+      "type": "boolean",
+      "default": true
+    },
     "href": {
       "type": "string"
     },

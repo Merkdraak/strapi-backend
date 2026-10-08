@@ -190,6 +190,7 @@ export interface SectionsButton extends Struct.ComponentSchema {
     anchor: Schema.Attribute.String;
     href: Schema.Attribute.String;
     label: Schema.Attribute.String & Schema.Attribute.Required;
+    showCta: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -212,6 +213,8 @@ export interface SectionsButtonRow extends Struct.ComponentSchema {
     primaryLabel: Schema.Attribute.String;
     secondaryHref: Schema.Attribute.String;
     secondaryLabel: Schema.Attribute.String;
+    showPrimary: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    showSecondary: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
     spaceBottomTablet: Schema.Attribute.String;
@@ -371,6 +374,7 @@ export interface SectionsContactCta extends Struct.ComponentSchema {
     highlightColor: Schema.Attribute.String;
     href: Schema.Attribute.String;
     label: Schema.Attribute.String;
+    showCta: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -571,6 +575,8 @@ export interface SectionsHero extends Struct.ComponentSchema {
     primaryLabel: Schema.Attribute.String;
     secondaryHref: Schema.Attribute.String;
     secondaryLabel: Schema.Attribute.String;
+    showPrimary: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    showSecondary: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -1049,6 +1055,7 @@ export interface SectionsSplit extends Struct.ComponentSchema {
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
     label: Schema.Attribute.String;
+    showCta: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     side: Schema.Attribute.String;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
@@ -1116,6 +1123,7 @@ export interface SectionsTeam extends Struct.ComponentSchema {
     highlightColor: Schema.Attribute.String;
     members: Schema.Attribute.Component<'shared.team-member', true>;
     note: Schema.Attribute.Text;
+    showNote: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -1232,6 +1240,7 @@ export interface SectionsWhyUs extends Struct.ComponentSchema {
     intro: Schema.Attribute.Text;
     note: Schema.Attribute.Text;
     pillars: Schema.Attribute.Component<'shared.pillar', true>;
+    showNote: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
