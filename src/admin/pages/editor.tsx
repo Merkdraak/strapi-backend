@@ -34,6 +34,9 @@ type SiteEditor = {
     hours: string;
     footerText: string;
     footerDisclaimer: string;
+    scanCtaHref: string;
+    scanCtaLabel: string;
+    scanCtaMenuLabel: string;
   };
   settings: { articlePrefix: string; googlePlaceId: string; formWebhook: string };
   footerServices: LinkRow[];
@@ -246,6 +249,9 @@ export default function MerkdraakEditor() {
             hours: data.contact?.hours ?? "",
             footerText: data.contact?.footerText ?? "",
             footerDisclaimer: data.contact?.footerDisclaimer ?? "",
+            scanCtaHref: data.contact?.scanCtaHref || "/online-marketing/scan",
+            scanCtaLabel: data.contact?.scanCtaLabel || "Gratis scan",
+            scanCtaMenuLabel: data.contact?.scanCtaMenuLabel || "Gratis scan aanvragen",
           },
           settings: {
             articlePrefix: data.settings?.articlePrefix || "kennisbank",
@@ -749,6 +755,22 @@ export default function MerkdraakEditor() {
               {textField("hours", "Openingstijden", nav.contact.hours, (value) => setNav({ ...nav, contact: { ...nav.contact, hours: value } }))}
               {textField("footerDisclaimer", "Disclaimer", nav.contact.footerDisclaimer, (value) => setNav({ ...nav, contact: { ...nav.contact, footerDisclaimer: value } }))}
             </Flex>
+            <Box paddingTop={6}>
+              <Divider />
+            </Box>
+            <Box paddingTop={6}>
+              <Typography variant="delta" tag="h2">Gratis scan knop</Typography>
+              <Box paddingTop={1}>
+                <Typography variant="pi" textColor="neutral600">
+                  Tekst en link van de knop in de header, het mobiele menu en de footer. Gebruik een relatief pad, bijvoorbeeld /online-marketing/scan.
+                </Typography>
+              </Box>
+              <Flex direction="column" alignItems="stretch" gap={4} paddingTop={4}>
+                {textField("scanCtaHref", "Link", nav.contact.scanCtaHref, (value) => setNav({ ...nav, contact: { ...nav.contact, scanCtaHref: value } }))}
+                {textField("scanCtaLabel", "Tekst in de header", nav.contact.scanCtaLabel, (value) => setNav({ ...nav, contact: { ...nav.contact, scanCtaLabel: value } }))}
+                {textField("scanCtaMenuLabel", "Tekst in menu en footer", nav.contact.scanCtaMenuLabel, (value) => setNav({ ...nav, contact: { ...nav.contact, scanCtaMenuLabel: value } }))}
+              </Flex>
+            </Box>
             <Box paddingTop={6}>
               <Divider />
             </Box>

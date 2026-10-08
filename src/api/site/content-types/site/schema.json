@@ -79,6 +79,18 @@
     "menuBackfilled": {
       "type": "boolean",
       "default": false
+    },
+    "scanCtaHref": {
+      "type": "string",
+      "default": "/online-marketing/scan"
+    },
+    "scanCtaLabel": {
+      "type": "string",
+      "default": "Gratis scan"
+    },
+    "scanCtaMenuLabel": {
+      "type": "string",
+      "default": "Gratis scan aanvragen"
     }
   }
 }

@@ -867,6 +867,12 @@ export interface ApiSiteSite extends Struct.CollectionTypeSchema {
     phoneDisplay: Schema.Attribute.String;
     phoneHref: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    scanCtaHref: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'/online-marketing/scan'>;
+    scanCtaLabel: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Gratis scan'>;
+    scanCtaMenuLabel: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Gratis scan aanvragen'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

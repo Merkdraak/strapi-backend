@@ -260,6 +260,9 @@ const site = {
     defaultDescription: { type: "text" },
     footerText: { type: "text" },
     footerDisclaimer: { type: "string" },
+    scanCtaHref: { type: "string", default: "/online-marketing/scan" },
+    scanCtaLabel: { type: "string", default: "Gratis scan" },
+    scanCtaMenuLabel: { type: "string", default: "Gratis scan aanvragen" },
   },
 };
 
