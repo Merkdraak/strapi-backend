@@ -1,16 +1,27 @@
-const allowed = new Set(["'self'", "http://localhost:3000"]);
+const allowed = new Set(["'self'", "http://localhost:3000", "https://test.merkdraak.nl"]);
 let cachedAt = 0;
 let origins = [...allowed].join(" ");
+
+function addOrigin(value: unknown) {
+  if (typeof value !== "string" || !value.trim()) return;
+  try {
+    allowed.add(new URL(value.trim()).origin);
+  } catch {
+    allowed.add(value.trim().replace(/\/$/, ""));
+  }
+}
 
 async function refreshOrigins() {
   if (Date.now() - cachedAt < 60_000) return;
   try {
+    addOrigin(process.env.FRONTEND_URL);
+    addOrigin(process.env.EDITOR_PUBLIC_URL);
     const sites = await strapi.documents("api::site.site").findMany({
       status: "published",
       fields: ["editorUrl"],
     });
     for (const site of sites) {
-      if (typeof site.editorUrl === "string" && site.editorUrl) allowed.add(site.editorUrl.replace(/\/$/, ""));
+      addOrigin(site.editorUrl);
     }
     origins = [...allowed].join(" ");
     cachedAt = Date.now();

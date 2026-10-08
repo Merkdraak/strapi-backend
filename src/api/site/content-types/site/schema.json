@@ -64,7 +64,7 @@
       "type": "text"
     },
     "footerDisclaimer": {
-      "type": "string"
+      "type": "text"
     },
     "articlePrefix": {
       "type": "string",

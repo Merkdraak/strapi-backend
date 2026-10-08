@@ -7,16 +7,13 @@
   "options": {},
   "attributes": {
     "initials": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "name": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "role": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "bio": {
       "type": "text"
@@ -24,7 +21,9 @@
     "image": {
       "type": "media",
       "multiple": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
     },
     "accent": {
       "type": "enumeration",

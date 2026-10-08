@@ -67,10 +67,20 @@ if [[ "$branch" != "main" ]]; then
   exit 1
 fi
 
+# Keep the root hook identical to the repo script for the next deploy.
+install -m 755 "$APP_DIR/scripts/deploy.sh" /usr/local/bin/merkdraak-strapi-deploy
+
 BUILD_LOCK=/run/lock/merkdraak-image-build.lock
 exec 8>"$BUILD_LOCK"
 echo "waiting for the image build slot"
 flock 8
+
+# Free disk before build; previous images often fill the koekje host.
+echo "pruning unused docker data"
+docker container prune -f >/dev/null
+docker image prune -af >/dev/null
+docker builder prune -af >/dev/null || true
+df -h / | tail -n 1 || true
 
 if ! docker buildx inspect merkdraak >/dev/null 2>&1; then
   docker buildx create --name merkdraak --driver docker-container --bootstrap >/dev/null

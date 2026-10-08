@@ -7,8 +7,7 @@
   "options": {},
   "attributes": {
     "body": {
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     "appearance": {
       "type": "enumeration",

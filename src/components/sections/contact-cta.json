@@ -9,11 +9,21 @@
     "title": {
       "type": "string"
     },
+    "highlight": {
+      "type": "string"
+    },
+    "highlightColor": {
+      "type": "string"
+    },
     "body": {
       "type": "text"
     },
     "label": {
       "type": "string"
+    },
+    "showCta": {
+      "type": "boolean",
+      "default": true
     },
     "href": {
       "type": "string"

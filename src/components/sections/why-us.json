@@ -17,8 +17,21 @@
     "heading": {
       "type": "string"
     },
+    "highlight": {
+      "type": "string"
+    },
+    "highlightColor": {
+      "type": "string"
+    },
     "intro": {
       "type": "text"
+    },
+    "note": {
+      "type": "text"
+    },
+    "showNote": {
+      "type": "boolean",
+      "default": true
     },
     "backgroundColor": {
       "type": "string"

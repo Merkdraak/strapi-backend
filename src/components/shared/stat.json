@@ -7,12 +7,10 @@
   "options": {},
   "attributes": {
     "value": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "label": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "trend": {
       "type": "boolean",

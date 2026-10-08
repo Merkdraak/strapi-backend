@@ -1,0 +1,34 @@
+---
+description: Strict Git branches and deploy rules for Merkdraak Strapi
+alwaysApply: true
+---
+
+# Git and deploy (Strapi)
+
+## Repositories
+
+- This repo is `strapi-backend` only → https://cms.merkdraak.nl
+- Frontend lives in a **separate** repo: `merkdraak-frontend` → https://test.merkdraak.nl
+- Never edit the wrong clone, a Docker container, `dist`/`.strapi`, or `/opt/...` on the server from this workspace.
+
+## Branch rules (mandatory)
+
+1. Before any edit: run `git status`, confirm branch, remote, and that you are **not** on `main`.
+2. All work stays on the user's current feature branch (usually `Roan`).
+3. **Never** checkout `main` to apply changes. **Never** push, merge, or fast-forward `main`.
+4. Do not create new branches unless the user asks.
+5. Do not force-push, hard-reset, or rebase shared branches.
+6. Commit only when the user asks. Push only to the **current feature branch** when that is part of the task — never to `main`.
+
+## After every change
+
+- Show which files changed (`git status` / `git diff`).
+- Confirm files are tracked (not ignored). Prefer not committing noisy `types/generated` line-ending-only diffs unless intentional.
+- Leave no silent local-only edits without stating the path and branch.
+
+## Deploy truth
+
+- Only **push to `main`** (by the user, usually via PR merge) triggers Actions → koekje → cms.merkdraak.nl.
+- Feature-branch pushes do **not** deploy.
+- Strapi needs `npm run build` inside the Docker image plus container recreate; a failed Actions run leaves the old container.
+- Pagebuilder preview in admin is an iframe of the frontend (`FRONTEND_URL` / `Site.editorUrl`); UI block changes require a frontend deploy.

@@ -7,8 +7,11 @@
   "options": {},
   "attributes": {
     "label": {
-      "type": "string",
-      "required": true
+      "type": "string"
+    },
+    "showCta": {
+      "type": "boolean",
+      "default": true
     },
     "href": {
       "type": "string"

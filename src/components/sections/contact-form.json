@@ -9,16 +9,88 @@
     "heading": {
       "type": "string"
     },
+    "headingLevel": {
+      "type": "string"
+    },
+    "fontWeight": {
+      "type": "string"
+    },
     "note": {
       "type": "text"
     },
+    "interestLabel": {
+      "type": "string"
+    },
+    "fields": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.form-field"
+    },
+    "nameLabel": {
+      "type": "string"
+    },
+    "namePlaceholder": {
+      "type": "string"
+    },
+    "emailLabel": {
+      "type": "string"
+    },
+    "emailPlaceholder": {
+      "type": "string"
+    },
+    "phoneLabel": {
+      "type": "string"
+    },
+    "phonePlaceholder": {
+      "type": "string"
+    },
+    "messageLabel": {
+      "type": "string"
+    },
+    "messagePlaceholder": {
+      "type": "string"
+    },
     "submitLabel": {
       "type": "string"
+    },
+    "pendingLabel": {
+      "type": "string"
+    },
+    "thanks": {
+      "type": "text"
+    },
+    "errorMessage": {
+      "type": "text"
+    },
+    "formWidth": {
+      "type": "enumeration",
+      "enum": ["narrow", "medium", "wide"],
+      "default": "medium"
     },
     "appearance": {
       "type": "enumeration",
       "enum": ["dark", "light", "accent"],
       "default": "dark"
+    },
+    "align": {
+      "type": "enumeration",
+      "enum": ["left", "center", "right"],
+      "default": "left"
+    },
+    "backgroundColor": {
+      "type": "string"
+    },
+    "textColor": {
+      "type": "string"
+    },
+    "accentColor": {
+      "type": "string"
+    },
+    "space": {
+      "type": "string"
+    },
+    "fontSize": {
+      "type": "string"
     },
     "anchor": {
       "type": "string"

@@ -43,6 +43,8 @@ const blockLabel: Record<string, string> = {
   "sections.why-us": "WaaromWij",
   "sections.team": "Team",
   "sections.contact-cta": "Contact",
+  "sections.contact-form": "Contactformulier",
+  "sections.scan-request-form": "Scanaanvraag",
   "sections.notice": "Mededeling",
   "sections.prose": "Tekst",
   "sections.bullet-list": "Lijst",
@@ -65,6 +67,7 @@ const blockLabel: Record<string, string> = {
   "sections.columns": "TweeKolommen",
   "sections.cards": "Kaarten",
   "sections.vacancies": "Vacatures",
+  "sections.spacer": "Afstand",
   "sections.accordion": "Uitklap",
   "sections.expert": "Expert",
   "sections.sources": "Bronnen",
@@ -72,6 +75,7 @@ const blockLabel: Record<string, string> = {
   "sections.before-after": "VoorNa",
   "sections.reviews": "Reviews",
   "sections.location": "Locatie",
+  "sections.map-embed": "Kaart",
   "sections.document": "Document",
   "sections.button-row": "Knoppen",
 };
@@ -170,6 +174,14 @@ function sectionIndex(path: string) {
   return match ? Number(match[1]) : -1;
 }
 
+function componentFromErrorText(text: string) {
+  const match =
+    text.match(/sections\.[a-z0-9-]+/i) ||
+    text.match(/component[`'"\s:]+(sections\.[a-z0-9-]+)/i) ||
+    text.match(/['"](sections\.[a-z0-9-]+)['"]/i);
+  return match ? String(match[1] ?? match[0]).toLowerCase() : "";
+}
+
 export function fromStrapiError(error: unknown, sections: unknown): EditorSaveError {
   if (error instanceof EditorSaveError) return error;
   if (isUniqueScopeKeyError(error)) {
@@ -177,7 +189,9 @@ export function fromStrapiError(error: unknown, sections: unknown): EditorSaveEr
       field: "scopeKey",
     });
   }
-  const raw = `${safeErrorText(error)} ${JSON.stringify(error && typeof error === "object" ? { name: (error as { name?: string }).name, message: (error as { message?: string }).message } : {})}`;
+  const chunks: string[] = [];
+  collectStrings(error, chunks);
+  const raw = `${safeErrorText(error)} ${chunks.join(" ")} ${JSON.stringify(error && typeof error === "object" ? { name: (error as { name?: string }).name, message: (error as { message?: string }).message } : {})}`;
   if (/foreign key/i.test(raw)) {
     return new EditorSaveError(400, "VALIDATION_ERROR", "De pagina kon niet aan de website worden gekoppeld. Probeer opnieuw op te slaan.");
   }
@@ -189,13 +203,27 @@ export function fromStrapiError(error: unknown, sections: unknown): EditorSaveEr
     const component = String(section?.__component ?? "");
     const label = blockLabel[component] || component || "onbekend blok";
     const field = path.replace(/^sections(?:\.|\[)\d+\]?\.?/, "") || undefined;
-    return new EditorSaveError(400, "INVALID_BLOCK", `Het blok '${label}' bevat ongeldige gegevens.`, {
+    const fieldHint =
+      field && /initials/i.test(field)
+        ? " Vul initialen in voor elk teamlid (of laat de naam staan zodat die automatisch worden afgeleid)."
+        : field
+          ? ` Controleer het veld '${field}'.`
+          : "";
+    return new EditorSaveError(400, "INVALID_BLOCK", `Het blok '${label}' bevat ongeldige gegevens.${fieldHint}`, {
       field,
       details: {
         blockType: component,
         blockIndex: index,
         field,
       },
+    });
+  }
+
+  const badComponent = componentFromErrorText(raw);
+  if (badComponent && (/not (allowed|valid|found)|unknown component|invalid component|does not exist|cannot be used/i.test(raw) || blockLabel[badComponent])) {
+    const label = blockLabel[badComponent] || badComponent;
+    return new EditorSaveError(400, "INVALID_BLOCK", `Het blok '${label}' is niet toegestaan op dit type pagina.`, {
+      details: { blockType: badComponent },
     });
   }
 

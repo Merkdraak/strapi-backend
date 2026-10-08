@@ -9,6 +9,7 @@ import {
   type EditorSaveBody,
 } from "./editor-errors";
 import { refreshFrontend } from "../../refresh-frontend";
+import { ensureScanRequestSections } from "../../sync-scan-forms";
 
 type SaveInput = {
   documentId?: string;
@@ -18,9 +19,9 @@ type SaveInput = {
 };
 
 type Documents = {
-  findFirst: (params: Record<string, unknown>) => Promise<{ documentId?: string; slug?: string; siteKey?: string } | null>;
-  findOne: (params: Record<string, unknown>) => Promise<{ documentId?: string; slug?: string; siteKey?: string } | null>;
-  findMany: (params: Record<string, unknown>) => Promise<{ documentId?: string }[]>;
+  findFirst: (params: Record<string, unknown>) => Promise<{ documentId?: string; slug?: string; siteKey?: string; entryKey?: string } | null>;
+  findOne: (params: Record<string, unknown>) => Promise<{ documentId?: string; slug?: string; siteKey?: string; entryKey?: string } | null>;
+  findMany: (params: Record<string, unknown>) => Promise<{ documentId?: string; pageType?: string }[]>;
   update: (params: Record<string, unknown>) => Promise<unknown>;
   create: (params: Record<string, unknown>) => Promise<{ documentId?: string }>;
   publish: (params: Record<string, unknown>) => Promise<unknown>;
@@ -31,19 +32,67 @@ function docs(strapi: Core.Strapi, uid: "api::page.page" | "api::case.case") {
   return strapi.documents(uid) as unknown as Documents;
 }
 
-async function otherWithScopeKey(strapi: Core.Strapi, scopeKey: string, documentId?: string) {
+function initialsFromName(name: string) {
+  const parts = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!parts.length) return "";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0] ?? ""}${parts[parts.length - 1][0] ?? ""}`.toUpperCase();
+}
+
+/** Fill required-looking nested fields so draft→publish does not fail on incomplete CMS data. */
+function normalizeSections(sections: unknown) {
+  if (!Array.isArray(sections)) return;
+  for (const section of sections) {
+    if (!section || typeof section !== "object") continue;
+    const record = section as Record<string, unknown>;
+    if (record.__component !== "sections.team" || !Array.isArray(record.members)) continue;
+    for (const member of record.members) {
+      if (!member || typeof member !== "object") continue;
+      const person = member as Record<string, unknown>;
+      const initials = typeof person.initials === "string" ? person.initials.trim() : "";
+      if (initials) {
+        person.initials = initials;
+        continue;
+      }
+      const name = typeof person.name === "string" ? person.name : "";
+      person.initials = initialsFromName(name);
+    }
+  }
+}
+
+async function otherWithScopeKey(
+  strapi: Core.Strapi,
+  scopeKey: string,
+  documentId?: string,
+  options: { forCase?: boolean } = {},
+) {
   const uids = ["api::page.page", "api::case.case"] as const;
   const statuses = ["draft", "published"] as const;
+  const self = String(documentId ?? "").trim();
   for (const uid of uids) {
     for (const status of statuses) {
+      const filters: Record<string, unknown> = { scopeKey };
+      // Exclude the document being updated at query level so draft/published
+      // versions of the same entry are never treated as collisions.
+      if (self) filters.documentId = { $ne: self };
       const found = await docs(strapi, uid).findMany({
-        filters: { scopeKey },
+        filters,
         status,
-        fields: ["scopeKey"],
+        fields: uid === "api::page.page" ? ["scopeKey", "documentId", "pageType"] : ["scopeKey", "documentId"],
         pagination: { pageSize: 20 },
       });
-      const other = found.find((item) => item.documentId && item.documentId !== documentId);
-      if (other) return other;
+      for (const item of found) {
+        const id = String(item.documentId ?? "").trim();
+        if (!id || id === self) continue;
+        // Leftover pageType=case rows after migration must not block case saves.
+        if (options.forCase && uid === "api::page.page" && String((item as { pageType?: string }).pageType ?? "") === "case") {
+          continue;
+        }
+        return item;
+      }
     }
   }
   return null;
@@ -72,19 +121,21 @@ export async function saveEditorPage(
   const site = await helpers.knownSite(siteKey);
   if (!site) throw new EditorSaveError(404, "NOT_FOUND", "Deze website is niet gevonden.");
   data.siteKey = siteKey;
-  data.site = site.id ?? site.documentId;
+  data.site = site.documentId ?? site.id;
 
   let previousSlug = "";
+  let previousEntryKey = "";
   if (input.documentId) {
     const current = await store.findOne({
       documentId: input.documentId,
       status: "draft",
-      fields: ["slug", "siteKey"],
+      fields: ["slug", "siteKey", "entryKey"],
     });
     if (!current || current.siteKey !== siteKey) {
       throw new EditorSaveError(404, "NOT_FOUND", "Deze pagina bestaat niet meer.");
     }
     previousSlug = current.slug ?? "";
+    previousEntryKey = String(current.entryKey ?? "").trim();
   }
 
   if (isCase) {
@@ -98,18 +149,20 @@ export async function saveEditorPage(
     delete data.formThanks;
     delete data.formRedirect;
     if (!data.parentKey) data.parentKey = "cases";
+    if (!String(data.visibility ?? "").trim()) data.visibility = "planned";
+    if (!String(data.cta ?? "").trim()) data.cta = "marketingscan";
   } else {
     helpers.applyKnowledgeSlug(data, helpers.normalizePrefix(site.articlePrefix));
     data.showInMenu = data.showInMenu === true || data.showInMenu === "true";
     if (!data.publishedOn) data.publishedOn = null;
+    if (!String(data.pageType ?? "").trim()) data.pageType = "company";
+    if (!String(data.visibility ?? "").trim()) data.visibility = "planned";
+    if (!String(data.cta ?? "").trim()) data.cta = "marketingscan";
     if (String(data.pageType) !== "home" && !String(data.slug ?? "").trim()) {
-      data.slug = slugify(String(data.title ?? data.entryKey ?? "pagina"));
+      data.slug = slugify(String(data.title ?? data.entryKey ?? "")) || `pagina-${Date.now()}`;
     }
   }
   const nextSlug = typeof data.slug === "string" ? data.slug : "";
-  if (previousSlug && nextSlug && previousSlug !== nextSlug) {
-    await helpers.rememberRedirect(strapi, siteKey, `/${previousSlug}`, `/${nextSlug}`);
-  }
 
   const parentKey = typeof data.parentKey === "string" ? data.parentKey : "";
   const relatedKeys = Array.isArray(data.relatedKeys) ? data.relatedKeys.filter((item) => typeof item === "string") : [];
@@ -121,7 +174,18 @@ export async function saveEditorPage(
       filters: { entryKey: parentKey, siteKey },
       status: "draft",
     });
-    if (parent?.documentId) data.parent = parent.documentId;
+    if (parent?.documentId) {
+      data.parent = parent.documentId;
+    } else if (isCase && parentKey === "cases") {
+      data.parent = null;
+    } else {
+      throw new EditorSaveError(400, "VALIDATION_ERROR", "De gekozen bovenliggende pagina bestaat niet.", {
+        field: "parentKey",
+        details: { parentKey },
+      });
+    }
+  } else {
+    data.parent = null;
   }
   if (relatedKeys.length) {
     const related = await pages.findMany({
@@ -130,7 +194,22 @@ export async function saveEditorPage(
       fields: ["entryKey"],
       pagination: { pageSize: 50 },
     });
-    data.related = related.map((item) => item.documentId);
+    const relatedRows = related as Array<{ documentId?: string; entryKey?: string }>;
+    const found = new Set(relatedRows.map((item) => String(item.entryKey ?? "")));
+    const missing = relatedKeys.filter((key) => !found.has(key));
+    if (missing.length) {
+      throw new EditorSaveError(
+        400,
+        "VALIDATION_ERROR",
+        missing.length === 1
+          ? `Gerelateerde pagina '${missing[0]}' bestaat niet.`
+          : `Gerelateerde pagina's bestaan niet: ${missing.join(", ")}.`,
+        { field: "relatedKeys", details: { missing } },
+      );
+    }
+    data.related = relatedRows.map((item) => item.documentId);
+  } else {
+    data.related = [];
   }
 
   const publishAt = typeof data.publishAt === "string" ? Date.parse(data.publishAt) : Number.NaN;
@@ -139,22 +218,41 @@ export async function saveEditorPage(
   if (scheduled) data.visibility = "planned";
 
   if (!String(data.entryKey ?? "").trim()) {
-    const source = isCase
-      ? String(data.slug ?? "").split("/").filter(Boolean).pop() || String(data.title ?? "case")
-      : typeof data.slug === "string" && data.slug
-        ? data.slug
-        : String(data.title ?? "pagina");
-    data.entryKey = isCase ? slugify(`case-${source}`) || `case-${Date.now()}` : slugify(source) || `pagina-${Date.now()}`;
+    // Prefer the existing key on update so a missing editor field cannot
+    // recreate the same scopeKey and trip the duplicate check.
+    if (previousEntryKey) {
+      data.entryKey = previousEntryKey;
+    } else {
+      const source = isCase
+        ? String(data.slug ?? "").split("/").filter(Boolean).pop() || String(data.title ?? "case")
+        : typeof data.slug === "string" && data.slug
+          ? data.slug
+          : String(data.title ?? "pagina");
+      data.entryKey = isCase ? slugify(`case-${source}`) || `case-${Date.now()}` : slugify(source) || `pagina-${Date.now()}`;
+    }
   }
   data.scopeKey = `${siteKey}:${String(data.entryKey).trim()}`;
 
-  const existing = await otherWithScopeKey(strapi, String(data.scopeKey), input.documentId);
+  // Contact always uses the pagebuilder. Other pages keep the editor "Opbouw" choice,
+  // but never leave composed unset when blocks are present (defaults to pagebuilder).
+  if (String(data.entryKey) === "contact") {
+    data.composed = true;
+  } else if (data.composed == null && Array.isArray(data.sections) && data.sections.length > 0) {
+    data.composed = true;
+  } else if (typeof data.composed === "string") {
+    data.composed = data.composed === "true";
+  }
+
+  const existing = await otherWithScopeKey(strapi, String(data.scopeKey), input.documentId, { forCase: isCase });
   if (existing) {
     throw new EditorSaveError(409, "DUPLICATE_SCOPE_KEY", "Er bestaat al een pagina met dezelfde sleutel. Kies een andere slug of entryKey.", {
       field: "scopeKey",
       details: { scopeKey: data.scopeKey },
     });
   }
+
+  normalizeSections(data.sections);
+  data.sections = ensureScanRequestSections(String(data.entryKey ?? ""), data.sections);
 
   const visibility = String(data.visibility ?? "planned");
   let documentId = input.documentId;
@@ -172,6 +270,14 @@ export async function saveEditorPage(
 
   if (!documentId) {
     throw new EditorSaveError(500, "DRAFT_SAVE_FAILED", "Opslaan is mislukt door een onverwachte fout.");
+  }
+
+  if (previousSlug && nextSlug && previousSlug !== nextSlug) {
+    try {
+      await helpers.rememberRedirect(strapi, siteKey, `/${previousSlug}`, `/${nextSlug}`);
+    } catch (error) {
+      strapi.log.warn(`editorSave redirect failed documentId=${documentId} from=/${previousSlug} to=/${nextSlug}`, error);
+    }
   }
 
   const wantPublished = visibility !== "planned";
@@ -192,9 +298,10 @@ export async function saveEditorPage(
     );
     const mapped = fromStrapiError(error, data.sections);
     const code = wantPublished ? "PUBLISH_FAILED" : "UNPUBLISH_FAILED";
+    const reason = mapped.message && mapped.code !== "UNKNOWN_ERROR" ? ` ${mapped.message}` : "";
     const message = wantPublished
-      ? "De wijzigingen zijn opgeslagen als concept, maar publiceren is mislukt."
-      : "De wijzigingen zijn opgeslagen, maar het offline halen van de pagina is mislukt.";
+      ? `De wijzigingen zijn opgeslagen als concept, maar publiceren is mislukt.${reason}`
+      : `De wijzigingen zijn opgeslagen, maar het offline halen van de pagina is mislukt.${reason}`;
     void refreshFrontend({ slug: nextSlug, siteKey }).catch((revalidateError: unknown) => {
       strapi.log.warn("editorSave frontend revalidate failed", revalidateError);
     });
@@ -207,8 +314,12 @@ export async function saveEditorPage(
         published: false,
         unpublished: false,
         documentId,
-        warning: { code, message, details: mapped.details },
-        error: { code, message, details: mapped.details },
+        warning: {
+          code,
+          message,
+          field: mapped.field,
+          details: { ...(mapped.details ?? {}), cause: mapped.code },
+        },
       }),
     };
   }

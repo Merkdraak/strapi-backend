@@ -10,10 +10,12 @@
       "type": "string"
     },
     "title": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "highlight": {
+      "type": "string"
+    },
+    "highlightColor": {
       "type": "string"
     },
     "body": {
@@ -30,6 +32,14 @@
     },
     "secondaryHref": {
       "type": "string"
+    },
+    "showPrimary": {
+      "type": "boolean",
+      "default": true
+    },
+    "showSecondary": {
+      "type": "boolean",
+      "default": true
     },
     "stats": {
       "type": "component",

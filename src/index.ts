@@ -1,7 +1,12 @@
 import type { Core } from "@strapi/strapi";
+import { clearEditorRequiredFieldsCache } from "./editor-required-fields";
 import { backfillMenu, normalizePrefix, syncArticlePrefix } from "./knowledge";
 import { registerPageBlocksTool } from "./page-blocks-mcp";
 import { publishScheduledPages } from "./publish-scheduled";
+import { syncComposedPages } from "./sync-composed-pages";
+import { syncContactPageBuilder } from "./sync-contact-page";
+import { syncEditorUrl } from "./sync-editor-url";
+import { syncScanRequestForms } from "./sync-scan-forms";
 
 // Webhook events that refresh the public site when content is saved.
 const events = ["entry.create", "entry.update", "entry.delete", "entry.publish", "entry.unpublish"];
@@ -15,6 +20,136 @@ function siteKeyFrom(value: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
     .slice(0, 80);
+}
+
+function asRecord(value: unknown) {
+  return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
+}
+
+function withId(value: Record<string, unknown>) {
+  const id = Number(value.id);
+  return Number.isInteger(id) && id > 0 ? { id } : {};
+}
+
+function textOf(value: unknown) {
+  return String(value ?? "");
+}
+
+async function pageDocumentId(strapi: Core.Strapi, siteKey: string, value: unknown) {
+  if (!value) return undefined;
+  if (typeof value === "string" && value.trim()) return value.trim();
+  const row = asRecord(value);
+  if (typeof row.documentId === "string" && row.documentId) return row.documentId;
+  const entryKey = textOf(row.entryKey).trim();
+  if (!entryKey) return undefined;
+  const page = await strapi.documents("api::page.page").findFirst({
+    filters: { siteKey, entryKey },
+    fields: ["entryKey"],
+  });
+  return page?.documentId;
+}
+
+function footerRows(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value.map((row) => {
+    const item = asRecord(row);
+    return {
+      label: textOf(item.label).trim() || "-",
+      href: textOf(item.href).trim() || "/",
+    };
+  });
+}
+
+async function navItems(strapi: Core.Strapi, siteKey: string, value: unknown) {
+  if (!Array.isArray(value)) return [];
+  const items = [];
+  for (const row of value) {
+    const item = asRecord(row);
+    const component = textOf(item.__component);
+    if (component === "nav.link") {
+      items.push({
+        __component: "nav.link",
+        ...withId(item),
+        label: textOf(item.label).trim() || "Link",
+        page: await pageDocumentId(strapi, siteKey, item.page),
+      });
+      continue;
+    }
+    if (component === "nav.dropdown") {
+      const links = Array.isArray(item.links) ? item.links : [];
+      items.push({
+        __component: "nav.dropdown",
+        ...withId(item),
+        label: textOf(item.label).trim() || "Menu",
+        links: await Promise.all(
+          links.map(async (link) => {
+            const entry = asRecord(link);
+            return {
+              ...withId(entry),
+              label: textOf(entry.label),
+              page: await pageDocumentId(strapi, siteKey, entry.page),
+            };
+          }),
+        ),
+      });
+      continue;
+    }
+    if (component !== "nav.mega") continue;
+    const columns = Array.isArray(item.columns) ? item.columns : [];
+    const feature = asRecord(item.feature);
+    const title = textOf(feature.title).trim();
+    const body = textOf(feature.body).trim();
+    const href = textOf(feature.href).trim();
+    const cta = textOf(feature.cta).trim();
+    items.push({
+      __component: "nav.mega",
+      ...withId(item),
+      menuId: textOf(item.menuId).trim() || textOf(item.label).trim() || "menu",
+      label: textOf(item.label).trim() || "Menu",
+      description: textOf(item.description),
+      columns: await Promise.all(
+        columns.map(async (column) => {
+          const col = asRecord(column);
+          const groups = Array.isArray(col.groups) ? col.groups : [];
+          return {
+            ...withId(col),
+            label: textOf(col.label).trim() || "Kolom",
+            groups: await Promise.all(
+              groups.map(async (group) => {
+                const grp = asRecord(group);
+                const links = Array.isArray(grp.links) ? grp.links : [];
+                return {
+                  ...withId(grp),
+                  links: await Promise.all(
+                    links.map(async (link) => {
+                      const entry = asRecord(link);
+                      return {
+                        ...withId(entry),
+                        label: textOf(entry.label),
+                        page: await pageDocumentId(strapi, siteKey, entry.page),
+                      };
+                    }),
+                  ),
+                };
+              }),
+            ),
+          };
+        }),
+      ),
+      feature: title && body && href && cta ? { ...withId(feature), title, body, href, cta } : undefined,
+    });
+  }
+  return items;
+}
+
+function saveError(error: unknown) {
+  if (!error || typeof error !== "object") return "De site kon niet worden opgeslagen.";
+  const err = error as { message?: string; details?: { errors?: { path?: string[]; message?: string }[] } };
+  const details = err.details?.errors
+    ?.map((item) => [item.path?.join("."), item.message].filter(Boolean).join(": "))
+    .filter(Boolean);
+  if (details?.length) return details.join(" ");
+  return err.message || "De site kon niet worden opgeslagen.";
 }
 
 
@@ -175,6 +310,11 @@ export default {
             phoneDisplay: site?.phoneDisplay ?? "",
             email: site?.email ?? "",
             address: site?.address ?? "",
+            kvk: site?.kvk ?? "",
+            btw: site?.btw ?? "",
+            hours: site?.hours ?? "",
+            footerText: site?.footerText ?? "",
+            footerDisclaimer: site?.footerDisclaimer ?? "",
           },
           settings: {
             articlePrefix: site?.articlePrefix || "kennisbank",
@@ -191,47 +331,67 @@ export default {
     routes.push({
       method: "POST",
       path: "/merkdraak-editor/navigation",
-      handler: async (ctx: { request: { body: Record<string, unknown> }; body: unknown }) => {
-        const body = ctx.request.body ?? {};
-        const siteKey = String(body.siteKey ?? "");
-        const site = await strapi.documents("api::site.site").findFirst({ filters: { key: siteKey }, status: "published" });
-        if (!site?.documentId) {
-          ctx.body = { ok: false };
-          return;
-        }
-        const contact = (body.contact ?? {}) as { phoneDisplay?: string; email?: string; address?: string };
-        const settings = (body.settings ?? {}) as { articlePrefix?: string; googlePlaceId?: string; formWebhook?: string };
-        const previousPrefix = site.articlePrefix || "kennisbank";
-        const nextPrefix = normalizePrefix(settings.articlePrefix ?? previousPrefix);
-        await strapi.documents("api::site.site").update({
-          documentId: site.documentId,
-          data: {
-            phoneDisplay: contact.phoneDisplay ?? site.phoneDisplay ?? "",
-            email: contact.email ?? site.email ?? "",
-            address: contact.address ?? site.address ?? "",
-            articlePrefix: nextPrefix,
-            googlePlaceId: String(settings.googlePlaceId ?? site.googlePlaceId ?? "").trim(),
-            formWebhook: String(settings.formWebhook ?? site.formWebhook ?? "").trim(),
-          },
-          status: "published",
-        });
-        await syncArticlePrefix(strapi, siteKey, previousPrefix, nextPrefix);
-        const navigation = await strapi.documents("api::navigation.navigation").findFirst({
-          filters: { siteKey },
-          status: "draft",
-        });
-        if (navigation?.documentId) {
-          await strapi.documents("api::navigation.navigation").update({
-            documentId: navigation.documentId,
+      handler: async (ctx: { request: { body: Record<string, unknown> }; body: unknown; status: number }) => {
+        try {
+          const raw = ctx.request.body ?? {};
+          const body = textOf(asRecord(raw.data).siteKey) || asRecord(raw.data).contact ? asRecord(raw.data) : raw;
+          const siteKey = String(body.siteKey ?? "");
+          const site = await strapi.documents("api::site.site").findFirst({ filters: { key: siteKey }, status: "published" });
+          if (!site?.documentId) {
+            ctx.body = { ok: false, error: "Website niet gevonden." };
+            return;
+          }
+          const contact = asRecord(body.contact);
+          const settings = asRecord(body.settings);
+          const previousPrefix = site.articlePrefix || "kennisbank";
+          const nextPrefix = normalizePrefix(settings.articlePrefix ?? previousPrefix);
+          await strapi.documents("api::site.site").update({
+            documentId: site.documentId,
             data: {
-              footerServices: body.footerServices,
-              footerOrganization: body.footerOrganization,
-              items: body.items,
-            } as never,
+              name: site.name ?? undefined,
+              key: site.key ?? undefined,
+              phoneDisplay: textOf(contact.phoneDisplay ?? site.phoneDisplay),
+              email: textOf(contact.email ?? site.email),
+              address: textOf(contact.address ?? site.address),
+              kvk: textOf(contact.kvk ?? site.kvk),
+              btw: textOf(contact.btw ?? site.btw),
+              hours: textOf(contact.hours ?? site.hours),
+              footerText: textOf(contact.footerText ?? site.footerText),
+              footerDisclaimer: textOf(contact.footerDisclaimer ?? site.footerDisclaimer),
+              articlePrefix: nextPrefix,
+              googlePlaceId: textOf(settings.googlePlaceId ?? site.googlePlaceId).trim(),
+              formWebhook: textOf(settings.formWebhook ?? site.formWebhook).trim(),
+            },
             status: "published",
           });
+          try {
+            await syncArticlePrefix(strapi, siteKey, previousPrefix, nextPrefix);
+          } catch (error) {
+            strapi.log.error(error);
+          }
+          const navigation = await strapi.documents("api::navigation.navigation").findFirst({
+            filters: { siteKey },
+            status: "draft",
+          });
+          if (navigation?.documentId) {
+            try {
+              await strapi.documents("api::navigation.navigation").update({
+                documentId: navigation.documentId,
+                data: {
+                  footerServices: footerRows(body.footerServices),
+                  footerOrganization: footerRows(body.footerOrganization),
+                } as never,
+                status: "published",
+              });
+            } catch (error) {
+              strapi.log.error(error);
+            }
+          }
+          ctx.body = { ok: true };
+        } catch (error) {
+          strapi.log.error(error);
+          ctx.body = { ok: false, error: saveError(error) };
         }
-        ctx.body = { ok: true };
       },
       config: adminOnly,
     });
@@ -260,6 +420,10 @@ export default {
     });
   },
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    clearEditorRequiredFieldsCache();
+    await syncEditorUrl(strapi).catch((error: unknown) => {
+      strapi.log.error(error);
+    });
     const merkdraak = await strapi.documents("api::site.site").findFirst({
       filters: { key: "merkdraak" },
       status: "published",
@@ -306,6 +470,15 @@ export default {
       strapi.log.error(error);
     });
     void backfillMenu(strapi).catch((error: unknown) => {
+      strapi.log.error(error);
+    });
+    void syncContactPageBuilder(strapi).catch((error: unknown) => {
+      strapi.log.error(error);
+    });
+    void syncScanRequestForms(strapi).catch((error: unknown) => {
+      strapi.log.error(error);
+    });
+    void syncComposedPages(strapi).catch((error: unknown) => {
       strapi.log.error(error);
     });
   },

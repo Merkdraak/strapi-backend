@@ -1,6 +1,42 @@
-# Deploy (koekje)
+# Deploy (koekje / cms.merkdraak.nl)
 
-Pushes to `main` deploy Strapi on `koekje` via GitHub Actions.
+Pushes to `main` deploy Strapi on koekje via GitHub Actions → **https://cms.merkdraak.nl**.
+
+## Zelf deployen via pull request
+
+1. Werk op je eigen branch.
+2. Open een **pull request naar `main`**.
+3. Merge de PR.
+4. Actions start automatisch de Strapi-deploy op koekje.
+
+**Merge naar `main` = deploy.** Geen extra handmatige stap nodig.
+Handmatig: Actions → Deploy-workflow → Run workflow.
+
+Een groene run eindigt met `deploy ok <short-sha>`. Rood = cms.merkdraak.nl draait nog de vorige image.
+
+## Als main wel updated is maar cms.merkdraak.nl niet
+
+1. Open **Actions → Deploy to koekje** voor de commit op `main`.
+2. Bekijk de log. Veelvoorkomende oorzaken:
+   - `no space left on device` tijdens image export → schijf op koekje vol.
+   - Build/admin compile errors → fix in de feature branch, opnieuw mergen.
+3. Disk opruimen op de server (root), daarna Actions opnieuw:
+   ```
+   docker container prune -f
+   docker image prune -af
+   docker builder prune -af
+   df -h /
+   ```
+4. `/usr/local/bin/merkdraak-strapi-deploy` is de live deploy-hook. Wijzigingen in `scripts/deploy.sh` gelden pas nadat die file daarheen is gekopieerd (eenmalig door iemand met root).
+
+## Wat je waar ziet
+
+| Repo | Push naar `main` | Zichtbaar op |
+| --- | --- | --- |
+| `strapi-backend` | CMS / API / schema | https://cms.merkdraak.nl |
+| `merkdraak-frontend` | Site + pagebuilder UI | https://test.merkdraak.nl |
+
+De pagebuilder in het CMS is een iframe van de frontend. Op de server moet `FRONTEND_URL=https://test.merkdraak.nl` staan (en idealiter `REVALIDATE_URL=https://test.merkdraak.nl/api/revalidate`). Bij start sync’t Strapi `Site.editorUrl` daarmee, zodat editor-wijzigingen na een frontend-deploy in het CMS zichtbaar zijn.
 
 ## What happens
 

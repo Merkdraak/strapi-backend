@@ -9,13 +9,28 @@
     "heading": {
       "type": "string"
     },
+    "highlight": {
+      "type": "string"
+    },
+    "highlightColor": {
+      "type": "string"
+    },
     "note": {
       "type": "text"
+    },
+    "showNote": {
+      "type": "boolean",
+      "default": true
     },
     "members": {
       "type": "component",
       "repeatable": true,
       "component": "shared.team-member"
+    },
+    "variant": {
+      "type": "enumeration",
+      "enum": ["portrait", "compact"],
+      "default": "portrait"
     },
     "eyebrow": {
       "type": "string"
