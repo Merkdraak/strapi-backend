@@ -18,9 +18,9 @@ type SaveInput = {
 };
 
 type Documents = {
-  findFirst: (params: Record<string, unknown>) => Promise<{ documentId?: string; slug?: string; siteKey?: string } | null>;
-  findOne: (params: Record<string, unknown>) => Promise<{ documentId?: string; slug?: string; siteKey?: string } | null>;
-  findMany: (params: Record<string, unknown>) => Promise<{ documentId?: string }[]>;
+  findFirst: (params: Record<string, unknown>) => Promise<{ documentId?: string; slug?: string; siteKey?: string; entryKey?: string } | null>;
+  findOne: (params: Record<string, unknown>) => Promise<{ documentId?: string; slug?: string; siteKey?: string; entryKey?: string } | null>;
+  findMany: (params: Record<string, unknown>) => Promise<{ documentId?: string; pageType?: string }[]>;
   update: (params: Record<string, unknown>) => Promise<unknown>;
   create: (params: Record<string, unknown>) => Promise<{ documentId?: string }>;
   publish: (params: Record<string, unknown>) => Promise<unknown>;
@@ -62,19 +62,36 @@ function normalizeSections(sections: unknown) {
   }
 }
 
-async function otherWithScopeKey(strapi: Core.Strapi, scopeKey: string, documentId?: string) {
+async function otherWithScopeKey(
+  strapi: Core.Strapi,
+  scopeKey: string,
+  documentId?: string,
+  options: { forCase?: boolean } = {},
+) {
   const uids = ["api::page.page", "api::case.case"] as const;
   const statuses = ["draft", "published"] as const;
+  const self = String(documentId ?? "").trim();
   for (const uid of uids) {
     for (const status of statuses) {
+      const filters: Record<string, unknown> = { scopeKey };
+      // Exclude the document being updated at query level so draft/published
+      // versions of the same entry are never treated as collisions.
+      if (self) filters.documentId = { $ne: self };
       const found = await docs(strapi, uid).findMany({
-        filters: { scopeKey },
+        filters,
         status,
-        fields: ["scopeKey"],
+        fields: uid === "api::page.page" ? ["scopeKey", "documentId", "pageType"] : ["scopeKey", "documentId"],
         pagination: { pageSize: 20 },
       });
-      const other = found.find((item) => item.documentId && item.documentId !== documentId);
-      if (other) return other;
+      for (const item of found) {
+        const id = String(item.documentId ?? "").trim();
+        if (!id || id === self) continue;
+        // Leftover pageType=case rows after migration must not block case saves.
+        if (options.forCase && uid === "api::page.page" && String((item as { pageType?: string }).pageType ?? "") === "case") {
+          continue;
+        }
+        return item;
+      }
     }
   }
   return null;
@@ -106,16 +123,18 @@ export async function saveEditorPage(
   data.site = site.documentId ?? site.id;
 
   let previousSlug = "";
+  let previousEntryKey = "";
   if (input.documentId) {
     const current = await store.findOne({
       documentId: input.documentId,
       status: "draft",
-      fields: ["slug", "siteKey"],
+      fields: ["slug", "siteKey", "entryKey"],
     });
     if (!current || current.siteKey !== siteKey) {
       throw new EditorSaveError(404, "NOT_FOUND", "Deze pagina bestaat niet meer.");
     }
     previousSlug = current.slug ?? "";
+    previousEntryKey = String(current.entryKey ?? "").trim();
   }
 
   if (isCase) {
@@ -198,12 +217,18 @@ export async function saveEditorPage(
   if (scheduled) data.visibility = "planned";
 
   if (!String(data.entryKey ?? "").trim()) {
-    const source = isCase
-      ? String(data.slug ?? "").split("/").filter(Boolean).pop() || String(data.title ?? "case")
-      : typeof data.slug === "string" && data.slug
-        ? data.slug
-        : String(data.title ?? "pagina");
-    data.entryKey = isCase ? slugify(`case-${source}`) || `case-${Date.now()}` : slugify(source) || `pagina-${Date.now()}`;
+    // Prefer the existing key on update so a missing editor field cannot
+    // recreate the same scopeKey and trip the duplicate check.
+    if (previousEntryKey) {
+      data.entryKey = previousEntryKey;
+    } else {
+      const source = isCase
+        ? String(data.slug ?? "").split("/").filter(Boolean).pop() || String(data.title ?? "case")
+        : typeof data.slug === "string" && data.slug
+          ? data.slug
+          : String(data.title ?? "pagina");
+      data.entryKey = isCase ? slugify(`case-${source}`) || `case-${Date.now()}` : slugify(source) || `pagina-${Date.now()}`;
+    }
   }
   data.scopeKey = `${siteKey}:${String(data.entryKey).trim()}`;
 
@@ -217,7 +242,7 @@ export async function saveEditorPage(
     data.composed = data.composed === "true";
   }
 
-  const existing = await otherWithScopeKey(strapi, String(data.scopeKey), input.documentId);
+  const existing = await otherWithScopeKey(strapi, String(data.scopeKey), input.documentId, { forCase: isCase });
   if (existing) {
     throw new EditorSaveError(409, "DUPLICATE_SCOPE_KEY", "Er bestaat al een pagina met dezelfde sleutel. Kies een andere slug of entryKey.", {
       field: "scopeKey",
