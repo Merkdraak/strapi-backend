@@ -1473,31 +1473,6 @@ export interface SharedTeamMember extends Struct.ComponentSchema {
   };
 }
 
-export interface SharedFormField extends Struct.ComponentSchema {
-  collectionName: 'components_shared_form_fields';
-  info: {
-    displayName: 'Formulierveld';
-    icon: 'layer';
-  };
-  attributes: {
-    autocomplete: Schema.Attribute.String;
-    fieldType: Schema.Attribute.Enumeration<
-      ['text', 'email', 'phone', 'textarea', 'select', 'checkbox']
-    > &
-      Schema.Attribute.DefaultTo<'text'> &
-      Schema.Attribute.Required;
-    helper: Schema.Attribute.String;
-    label: Schema.Attribute.String & Schema.Attribute.Required;
-    options: Schema.Attribute.Text;
-    placeholder: Schema.Attribute.String;
-    required: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
-    role: Schema.Attribute.Enumeration<
-      ['name', 'email', 'phone', 'message', 'extra']
-    > &
-      Schema.Attribute.DefaultTo<'extra'>;
-  };
-}
-
 export interface SharedTextItem extends Struct.ComponentSchema {
   collectionName: 'components_shared_text_items';
   info: {
@@ -1601,7 +1576,6 @@ declare module '@strapi/strapi' {
       'shared.article-type': SharedArticleType;
       'shared.content-card': SharedContentCard;
       'shared.faq-item': SharedFaqItem;
-      'shared.form-field': SharedFormField;
       'shared.form-field': SharedFormField;
       'shared.named-item': SharedNamedItem;
       'shared.pillar': SharedPillar;

@@ -16,7 +16,7 @@ export const sectionPopulate = {
     "sections.notice": { populate: "*" },
     "sections.testimonial": { populate: "*" },
     "sections.contact-cta": { populate: "*" },
-    "sections.contact-form": { populate: "*" },
+    "sections.contact-form": { populate: ["fields"] },
     "sections.case-grid": { populate: "*" },
     "sections.page-index": { populate: ["articleTypes"] },
     "sections.link-list": { populate: ["items"] },
