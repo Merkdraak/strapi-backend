@@ -503,6 +503,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
         'sections.team',
         'sections.contact-cta',
         'sections.contact-form',
+        'sections.application-form',
         'sections.scan-request-form',
         'sections.notice',
         'sections.prose',
@@ -600,11 +601,14 @@ export interface ApiFormSubmissionFormSubmission
     draftAndPublish: false;
   };
   attributes: {
+    consent: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    cv: Schema.Attribute.Media<'files'>;
     email: Schema.Attribute.String & Schema.Attribute.Required;
     interest: Schema.Attribute.String;
+    linkedinUrl: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -613,12 +617,21 @@ export interface ApiFormSubmissionFormSubmission
       Schema.Attribute.Private;
     message: Schema.Attribute.Text & Schema.Attribute.Required;
     name: Schema.Attribute.String & Schema.Attribute.Required;
+    pageUrl: Schema.Attribute.String;
     phone: Schema.Attribute.String;
+    portfolioUrl: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     siteKey: Schema.Attribute.String & Schema.Attribute.Required;
+    submissionType: Schema.Attribute.Enumeration<
+      ['contact', 'scan', 'application']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'contact'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    vacancySlug: Schema.Attribute.String;
+    vacancyTitle: Schema.Attribute.String;
   };
 }
 
@@ -733,6 +746,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.team',
         'sections.contact-cta',
         'sections.contact-form',
+        'sections.application-form',
         'sections.scan-request-form',
         'sections.notice',
         'sections.prose',

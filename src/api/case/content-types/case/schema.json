@@ -132,6 +132,7 @@
         "sections.team",
         "sections.contact-cta",
         "sections.contact-form",
+        "sections.application-form",
         "sections.scan-request-form",
         "sections.notice",
         "sections.prose",

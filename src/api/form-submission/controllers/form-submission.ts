@@ -1,4 +1,6 @@
 import { factories } from "@strapi/strapi";
+import fs from "fs";
+import path from "path";
 
 const scanRequests = {
   seo: { label: "SEO-scan", pageLabel: "SEO", path: "/online-marketing/seo" },
@@ -9,6 +11,14 @@ const scanRequests = {
 type ScanType = keyof typeof scanRequests;
 
 const hourly = new Map<string, number[]>();
+
+const CV_MAX_BYTES = 5 * 1024 * 1024;
+const CV_MIME = new Set([
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]);
+const CV_EXT = new Set([".pdf", ".doc", ".docx"]);
 
 function clip(value: unknown, max: number) {
   return String(value ?? "").trim().slice(0, max);
@@ -72,6 +82,17 @@ function validPhone(value: string) {
   return true;
 }
 
+function validUrl(value: string) {
+  const raw = value.trim();
+  if (!raw) return true;
+  try {
+    const url = new URL(raw.startsWith("http") ? raw : `https://${raw}`);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 function toE164(value: string) {
   const raw = value.replace(/[^\d+]/g, "");
   if (raw.startsWith("+") && raw.length >= 11 && raw.length <= 16) return raw;
@@ -84,11 +105,64 @@ function plain(value: string) {
   return value.replace(/[\r\n]+/g, " ").trim();
 }
 
+function truthy(value: unknown) {
+  return value === true || value === "true" || value === "1" || value === "on" || value === "ja";
+}
+
+type UploadFile = {
+  filepath?: string;
+  path?: string;
+  originalFilename?: string;
+  name?: string;
+  mimetype?: string;
+  type?: string;
+  size?: number;
+};
+
+function firstFile(value: unknown): UploadFile | null {
+  if (!value) return null;
+  if (Array.isArray(value)) return (value[0] as UploadFile) ?? null;
+  return value as UploadFile;
+}
+
+function cvFilePath(file: UploadFile) {
+  return String(file.filepath || file.path || "").trim();
+}
+
+function cvFileName(file: UploadFile) {
+  return String(file.originalFilename || file.name || "cv").trim() || "cv";
+}
+
+function cvMime(file: UploadFile) {
+  return String(file.mimetype || file.type || "").trim().toLowerCase();
+}
+
+function validateCv(file: UploadFile | null, required: boolean) {
+  if (!file || !cvFilePath(file)) {
+    return required ? "Upload een geldig CV-bestand." : "";
+  }
+  const size = Number(file.size ?? 0);
+  if (!Number.isFinite(size) || size <= 0) return "Upload een geldig CV-bestand.";
+  if (size > CV_MAX_BYTES) return "Het bestand is te groot.";
+  const mime = cvMime(file);
+  const ext = path.extname(cvFileName(file)).toLowerCase();
+  if (!CV_MIME.has(mime) || !CV_EXT.has(ext)) return "Upload een geldig CV-bestand.";
+  return "";
+}
+
 async function sendMail(
   strapi: {
-    plugin: (name: string) => { service: (name: string) => { send: (payload: Record<string, string>) => Promise<unknown> } };
+    plugin: (name: string) => {
+      service: (name: string) => { send: (payload: Record<string, unknown>) => Promise<unknown> };
+    };
   },
-  payload: { to: string; subject: string; text: string; replyTo?: string },
+  payload: {
+    to: string;
+    subject: string;
+    text: string;
+    replyTo?: string;
+    attachments?: Array<{ filename: string; content: Buffer; contentType?: string }>;
+  },
 ) {
   if (!payload.to) return;
   await strapi.plugin("email").service("email").send({
@@ -96,6 +170,7 @@ async function sendMail(
     subject: payload.subject,
     text: payload.text,
     ...(payload.replyTo ? { replyTo: payload.replyTo } : {}),
+    ...(payload.attachments?.length ? { attachments: payload.attachments } : {}),
   });
 }
 
@@ -157,7 +232,15 @@ export default factories.createCoreController("api::form-submission.form-submiss
     });
     if (!site) return ctx.notFound();
     await strapi.documents("api::form-submission.form-submission").create({
-      data: { siteKey, name, email, phone, message, interest },
+      data: {
+        siteKey,
+        submissionType: scan ? "scan" : "contact",
+        name,
+        email,
+        phone,
+        message,
+        interest,
+      },
     });
 
     const staff =
@@ -211,6 +294,180 @@ export default factories.createCoreController("api::form-submission.form-submiss
         strapi.log.warn("form confirmation sms failed");
         strapi.log.warn(error);
       }
+    }
+
+    ctx.body = { ok: true };
+  },
+
+  async apply(ctx) {
+    if (!authorized(ctx)) return ctx.unauthorized();
+    const body = (ctx.request.body ?? {}) as Record<string, unknown>;
+    if (clip(body.company, 200)) {
+      ctx.body = { ok: true };
+      return;
+    }
+
+    const siteKey = clip(body.siteKey, 80);
+    const name = clip(body.name, 120);
+    const email = clip(body.email, 200);
+    const phone = clip(body.phone, 40);
+    const motivation = clip(body.motivation ?? body.message, 4000);
+    const notes = clip(body.notes, 4000);
+    const linkedinUrl = clip(body.linkedinUrl, 500);
+    const portfolioUrl = clip(body.portfolioUrl, 500);
+    const vacancyTitle = clip(body.vacancyTitle, 200);
+    const vacancySlug = clip(body.vacancySlug, 200);
+    const pageUrl = clip(body.pageUrl, 500);
+    const consentRequired = truthy(body.consentRequired);
+    const consent = truthy(body.consent);
+    const cvRequired = body.cvRequired == null ? true : truthy(body.cvRequired);
+    const sendConfirmation = body.sendConfirmation == null ? true : truthy(body.sendConfirmation);
+    const confirmationSubject =
+      clip(body.confirmationSubject, 200) ||
+      `We hebben je sollicitatie ontvangen${vacancyTitle ? ` — ${vacancyTitle}` : ""}`;
+    const confirmationText =
+      clip(body.confirmationText, 4000) ||
+      `Hallo ${name || "sollicitant"},\n\nBedankt voor je sollicitatie${vacancyTitle ? ` voor ${vacancyTitle}` : ""}. We hebben je gegevens ontvangen en nemen contact met je op.\n\nMet vriendelijke groet,\nMerkdraak`;
+
+    const files = (ctx.request.files ?? {}) as Record<string, unknown>;
+    const cvUpload = firstFile(files.cv ?? files.file ?? files.files);
+    const cvError = validateCv(cvUpload, cvRequired);
+    if (cvError) return ctx.badRequest(cvError);
+
+    if (!siteKey || !name || !motivation || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return ctx.badRequest("Vul naam, een geldig e-mailadres en je motivatie in.");
+    }
+    if (!validPhone(phone)) {
+      return ctx.badRequest("Vul een geldig telefoonnummer in.");
+    }
+    if (!validUrl(linkedinUrl) || !validUrl(portfolioUrl)) {
+      return ctx.badRequest("Vul een geldige URL in.");
+    }
+    if (consentRequired && !consent) {
+      return ctx.badRequest("Dit veld is verplicht.");
+    }
+    if (!validStarted(body.started)) {
+      return ctx.badRequest("Even geduld. Wacht een paar seconden en verstuur het formulier opnieuw.");
+    }
+    if (tooMany(clientKey(ctx.request.ip, ctx.request.header["x-forwarded-for"], email))) {
+      ctx.status = 429;
+      ctx.body = { error: { message: "Je hebt dit formulier te vaak verzonden. Probeer het later opnieuw." } };
+      return;
+    }
+
+    const site = await strapi.documents("api::site.site").findFirst({
+      filters: { key: siteKey },
+      status: "published",
+    });
+    if (!site) return ctx.notFound();
+
+    let cvId: number | null = null;
+    let cvAttachment: { filename: string; content: Buffer; contentType?: string } | null = null;
+    if (cvUpload) {
+      try {
+        const created = await strapi.plugin("upload").service("upload").upload({
+          data: {
+            fileInfo: {
+              name: cvFileName(cvUpload),
+              alternativeText: `CV van ${name}`,
+              caption: vacancyTitle ? `Sollicitatie: ${vacancyTitle}` : "Sollicitatie",
+            },
+          },
+          files: cvUpload,
+        });
+        const file = Array.isArray(created) ? created[0] : created;
+        cvId = typeof file?.id === "number" ? file.id : Number(file?.id) || null;
+        const diskPath = cvFilePath(cvUpload);
+        if (diskPath && fs.existsSync(diskPath)) {
+          cvAttachment = {
+            filename: cvFileName(cvUpload),
+            content: fs.readFileSync(diskPath),
+            contentType: cvMime(cvUpload) || undefined,
+          };
+        }
+      } catch (error) {
+        strapi.log.warn("application cv upload failed");
+        strapi.log.warn(error);
+        return ctx.badRequest("Upload een geldig CV-bestand.");
+      }
+    }
+
+    const messageParts = [motivation];
+    if (notes) messageParts.push(`Extra toelichting:\n${notes}`);
+    if (linkedinUrl) messageParts.push(`LinkedIn: ${linkedinUrl}`);
+    if (portfolioUrl) messageParts.push(`Portfolio: ${portfolioUrl}`);
+    if (consentRequired || consent) messageParts.push(`Privacy/toestemming: ${consent ? "Ja" : "Nee"}`);
+    const message = messageParts.join("\n\n").slice(0, 4000);
+
+    await strapi.documents("api::form-submission.form-submission").create({
+      data: {
+        siteKey,
+        submissionType: "application",
+        name,
+        email,
+        phone,
+        message,
+        interest: vacancyTitle || "Sollicitatie",
+        vacancyTitle,
+        vacancySlug,
+        pageUrl,
+        linkedinUrl,
+        portfolioUrl,
+        consent,
+        ...(cvId ? { cv: cvId } : {}),
+      },
+    });
+
+    const staff =
+      notifyAddress(body.notifyEmail) ||
+      notifyAddress(body.recipientEmail) ||
+      notifyAddress(body.to) ||
+      notifyAddress(site.email);
+    const vacancyLine = vacancyTitle || "onbekende vacature";
+
+    try {
+      if (staff) {
+        await sendMail(strapi, {
+          to: staff,
+          subject: `Sollicitatie voor: ${vacancyLine} – ${site.name ?? siteKey}`,
+          text: [
+            `Sollicitatie voor: ${vacancyLine}`,
+            vacancySlug ? `Vacature-slug/id: ${vacancySlug}` : "",
+            pageUrl ? `Pagina-URL: ${pageUrl}` : "",
+            "",
+            `Naam: ${name}`,
+            `E-mail: ${email}`,
+            `Telefoon: ${phone || "-"}`,
+            linkedinUrl ? `LinkedIn: ${linkedinUrl}` : "",
+            portfolioUrl ? `Portfolio: ${portfolioUrl}` : "",
+            consentRequired || consent ? `Toestemming: ${consent ? "Ja" : "Nee"}` : "",
+            cvAttachment ? `CV: bijgevoegd (${cvAttachment.filename})` : cvRequired ? "CV: ontbreekt" : "CV: niet aangeleverd",
+            "",
+            "Motivatie:",
+            motivation,
+            notes ? `\nExtra toelichting:\n${notes}` : "",
+          ]
+            .filter((line) => line !== "")
+            .join("\n"),
+          replyTo: email,
+          attachments: cvAttachment ? [cvAttachment] : undefined,
+        });
+      }
+      if (sendConfirmation) {
+        await sendMail(strapi, {
+          to: email,
+          subject: confirmationSubject.includes("{{vacature}}")
+            ? confirmationSubject.split("{{vacature}}").join(vacancyLine)
+            : confirmationSubject,
+          text: confirmationText
+            .split("{{naam}}").join(name)
+            .split("{{vacature}}").join(vacancyLine)
+            .split("{{site}}").join(String(site.name ?? "Merkdraak")),
+        });
+      }
+    } catch (error) {
+      strapi.log.warn("application email failed");
+      strapi.log.warn(error);
     }
 
     ctx.body = { ok: true };

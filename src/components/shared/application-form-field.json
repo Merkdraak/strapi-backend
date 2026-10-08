@@ -1,0 +1,43 @@
+{
+  "collectionName": "components_shared_application_form_fields",
+  "info": {
+    "displayName": "Sollicitatieveld",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "fieldType": {
+      "type": "enumeration",
+      "enum": ["text", "email", "phone", "textarea", "url", "file", "checkbox"],
+      "default": "text",
+      "required": true
+    },
+    "placeholder": {
+      "type": "string"
+    },
+    "required": {
+      "type": "boolean",
+      "default": true
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "helper": {
+      "type": "string"
+    },
+    "role": {
+      "type": "enumeration",
+      "enum": ["name", "email", "phone", "motivation", "cv", "linkedin", "portfolio", "notes", "consent"],
+      "default": "notes",
+      "required": true
+    },
+    "autocomplete": {
+      "type": "string"
+    }
+  }
+}

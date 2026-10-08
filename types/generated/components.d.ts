@@ -120,6 +120,48 @@ export interface SectionsAccordion extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsApplicationForm extends Struct.ComponentSchema {
+  collectionName: 'components_sections_application_forms';
+  info: {
+    displayName: 'Sollicitatieformulier';
+    icon: 'file';
+  };
+  attributes: {
+    accentColor: Schema.Attribute.String;
+    align: Schema.Attribute.Enumeration<['left', 'center', 'right']> &
+      Schema.Attribute.DefaultTo<'left'>;
+    anchor: Schema.Attribute.String;
+    appearance: Schema.Attribute.Enumeration<['dark', 'light', 'accent']> &
+      Schema.Attribute.DefaultTo<'dark'>;
+    backgroundColor: Schema.Attribute.String;
+    confirmationSubject: Schema.Attribute.String;
+    confirmationText: Schema.Attribute.Text;
+    errorMessage: Schema.Attribute.Text;
+    fields: Schema.Attribute.Component<'shared.application-form-field', true>;
+    fontSize: Schema.Attribute.String;
+    fontWeight: Schema.Attribute.String;
+    formWidth: Schema.Attribute.Enumeration<['narrow', 'medium', 'wide']> &
+      Schema.Attribute.DefaultTo<'medium'>;
+    heading: Schema.Attribute.String;
+    headingLevel: Schema.Attribute.String;
+    intro: Schema.Attribute.Text;
+    pendingLabel: Schema.Attribute.String;
+    recipientEmail: Schema.Attribute.Email;
+    sendConfirmation: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    space: Schema.Attribute.String;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
+    submitLabel: Schema.Attribute.String;
+    textColor: Schema.Attribute.String;
+    thanks: Schema.Attribute.Text;
+  };
+}
+
 export interface SectionsBeforeAfter extends Struct.ComponentSchema {
   collectionName: 'components_sections_before_afters';
   info: {
@@ -1332,6 +1374,42 @@ export interface SharedAccordionItem extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedApplicationFormField extends Struct.ComponentSchema {
+  collectionName: 'components_shared_application_form_fields';
+  info: {
+    displayName: 'Sollicitatieveld';
+    icon: 'layer';
+  };
+  attributes: {
+    autocomplete: Schema.Attribute.String;
+    enabled: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    fieldType: Schema.Attribute.Enumeration<
+      ['text', 'email', 'phone', 'textarea', 'url', 'file', 'checkbox']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'text'>;
+    helper: Schema.Attribute.String;
+    label: Schema.Attribute.String & Schema.Attribute.Required;
+    placeholder: Schema.Attribute.String;
+    required: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    role: Schema.Attribute.Enumeration<
+      [
+        'name',
+        'email',
+        'phone',
+        'motivation',
+        'cv',
+        'linkedin',
+        'portfolio',
+        'notes',
+        'consent',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'notes'>;
+  };
+}
+
 export interface SharedArticleType extends Struct.ComponentSchema {
   collectionName: 'components_shared_article_types';
   info: {
@@ -1621,6 +1699,7 @@ declare module '@strapi/strapi' {
       'nav.mega': NavMega;
       'nav.page-link': NavPageLink;
       'sections.accordion': SectionsAccordion;
+      'sections.application-form': SectionsApplicationForm;
       'sections.before-after': SectionsBeforeAfter;
       'sections.bullet-list': SectionsBulletList;
       'sections.button': SectionsButton;
@@ -1666,6 +1745,7 @@ declare module '@strapi/strapi' {
       'sections.video': SectionsVideo;
       'sections.why-us': SectionsWhyUs;
       'shared.accordion-item': SharedAccordionItem;
+      'shared.application-form-field': SharedApplicationFormField;
       'shared.article-type': SharedArticleType;
       'shared.case-tab': SharedCaseTab;
       'shared.content-card': SharedContentCard;

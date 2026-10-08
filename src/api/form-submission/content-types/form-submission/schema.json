@@ -15,6 +15,12 @@
       "type": "string",
       "required": true
     },
+    "submissionType": {
+      "type": "enumeration",
+      "enum": ["contact", "scan", "application"],
+      "default": "contact",
+      "required": true
+    },
     "name": {
       "type": "string",
       "required": true
@@ -32,6 +38,31 @@
     },
     "interest": {
       "type": "string"
+    },
+    "vacancyTitle": {
+      "type": "string"
+    },
+    "vacancySlug": {
+      "type": "string"
+    },
+    "pageUrl": {
+      "type": "string"
+    },
+    "linkedinUrl": {
+      "type": "string"
+    },
+    "portfolioUrl": {
+      "type": "string"
+    },
+    "consent": {
+      "type": "boolean",
+      "default": false
+    },
+    "cv": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["files"]
     }
   }
 }

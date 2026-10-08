@@ -44,6 +44,7 @@ const blockLabel: Record<string, string> = {
   "sections.team": "Team",
   "sections.contact-cta": "Contact",
   "sections.contact-form": "Contactformulier",
+  "sections.application-form": "Sollicitatieformulier",
   "sections.scan-request-form": "Scanaanvraag",
   "sections.notice": "Mededeling",
   "sections.prose": "Tekst",
