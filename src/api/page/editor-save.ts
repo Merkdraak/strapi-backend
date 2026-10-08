@@ -9,6 +9,7 @@ import {
   type EditorSaveBody,
 } from "./editor-errors";
 import { refreshFrontend } from "../../refresh-frontend";
+import { ensureScanRequestSections } from "../../sync-scan-forms";
 
 type SaveInput = {
   documentId?: string;
@@ -211,6 +212,7 @@ export async function saveEditorPage(
   }
 
   normalizeSections(data.sections);
+  data.sections = ensureScanRequestSections(String(data.entryKey ?? ""), data.sections);
 
   const visibility = String(data.visibility ?? "planned");
   let documentId = input.documentId;

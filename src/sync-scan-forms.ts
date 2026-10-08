@@ -28,7 +28,7 @@ type PageDraft = {
   sections?: { __component?: string; scanType?: string }[] | null;
 };
 
-function scanSection(page: (typeof pages)[number]) {
+export function scanRequestSection(page: (typeof pages)[number]) {
   return {
     __component: "sections.scan-request-form",
     scanType: page.scanType,
@@ -36,6 +36,19 @@ function scanSection(page: (typeof pages)[number]) {
     intro: page.intro,
     recipientEmail: "mike@merkdraak.nl",
   };
+}
+
+/** Keep the scanaanvraag-blok on SEO / SEA / CRO even when an editor save omits it. */
+export function ensureScanRequestSections(entryKey: string, sections: unknown) {
+  const target = pages.find((page) => page.entryKey === entryKey);
+  if (!target) return sections;
+  const list = Array.isArray(sections) ? [...sections] : [];
+  const hasForm = list.some(
+    (section) =>
+      section && typeof section === "object" && (section as { __component?: string }).__component === "sections.scan-request-form",
+  );
+  if (hasForm) return list;
+  return [...list, scanRequestSection(target)];
 }
 
 /**
@@ -61,7 +74,7 @@ export async function syncScanRequestForms(strapi: Core.Strapi) {
       continue;
     }
 
-    const nextSections = [...sections, scanSection(target)];
+    const nextSections = [...sections, scanRequestSection(target)];
     await strapi.documents("api::page.page").update({
       documentId: page.documentId,
       status: "draft",
