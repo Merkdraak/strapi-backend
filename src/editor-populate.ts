@@ -10,7 +10,7 @@ export const sectionPopulate = {
     "sections.numbered-steps": { populate: ["steps"] },
     "sections.faq": { populate: ["items"] },
     "sections.price-factors": { populate: ["items"] },
-    "sections.service-cards": { populate: { cards: { populate: ["items"] } } },
+    "sections.service-cards": { populate: { cards: { populate: ["items", "image"] } } },
     "sections.case-story": { populate: ["approach", "metrics", "image"] },
     "sections.prose": { populate: "*" },
     "sections.notice": { populate: "*" },
