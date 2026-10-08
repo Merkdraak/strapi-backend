@@ -129,15 +129,17 @@ export async function saveEditorPage(
     delete data.formThanks;
     delete data.formRedirect;
     if (!data.parentKey) data.parentKey = "cases";
+    if (!String(data.visibility ?? "").trim()) data.visibility = "planned";
+    if (!String(data.cta ?? "").trim()) data.cta = "marketingscan";
   } else {
     helpers.applyKnowledgeSlug(data, helpers.normalizePrefix(site.articlePrefix));
     data.showInMenu = data.showInMenu === true || data.showInMenu === "true";
     if (!data.publishedOn) data.publishedOn = null;
+    if (!String(data.pageType ?? "").trim()) data.pageType = "company";
+    if (!String(data.visibility ?? "").trim()) data.visibility = "planned";
+    if (!String(data.cta ?? "").trim()) data.cta = "marketingscan";
     if (String(data.pageType) !== "home" && !String(data.slug ?? "").trim()) {
-      data.slug = slugify(String(data.title ?? data.entryKey ?? "pagina"));
-    }
-    if (String(data.pageType) !== "home" && !String(data.slug ?? "").trim()) {
-      throw new EditorSaveError(400, "VALIDATION_ERROR", "Vul een geldige URL-slug in voordat je opslaat.", { field: "slug" });
+      data.slug = slugify(String(data.title ?? data.entryKey ?? "")) || `pagina-${Date.now()}`;
     }
   }
   const nextSlug = typeof data.slug === "string" ? data.slug : "";

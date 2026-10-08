@@ -10,8 +10,7 @@
       "type": "string"
     },
     "body": {
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     "headingLevel": {
       "type": "string"

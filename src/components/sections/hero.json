@@ -10,8 +10,7 @@
       "type": "string"
     },
     "title": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "highlight": {
       "type": "string"
