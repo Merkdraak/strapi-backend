@@ -58,7 +58,7 @@ function normalizeSections(sections: unknown) {
         continue;
       }
       const name = typeof person.name === "string" ? person.name : "";
-      person.initials = initialsFromName(name) || "NN";
+      person.initials = initialsFromName(name);
     }
   }
 }
@@ -130,15 +130,17 @@ export async function saveEditorPage(
     delete data.formThanks;
     delete data.formRedirect;
     if (!data.parentKey) data.parentKey = "cases";
+    if (!String(data.visibility ?? "").trim()) data.visibility = "planned";
+    if (!String(data.cta ?? "").trim()) data.cta = "marketingscan";
   } else {
     helpers.applyKnowledgeSlug(data, helpers.normalizePrefix(site.articlePrefix));
     data.showInMenu = data.showInMenu === true || data.showInMenu === "true";
     if (!data.publishedOn) data.publishedOn = null;
+    if (!String(data.pageType ?? "").trim()) data.pageType = "company";
+    if (!String(data.visibility ?? "").trim()) data.visibility = "planned";
+    if (!String(data.cta ?? "").trim()) data.cta = "marketingscan";
     if (String(data.pageType) !== "home" && !String(data.slug ?? "").trim()) {
-      data.slug = slugify(String(data.title ?? data.entryKey ?? "pagina"));
-    }
-    if (String(data.pageType) !== "home" && !String(data.slug ?? "").trim()) {
-      throw new EditorSaveError(400, "VALIDATION_ERROR", "Vul een geldige URL-slug in voordat je opslaat.", { field: "slug" });
+      data.slug = slugify(String(data.title ?? data.entryKey ?? "")) || `pagina-${Date.now()}`;
     }
   }
   const nextSlug = typeof data.slug === "string" ? data.slug : "";
@@ -173,7 +175,20 @@ export async function saveEditorPage(
       fields: ["entryKey"],
       pagination: { pageSize: 50 },
     });
-    data.related = related.map((item) => item.documentId);
+    const relatedRows = related as Array<{ documentId?: string; entryKey?: string }>;
+    const found = new Set(relatedRows.map((item) => String(item.entryKey ?? "")));
+    const missing = relatedKeys.filter((key) => !found.has(key));
+    if (missing.length) {
+      throw new EditorSaveError(
+        400,
+        "VALIDATION_ERROR",
+        missing.length === 1
+          ? `Gerelateerde pagina '${missing[0]}' bestaat niet.`
+          : `Gerelateerde pagina's bestaan niet: ${missing.join(", ")}.`,
+        { field: "relatedKeys", details: { missing } },
+      );
+    }
+    data.related = relatedRows.map((item) => item.documentId);
   } else {
     data.related = [];
   }

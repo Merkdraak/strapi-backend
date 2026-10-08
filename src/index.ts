@@ -1,4 +1,5 @@
 import type { Core } from "@strapi/strapi";
+import { clearEditorRequiredFieldsCache } from "./editor-required-fields";
 import { backfillMenu, normalizePrefix, syncArticlePrefix } from "./knowledge";
 import { registerPageBlocksTool } from "./page-blocks-mcp";
 import { publishScheduledPages } from "./publish-scheduled";
@@ -419,6 +420,7 @@ export default {
     });
   },
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    clearEditorRequiredFieldsCache();
     await syncEditorUrl(strapi).catch((error: unknown) => {
       strapi.log.error(error);
     });
