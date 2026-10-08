@@ -1,4 +1,4 @@
-﻿import type { Schema, Struct } from '@strapi/strapi';
+import type { Schema, Struct } from '@strapi/strapi';
 
 export interface NavColumn extends Struct.ComponentSchema {
   collectionName: 'components_nav_columns';
@@ -964,7 +964,6 @@ export interface SectionsRow extends Struct.ComponentSchema {
     textColor: Schema.Attribute.String;
   };
 }
-
 
 export interface SectionsScanRequestForm extends Struct.ComponentSchema {
   collectionName: 'components_sections_scan_request_forms';
