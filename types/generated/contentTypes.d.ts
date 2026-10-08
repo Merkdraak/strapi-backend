@@ -469,15 +469,16 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
     cta: Schema.Attribute.Enumeration<
       ['marketingscan', 'websitescan', 'contact', 'cases']
     > &
+      Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'marketingscan'>;
-    description: Schema.Attribute.Text;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
     entryKey: Schema.Attribute.String & Schema.Attribute.Required;
     eyebrow: Schema.Attribute.String;
     intro: Schema.Attribute.Text;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::case.case'> &
       Schema.Attribute.Private;
-    navLabel: Schema.Attribute.String;
+    navLabel: Schema.Attribute.String & Schema.Attribute.Required;
     nofollow: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     ogDescription: Schema.Attribute.Text;
     ogImage: Schema.Attribute.Media<'images'>;
@@ -502,7 +503,6 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
         'sections.why-us',
         'sections.team',
         'sections.contact-cta',
-        'sections.contact-form',
         'sections.notice',
         'sections.prose',
         'sections.bullet-list',
@@ -525,7 +525,6 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
         'sections.table',
         'sections.columns',
         'sections.cards',
-        'sections.vacancies',
         'sections.accordion',
         'sections.expert',
         'sections.sources',
@@ -533,56 +532,23 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
         'sections.before-after',
         'sections.reviews',
         'sections.location',
-        'sections.map-embed',
         'sections.document',
         'sections.button-row',
       ]
     >;
-    seoTitle: Schema.Attribute.String;
+    seoTitle: Schema.Attribute.String & Schema.Attribute.Required;
     site: Schema.Attribute.Relation<'manyToOne', 'api::site.site'>;
     siteKey: Schema.Attribute.String & Schema.Attribute.Required;
     slug: Schema.Attribute.String;
-    title: Schema.Attribute.String;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     visibility: Schema.Attribute.Enumeration<
       ['planned', 'concept', 'published']
     > &
+      Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'planned'>;
-  };
-}
-
-export interface ApiEditorPresetEditorPreset
-  extends Struct.CollectionTypeSchema {
-  collectionName: 'editor_presets';
-  info: {
-    description: 'Favoriete blokken voor de pagina-editor. Niet openbaar op de site.';
-    displayName: 'Editorpreset';
-    pluralName: 'editor-presets';
-    singularName: 'editor-preset';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::editor-preset.editor-preset'
-    > &
-      Schema.Attribute.Private;
-    name: Schema.Attribute.String & Schema.Attribute.Required;
-    payload: Schema.Attribute.JSON & Schema.Attribute.Required;
-    publishedAt: Schema.Attribute.DateTime;
-    puckType: Schema.Attribute.String & Schema.Attribute.Required;
-    siteKey: Schema.Attribute.String & Schema.Attribute.Required;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
   };
 }
 
@@ -690,8 +656,9 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     cta: Schema.Attribute.Enumeration<
       ['marketingscan', 'websitescan', 'contact', 'cases']
     > &
+      Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'marketingscan'>;
-    description: Schema.Attribute.Text;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
     entryKey: Schema.Attribute.String & Schema.Attribute.Required;
     eyebrow: Schema.Attribute.String;
     formEmail: Schema.Attribute.String;
@@ -701,7 +668,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::page.page'> &
       Schema.Attribute.Private;
-    navLabel: Schema.Attribute.String;
+    navLabel: Schema.Attribute.String & Schema.Attribute.Required;
     nofollow: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     ogDescription: Schema.Attribute.Text;
     ogImage: Schema.Attribute.Media<'images'>;
@@ -709,7 +676,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     pageType: Schema.Attribute.Enumeration<
       ['home', 'company', 'overview', 'service', 'case', 'knowledge']
     > &
-      Schema.Attribute.DefaultTo<'company'>;
+      Schema.Attribute.Required;
     parent: Schema.Attribute.Relation<'manyToOne', 'api::page.page'>;
     phase: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
     publishAt: Schema.Attribute.DateTime;
@@ -762,23 +729,23 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.before-after',
         'sections.reviews',
         'sections.location',
-        'sections.map-embed',
         'sections.document',
         'sections.button-row',
       ]
     >;
-    seoTitle: Schema.Attribute.String;
+    seoTitle: Schema.Attribute.String & Schema.Attribute.Required;
     showInMenu: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     site: Schema.Attribute.Relation<'manyToOne', 'api::site.site'>;
     siteKey: Schema.Attribute.String & Schema.Attribute.Required;
     slug: Schema.Attribute.String;
-    title: Schema.Attribute.String;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     visibility: Schema.Attribute.Enumeration<
       ['planned', 'concept', 'published']
     > &
+      Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'planned'>;
   };
 }
@@ -847,7 +814,7 @@ export interface ApiSiteSite extends Struct.CollectionTypeSchema {
     editorUrl: Schema.Attribute.String;
     email: Schema.Attribute.String;
     emailHref: Schema.Attribute.String;
-    footerDisclaimer: Schema.Attribute.Text;
+    footerDisclaimer: Schema.Attribute.String;
     footerText: Schema.Attribute.Text;
     formWebhook: Schema.Attribute.String;
     googlePlaceId: Schema.Attribute.String;
@@ -1381,7 +1348,6 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::case.case': ApiCaseCase;
-      'api::editor-preset.editor-preset': ApiEditorPresetEditorPreset;
       'api::form-submission.form-submission': ApiFormSubmissionFormSubmission;
       'api::navigation.navigation': ApiNavigationNavigation;
       'api::page.page': ApiPagePage;
