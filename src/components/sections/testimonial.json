@@ -7,12 +7,10 @@
   "options": {},
   "attributes": {
     "quote": {
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     "name": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "role": {
       "type": "string"

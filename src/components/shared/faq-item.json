@@ -7,12 +7,10 @@
   "options": {},
   "attributes": {
     "question": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "answer": {
-      "type": "text",
-      "required": true
+      "type": "text"
     }
   }
 }

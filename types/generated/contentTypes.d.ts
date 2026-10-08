@@ -469,16 +469,15 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
     cta: Schema.Attribute.Enumeration<
       ['marketingscan', 'websitescan', 'contact', 'cases']
     > &
-      Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'marketingscan'>;
-    description: Schema.Attribute.Text & Schema.Attribute.Required;
+    description: Schema.Attribute.Text;
     entryKey: Schema.Attribute.String & Schema.Attribute.Required;
     eyebrow: Schema.Attribute.String;
     intro: Schema.Attribute.Text;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::case.case'> &
       Schema.Attribute.Private;
-    navLabel: Schema.Attribute.String & Schema.Attribute.Required;
+    navLabel: Schema.Attribute.String;
     nofollow: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     ogDescription: Schema.Attribute.Text;
     ogImage: Schema.Attribute.Media<'images'>;
@@ -539,18 +538,17 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
         'sections.button-row',
       ]
     >;
-    seoTitle: Schema.Attribute.String & Schema.Attribute.Required;
+    seoTitle: Schema.Attribute.String;
     site: Schema.Attribute.Relation<'manyToOne', 'api::site.site'>;
     siteKey: Schema.Attribute.String & Schema.Attribute.Required;
     slug: Schema.Attribute.String;
-    title: Schema.Attribute.String & Schema.Attribute.Required;
+    title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     visibility: Schema.Attribute.Enumeration<
       ['planned', 'concept', 'published']
     > &
-      Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'planned'>;
   };
 }
@@ -692,9 +690,8 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     cta: Schema.Attribute.Enumeration<
       ['marketingscan', 'websitescan', 'contact', 'cases']
     > &
-      Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'marketingscan'>;
-    description: Schema.Attribute.Text & Schema.Attribute.Required;
+    description: Schema.Attribute.Text;
     entryKey: Schema.Attribute.String & Schema.Attribute.Required;
     eyebrow: Schema.Attribute.String;
     formEmail: Schema.Attribute.String;
@@ -704,7 +701,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::page.page'> &
       Schema.Attribute.Private;
-    navLabel: Schema.Attribute.String & Schema.Attribute.Required;
+    navLabel: Schema.Attribute.String;
     nofollow: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     ogDescription: Schema.Attribute.Text;
     ogImage: Schema.Attribute.Media<'images'>;
@@ -712,7 +709,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     pageType: Schema.Attribute.Enumeration<
       ['home', 'company', 'overview', 'service', 'case', 'knowledge']
     > &
-      Schema.Attribute.Required;
+      Schema.Attribute.DefaultTo<'company'>;
     parent: Schema.Attribute.Relation<'manyToOne', 'api::page.page'>;
     phase: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
     publishAt: Schema.Attribute.DateTime;
@@ -770,19 +767,18 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.button-row',
       ]
     >;
-    seoTitle: Schema.Attribute.String & Schema.Attribute.Required;
+    seoTitle: Schema.Attribute.String;
     showInMenu: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     site: Schema.Attribute.Relation<'manyToOne', 'api::site.site'>;
     siteKey: Schema.Attribute.String & Schema.Attribute.Required;
     slug: Schema.Attribute.String;
-    title: Schema.Attribute.String & Schema.Attribute.Required;
+    title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     visibility: Schema.Attribute.Enumeration<
       ['planned', 'concept', 'published']
     > &
-      Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'planned'>;
   };
 }
