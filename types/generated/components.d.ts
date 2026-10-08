@@ -190,6 +190,7 @@ export interface SectionsButton extends Struct.ComponentSchema {
     anchor: Schema.Attribute.String;
     href: Schema.Attribute.String;
     label: Schema.Attribute.String;
+    showCta: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -212,6 +213,8 @@ export interface SectionsButtonRow extends Struct.ComponentSchema {
     primaryLabel: Schema.Attribute.String;
     secondaryHref: Schema.Attribute.String;
     secondaryLabel: Schema.Attribute.String;
+    showPrimary: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    showSecondary: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
     spaceBottomTablet: Schema.Attribute.String;
@@ -371,8 +374,7 @@ export interface SectionsContactCta extends Struct.ComponentSchema {
     highlightColor: Schema.Attribute.String;
     href: Schema.Attribute.String;
     label: Schema.Attribute.String;
-    showCta: Schema.Attribute.Boolean &
-      Schema.Attribute.DefaultTo<true>;
+    showCta: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -590,6 +592,8 @@ export interface SectionsHero extends Struct.ComponentSchema {
     primaryLabel: Schema.Attribute.String;
     secondaryHref: Schema.Attribute.String;
     secondaryLabel: Schema.Attribute.String;
+    showPrimary: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    showSecondary: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -1016,7 +1020,6 @@ export interface SectionsRow extends Struct.ComponentSchema {
   };
 }
 
-
 export interface SectionsScanRequestForm extends Struct.ComponentSchema {
   collectionName: 'components_sections_scan_request_forms';
   info: {
@@ -1125,6 +1128,7 @@ export interface SectionsSplit extends Struct.ComponentSchema {
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
     label: Schema.Attribute.String;
+    showCta: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     side: Schema.Attribute.String;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
@@ -1192,8 +1196,7 @@ export interface SectionsTeam extends Struct.ComponentSchema {
     highlightColor: Schema.Attribute.String;
     members: Schema.Attribute.Component<'shared.team-member', true>;
     note: Schema.Attribute.Text;
-    showNote: Schema.Attribute.Boolean &
-      Schema.Attribute.DefaultTo<true>;
+    showNote: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -1309,9 +1312,8 @@ export interface SectionsWhyUs extends Struct.ComponentSchema {
     highlightColor: Schema.Attribute.String;
     intro: Schema.Attribute.Text;
     note: Schema.Attribute.Text;
-    showNote: Schema.Attribute.Boolean &
-      Schema.Attribute.DefaultTo<true>;
     pillars: Schema.Attribute.Component<'shared.pillar', true>;
+    showNote: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -1484,6 +1486,8 @@ export interface SharedServiceCard extends Struct.ComponentSchema {
     cardId: Schema.Attribute.String;
     description: Schema.Attribute.Text;
     href: Schema.Attribute.String;
+    icon: Schema.Attribute.String & Schema.Attribute.DefaultTo<''>;
+    image: Schema.Attribute.Media<'images'>;
     items: Schema.Attribute.Component<'shared.text-item', true>;
     pageId: Schema.Attribute.String;
     title: Schema.Attribute.String;
