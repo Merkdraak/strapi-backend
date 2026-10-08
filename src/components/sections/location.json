@@ -9,6 +9,12 @@
     "heading": {
       "type": "string"
     },
+    "headingLevel": {
+      "type": "string"
+    },
+    "fontWeight": {
+      "type": "string"
+    },
     "name": {
       "type": "string"
     },
@@ -21,13 +27,99 @@
     "city": {
       "type": "string"
     },
+    "country": {
+      "type": "string"
+    },
+    "mapQuery": {
+      "type": "string"
+    },
+    "latitude": {
+      "type": "string"
+    },
+    "longitude": {
+      "type": "string"
+    },
+    "zoom": {
+      "type": "string"
+    },
+    "mapHeight": {
+      "type": "enumeration",
+      "enum": ["small", "medium", "large"],
+      "default": "medium"
+    },
+    "mapTitle": {
+      "type": "string"
+    },
+    "showMap": {
+      "type": "enumeration",
+      "enum": ["true", "false"],
+      "default": "true"
+    },
     "phone": {
       "type": "string"
     },
     "email": {
       "type": "string"
     },
+    "hours": {
+      "type": "text"
+    },
+    "kvk": {
+      "type": "string"
+    },
+    "btw": {
+      "type": "string"
+    },
+    "addressLabel": {
+      "type": "string"
+    },
+    "emailLabel": {
+      "type": "string"
+    },
+    "hoursLabel": {
+      "type": "string"
+    },
+    "kvkLabel": {
+      "type": "string"
+    },
+    "phoneButton": {
+      "type": "string"
+    },
+    "emailButton": {
+      "type": "string"
+    },
+    "routeLabel": {
+      "type": "string"
+    },
     "href": {
+      "type": "string"
+    },
+    "note": {
+      "type": "text"
+    },
+    "appearance": {
+      "type": "enumeration",
+      "enum": ["dark", "light", "accent"],
+      "default": "dark"
+    },
+    "align": {
+      "type": "enumeration",
+      "enum": ["left", "center", "right"],
+      "default": "left"
+    },
+    "backgroundColor": {
+      "type": "string"
+    },
+    "textColor": {
+      "type": "string"
+    },
+    "accentColor": {
+      "type": "string"
+    },
+    "space": {
+      "type": "string"
+    },
+    "fontSize": {
       "type": "string"
     },
     "anchor": {

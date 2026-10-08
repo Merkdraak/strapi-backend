@@ -381,11 +381,33 @@ export interface SectionsContactForm extends Struct.ComponentSchema {
     icon: 'layer';
   };
   attributes: {
+    accentColor: Schema.Attribute.String;
+    align: Schema.Attribute.Enumeration<['left', 'center', 'right']> &
+      Schema.Attribute.DefaultTo<'left'>;
     anchor: Schema.Attribute.String;
     appearance: Schema.Attribute.Enumeration<['dark', 'light', 'accent']> &
       Schema.Attribute.DefaultTo<'dark'>;
+    backgroundColor: Schema.Attribute.String;
+    emailLabel: Schema.Attribute.String;
+    emailPlaceholder: Schema.Attribute.String;
+    errorMessage: Schema.Attribute.Text;
+    fields: Schema.Attribute.Component<'shared.form-field', true>;
+    fontSize: Schema.Attribute.String;
+    fontWeight: Schema.Attribute.String;
+    formWidth: Schema.Attribute.Enumeration<['narrow', 'medium', 'wide']> &
+      Schema.Attribute.DefaultTo<'medium'>;
     heading: Schema.Attribute.String;
+    headingLevel: Schema.Attribute.String;
+    interestLabel: Schema.Attribute.String;
+    messageLabel: Schema.Attribute.String;
+    messagePlaceholder: Schema.Attribute.String;
+    nameLabel: Schema.Attribute.String;
+    namePlaceholder: Schema.Attribute.String;
     note: Schema.Attribute.Text;
+    pendingLabel: Schema.Attribute.String;
+    phoneLabel: Schema.Attribute.String;
+    phonePlaceholder: Schema.Attribute.String;
+    space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
     spaceBottomTablet: Schema.Attribute.String;
@@ -393,6 +415,8 @@ export interface SectionsContactForm extends Struct.ComponentSchema {
     spaceTopMobile: Schema.Attribute.String;
     spaceTopTablet: Schema.Attribute.String;
     submitLabel: Schema.Attribute.String;
+    textColor: Schema.Attribute.String;
+    thanks: Schema.Attribute.Text;
   };
 }
 
@@ -654,14 +678,44 @@ export interface SectionsLocation extends Struct.ComponentSchema {
     icon: 'pinMap';
   };
   attributes: {
+    accentColor: Schema.Attribute.String;
+    addressLabel: Schema.Attribute.String;
+    align: Schema.Attribute.Enumeration<['left', 'center', 'right']> &
+      Schema.Attribute.DefaultTo<'left'>;
     anchor: Schema.Attribute.String;
+    appearance: Schema.Attribute.Enumeration<['dark', 'light', 'accent']> &
+      Schema.Attribute.DefaultTo<'dark'>;
+    backgroundColor: Schema.Attribute.String;
+    btw: Schema.Attribute.String;
     city: Schema.Attribute.String;
+    country: Schema.Attribute.String;
     email: Schema.Attribute.String;
+    emailButton: Schema.Attribute.String;
+    emailLabel: Schema.Attribute.String;
+    fontSize: Schema.Attribute.String;
+    fontWeight: Schema.Attribute.String;
     heading: Schema.Attribute.String;
+    headingLevel: Schema.Attribute.String;
+    hours: Schema.Attribute.Text;
+    hoursLabel: Schema.Attribute.String;
     href: Schema.Attribute.String;
+    kvk: Schema.Attribute.String;
+    kvkLabel: Schema.Attribute.String;
+    latitude: Schema.Attribute.String;
+    longitude: Schema.Attribute.String;
+    mapHeight: Schema.Attribute.Enumeration<['small', 'medium', 'large']> &
+      Schema.Attribute.DefaultTo<'medium'>;
+    mapQuery: Schema.Attribute.String;
+    mapTitle: Schema.Attribute.String;
     name: Schema.Attribute.String;
+    note: Schema.Attribute.Text;
     phone: Schema.Attribute.String;
+    phoneButton: Schema.Attribute.String;
     postalCode: Schema.Attribute.String;
+    routeLabel: Schema.Attribute.String;
+    showMap: Schema.Attribute.Enumeration<['true', 'false']> &
+      Schema.Attribute.DefaultTo<'true'>;
+    space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
     spaceBottomTablet: Schema.Attribute.String;
@@ -669,6 +723,8 @@ export interface SectionsLocation extends Struct.ComponentSchema {
     spaceTopMobile: Schema.Attribute.String;
     spaceTopTablet: Schema.Attribute.String;
     street: Schema.Attribute.String;
+    textColor: Schema.Attribute.String;
+    zoom: Schema.Attribute.String;
   };
 }
 
@@ -1237,6 +1293,31 @@ export interface SharedFaqItem extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedFormField extends Struct.ComponentSchema {
+  collectionName: 'components_shared_form_fields';
+  info: {
+    displayName: 'Formulierveld';
+    icon: 'layer';
+  };
+  attributes: {
+    autocomplete: Schema.Attribute.String;
+    fieldType: Schema.Attribute.Enumeration<
+      ['text', 'email', 'phone', 'textarea', 'select', 'checkbox']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'text'>;
+    helper: Schema.Attribute.String;
+    label: Schema.Attribute.String & Schema.Attribute.Required;
+    options: Schema.Attribute.Text;
+    placeholder: Schema.Attribute.String;
+    required: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    role: Schema.Attribute.Enumeration<
+      ['name', 'email', 'phone', 'message', 'extra']
+    > &
+      Schema.Attribute.DefaultTo<'extra'>;
+  };
+}
+
 export interface SharedNamedItem extends Struct.ComponentSchema {
   collectionName: 'components_shared_named_items';
   info: {
@@ -1392,6 +1473,31 @@ export interface SharedTeamMember extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedFormField extends Struct.ComponentSchema {
+  collectionName: 'components_shared_form_fields';
+  info: {
+    displayName: 'Formulierveld';
+    icon: 'layer';
+  };
+  attributes: {
+    autocomplete: Schema.Attribute.String;
+    fieldType: Schema.Attribute.Enumeration<
+      ['text', 'email', 'phone', 'textarea', 'select', 'checkbox']
+    > &
+      Schema.Attribute.DefaultTo<'text'> &
+      Schema.Attribute.Required;
+    helper: Schema.Attribute.String;
+    label: Schema.Attribute.String & Schema.Attribute.Required;
+    options: Schema.Attribute.Text;
+    placeholder: Schema.Attribute.String;
+    required: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    role: Schema.Attribute.Enumeration<
+      ['name', 'email', 'phone', 'message', 'extra']
+    > &
+      Schema.Attribute.DefaultTo<'extra'>;
+  };
+}
+
 export interface SharedTextItem extends Struct.ComponentSchema {
   collectionName: 'components_shared_text_items';
   info: {
@@ -1495,6 +1601,8 @@ declare module '@strapi/strapi' {
       'shared.article-type': SharedArticleType;
       'shared.content-card': SharedContentCard;
       'shared.faq-item': SharedFaqItem;
+      'shared.form-field': SharedFormField;
+      'shared.form-field': SharedFormField;
       'shared.named-item': SharedNamedItem;
       'shared.pillar': SharedPillar;
       'shared.review-item': SharedReviewItem;

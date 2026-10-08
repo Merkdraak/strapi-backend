@@ -1,0 +1,41 @@
+{
+  "collectionName": "components_shared_form_fields",
+  "info": {
+    "displayName": "Formulierveld",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "fieldType": {
+      "type": "enumeration",
+      "enum": ["text", "email", "phone", "textarea", "select", "checkbox"],
+      "default": "text",
+      "required": true
+    },
+    "placeholder": {
+      "type": "string"
+    },
+    "required": {
+      "type": "boolean",
+      "default": true
+    },
+    "helper": {
+      "type": "string"
+    },
+    "options": {
+      "type": "text"
+    },
+    "role": {
+      "type": "enumeration",
+      "enum": ["name", "email", "phone", "message", "extra"],
+      "default": "extra"
+    },
+    "autocomplete": {
+      "type": "string"
+    }
+  }
+}
