@@ -8,7 +8,7 @@
   "attributes": {
     "scanType": {
       "type": "enumeration",
-      "enum": ["seo", "sea", "cro", "general", "social"],
+      "enum": ["seo", "sea", "cro", "general", "social", "website"],
       "required": true,
       "default": "seo"
     },

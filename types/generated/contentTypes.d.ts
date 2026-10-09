@@ -692,7 +692,16 @@ export interface ApiFormSubmissionFormSubmission
     phone: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     requestType: Schema.Attribute.Enumeration<
-      ['contact', 'seo', 'sea', 'cro', 'general', 'social', 'vacancy']
+      [
+        'contact',
+        'seo',
+        'sea',
+        'cro',
+        'general',
+        'social',
+        'website',
+        'vacancy',
+      ]
     > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'contact'>;
@@ -778,8 +787,6 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
   attributes: {
     authorName: Schema.Attribute.String;
     canonicalUrl: Schema.Attribute.String;
-    cardIcon: Schema.Attribute.String & Schema.Attribute.DefaultTo<''>;
-    cardImage: Schema.Attribute.Media<'images'>;
     cluster: Schema.Attribute.String;
     composed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     createdAt: Schema.Attribute.DateTime;
