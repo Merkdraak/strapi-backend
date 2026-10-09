@@ -10,6 +10,14 @@
   "options": {
     "draftAndPublish": false
   },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": false
+    },
+    "content-type-builder": {
+      "visible": false
+    }
+  },
   "attributes": {
     "siteKey": {
       "type": "string",
@@ -32,6 +40,34 @@
     },
     "interest": {
       "type": "string"
+    },
+    "requestType": {
+      "type": "enumeration",
+      "enum": ["contact", "seo", "sea", "cro"],
+      "default": "contact",
+      "required": true
+    },
+    "sourcePath": {
+      "type": "string"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["nieuw", "gelezen", "afgehandeld"],
+      "default": "nieuw",
+      "required": true
+    },
+    "teamMailStatus": {
+      "type": "enumeration",
+      "enum": ["pending", "sent", "skipped", "failed"],
+      "default": "pending"
+    },
+    "visitorMailStatus": {
+      "type": "enumeration",
+      "enum": ["pending", "sent", "skipped", "failed"],
+      "default": "pending"
+    },
+    "mailError": {
+      "type": "text"
     }
   }
 }
