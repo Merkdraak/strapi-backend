@@ -210,6 +210,7 @@ export default factories.createCoreController("api::form-submission.form-submiss
         site: String(site.name ?? siteKey),
         sourcePath,
         sourceUrl: `${publicOrigin()}${sourcePath}`,
+        kind: scan ? "scan" : "contact",
       },
     });
 
