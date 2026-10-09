@@ -157,56 +157,11 @@ export default factories.createCoreController("api::form-submission.form-submiss
       status: "published",
     });
     if (!site) return ctx.notFound();
-    await strapi.documents("api::form-submission.form-submission").create({
-      data: {
-        siteKey,
-        name,
-        email,
-        phone,
-        ...(companyName ? { companyName } : {}),
-        ...(companyUrl ? { companyUrl } : {}),
-        message,
-        interest,
-      },
-    });
 
     const settings = await loadEmailSettings(strapi);
     const staff =
       notifyAddress(body.notifyEmail) ||
       notifyAddress(body.to) ||
-      notifyAddress(site.email);
-    const topic = interest || "contact";
-    const sourceUrl = scan ? `${publicOrigin()}${scan.path}` : "";
-    try {
-      if (staff) {
-        await sendMail(strapi, {
-          to: staff,
-          subject: scan
-            ? `Nieuwe aanvraag ${scan.label} – ${site.name ?? siteKey}`
-            : `Nieuw bericht via ${site.name ?? siteKey}: ${plain(topic)}`,
-          text: scan
-            ? [
-                `Type aanvraag: ${scan.label}`,
-                `Pagina: ${scan.pageLabel}`,
-                `Bron-URL: ${sourceUrl}`,
-                "",
-                `Bedrijfsnaam: ${companyName}`,
-                `Website: ${companyUrl}`,
-                `Naam: ${name}`,
-                `E-mail: ${email}`,
-                `Telefoon: ${phone || "-"}`,
-                "",
-                "Bericht:",
-                message,
-              ].join("\n")
-            : `Naam: ${name}\nE-mail: ${email}\nTelefoon: ${phone || "-"}\nInteresse: ${topic}\n\n${message}`,
-          replyTo: email,
-        });
-      }
-      await sendMail(strapi, {
-        to: email,
-        subject: `We hebben je bericht ontvangen${site.name ? ` — ${site.name}` : ""}`,
-        text: `Hallo ${name},\n\nBedankt voor je bericht${interest ? ` over ${interest}` : ""}. We hebben het ontvangen en nemen contact met je op.\n\nMet vriendelijke groet,\n${site.name ?? "Merkdraak"}`,
       (scan ? "" : notifyAddress(site.email)) ||
       notifyAddress(settings.defaultRecipient);
 
