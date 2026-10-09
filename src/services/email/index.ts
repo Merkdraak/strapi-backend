@@ -8,7 +8,7 @@ import { sendViaSendgrid } from "./providers/sendgrid";
 import { sendViaSes } from "./providers/ses";
 import { sendViaSmtp } from "./providers/smtp";
 import { loadEmailSettings, saveEmailSettings } from "./settings";
-import { renderTeamMail, renderVisitorMail, type TemplateContext } from "./templates";
+import { emailHtml, renderTeamMail, renderVisitorMail, type TemplateContext } from "./templates";
 import type { EmailProvider, MailPayload, SendResult } from "./types";
 
 async function dispatch(provider: EmailProvider, payload: MailPayload): Promise<SendResult> {
@@ -91,6 +91,7 @@ export async function sendFormEmails(
           to: input.staffTo,
           subject: mail.subject,
           text: mail.text,
+          html: mail.html,
           replyTo: input.visitorReplyTo || input.visitorTo,
         });
         return { ok: result.ok, skipped: false as const, result };
@@ -107,6 +108,7 @@ export async function sendFormEmails(
           to: input.visitorTo,
           subject: mail.subject,
           text: mail.text,
+          html: mail.html,
           replyTo: settings.replyTo || settings.fromEmail,
         });
         return { ok: result.ok, skipped: false as const, result };
@@ -137,6 +139,7 @@ export async function sendTestMail(strapi: Core.Strapi, to: string) {
     to,
     subject: `Testmail via ${settings.provider}`,
     text: `Dit is een testmail van Merkdraak Strapi, verstuurd via ${settings.provider}.`,
+    html: emailHtml(`Dit is een testmail van Merkdraak Strapi, verstuurd via ${settings.provider}.`, "Merkdraak"),
   });
   if (result.ok) {
     return {

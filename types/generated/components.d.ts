@@ -400,7 +400,11 @@ export interface SectionsContactForm extends Struct.ComponentSchema {
     anchor: Schema.Attribute.String;
     appearance: Schema.Attribute.Enumeration<['dark', 'light', 'accent']> &
       Schema.Attribute.DefaultTo<'dark'>;
+    asideHeading: Schema.Attribute.String;
     backgroundColor: Schema.Attribute.String;
+    body: Schema.Attribute.Text;
+    contactText: Schema.Attribute.Text;
+    disclaimer: Schema.Attribute.Text;
     emailLabel: Schema.Attribute.String;
     emailPlaceholder: Schema.Attribute.String;
     errorMessage: Schema.Attribute.Text;
@@ -412,14 +416,23 @@ export interface SectionsContactForm extends Struct.ComponentSchema {
     heading: Schema.Attribute.String;
     headingLevel: Schema.Attribute.String;
     interestLabel: Schema.Attribute.String;
+    marketingscanBody: Schema.Attribute.Text;
+    marketingscanLabel: Schema.Attribute.String;
     messageLabel: Schema.Attribute.String;
     messagePlaceholder: Schema.Attribute.String;
     nameLabel: Schema.Attribute.String;
     namePlaceholder: Schema.Attribute.String;
     note: Schema.Attribute.Text;
+    officeAddress: Schema.Attribute.String;
+    officeBtw: Schema.Attribute.String;
+    officeEmail: Schema.Attribute.Email;
+    officeKvk: Schema.Attribute.String;
+    officePhone: Schema.Attribute.String;
     pendingLabel: Schema.Attribute.String;
     phoneLabel: Schema.Attribute.String;
     phonePlaceholder: Schema.Attribute.String;
+    recipientEmail: Schema.Attribute.Email;
+    showSiteDetails: Schema.Attribute.Boolean;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -430,6 +443,8 @@ export interface SectionsContactForm extends Struct.ComponentSchema {
     submitLabel: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
     thanks: Schema.Attribute.Text;
+    websitescanBody: Schema.Attribute.Text;
+    websitescanLabel: Schema.Attribute.String;
   };
 }
 
