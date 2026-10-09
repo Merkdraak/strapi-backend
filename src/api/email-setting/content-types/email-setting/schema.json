@@ -1,0 +1,76 @@
+{
+  "kind": "singleType",
+  "collectionName": "email_settings",
+  "info": {
+    "singularName": "email-setting",
+    "pluralName": "email-settings",
+    "displayName": "E-mailinstellingen",
+    "description": "Centrale mailconfiguratie zonder secrets. Credentials staan in environment variables."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": false
+    },
+    "content-type-builder": {
+      "visible": false
+    }
+  },
+  "attributes": {
+    "provider": {
+      "type": "enumeration",
+      "enum": ["smtp", "resend", "sendgrid", "mailgun", "postmark", "ses"],
+      "default": "smtp",
+      "required": true
+    },
+    "fromName": {
+      "type": "string",
+      "default": "Merkdraak"
+    },
+    "fromEmail": {
+      "type": "email",
+      "default": "noreply@merkdraak.nl"
+    },
+    "replyTo": {
+      "type": "email",
+      "default": "info@merkdraak.nl"
+    },
+    "defaultRecipient": {
+      "type": "email"
+    },
+    "sendVisitorConfirmation": {
+      "type": "boolean",
+      "default": true
+    },
+    "sendTeamNotification": {
+      "type": "boolean",
+      "default": true
+    },
+    "teamSubject": {
+      "type": "string",
+      "default": "Nieuwe aanvraag: {{type}} – {{name}}"
+    },
+    "teamIntro": {
+      "type": "text",
+      "default": "Er is een nieuwe formulierinzending binnengekomen."
+    },
+    "teamOutro": {
+      "type": "text",
+      "default": "Open Strapi om de inzending af te handelen."
+    },
+    "visitorSubject": {
+      "type": "string",
+      "default": "We hebben je bericht ontvangen — {{site}}"
+    },
+    "visitorIntro": {
+      "type": "text",
+      "default": "Bedankt voor je bericht. We hebben het ontvangen en nemen contact met je op."
+    },
+    "visitorOutro": {
+      "type": "text",
+      "default": "Met vriendelijke groet,\n{{site}}"
+    }
+  }
+}

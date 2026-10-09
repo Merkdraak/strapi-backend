@@ -24,6 +24,8 @@ import { EmptyDocuments } from "@strapi/icons/symbols";
 type SiteRow = { key: string; name: string; domain: string; editorUrl: string };
 type PageRow = { documentId: string; title: string; slug: string; visibility: string; pageType: string; kind?: "page" | "case" };
 type LinkRow = { label?: string; href?: string };
+type FaviconFile = { id: number; url: string; name: string };
+
 type SiteEditor = {
   contact: {
     phoneDisplay: string;
@@ -35,7 +37,12 @@ type SiteEditor = {
     footerText: string;
     footerDisclaimer: string;
   };
-  settings: { articlePrefix: string; googlePlaceId: string; formWebhook: string };
+  settings: {
+    articlePrefix: string;
+    googlePlaceId: string;
+    formWebhook: string;
+    favicon: FaviconFile | null;
+  };
   footerServices: LinkRow[];
   footerOrganization: LinkRow[];
   items: { __component?: string; label?: string; page?: { entryKey?: string }; links?: { label?: string; page?: { entryKey?: string } }[] }[];
@@ -251,6 +258,7 @@ export default function MerkdraakEditor() {
             articlePrefix: data.settings?.articlePrefix || "kennisbank",
             googlePlaceId: data.settings?.googlePlaceId ?? "",
             formWebhook: data.settings?.formWebhook ?? "",
+            favicon: data.settings?.favicon ?? null,
           },
         });
       })
@@ -662,7 +670,12 @@ export default function MerkdraakEditor() {
       post(`/admin/merkdraak-editor/navigation`, {
         siteKey,
         contact: nav.contact,
-        settings: nav.settings,
+        settings: {
+          articlePrefix: nav.settings.articlePrefix,
+          googlePlaceId: nav.settings.googlePlaceId,
+          formWebhook: nav.settings.formWebhook,
+          faviconId: nav.settings.favicon?.id ?? null,
+        },
         footerServices: nav.footerServices,
         footerOrganization: nav.footerOrganization,
       })
@@ -681,6 +694,36 @@ export default function MerkdraakEditor() {
           setError(message);
           toggleNotification({ type: "danger", message });
         });
+    }
+    async function onFaviconSelected(fileList: FileList | null) {
+      const file = fileList?.[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        toggleNotification({ type: "danger", message: "Kies een afbeelding (PNG, ICO, SVG of JPG)." });
+        return;
+      }
+      const form = new FormData();
+      form.append("files", file);
+      try {
+        const response = await post("/upload", form);
+        const uploaded = Array.isArray(response.data) ? response.data[0] : response.data;
+        const id = Number(uploaded?.id);
+        const url = String(uploaded?.url ?? "").trim();
+        if (!Number.isInteger(id) || id <= 0 || !url) {
+          toggleNotification({ type: "danger", message: "Favicon-upload mislukt." });
+          return;
+        }
+        setNav({
+          ...nav,
+          settings: {
+            ...nav.settings,
+            favicon: { id, url, name: String(uploaded?.name ?? file.name) },
+          },
+        });
+        toggleNotification({ type: "success", message: "Favicon geüpload. Klik Opslaan om te bewaren." });
+      } catch {
+        toggleNotification({ type: "danger", message: "Favicon-upload mislukt." });
+      }
     }
     function textField(name: string, label: string, value: string, onChange: (value: string) => void) {
       return (
@@ -766,6 +809,65 @@ export default function MerkdraakEditor() {
                   <Box paddingTop={1}>
                     <Typography variant="pi" textColor="neutral600">Alleen nodig als een reviewblok de reviews van het Google-bedrijfsprofiel toont.</Typography>
                   </Box>
+                </Box>
+                <Box>
+                  <Field.Root name="favicon">
+                    <Field.Label>Favicon</Field.Label>
+                    <Box paddingTop={2}>
+                      <Flex gap={4} alignItems="center" wrap="wrap">
+                        {nav.settings.favicon?.url ? (
+                          <Box
+                            padding={2}
+                            background="neutral100"
+                            hasRadius
+                            borderColor="neutral200"
+                            style={{ width: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}
+                          >
+                            <img
+                              src={nav.settings.favicon.url}
+                              alt=""
+                              width={32}
+                              height={32}
+                              style={{ maxWidth: 32, maxHeight: 32, objectFit: "contain" }}
+                            />
+                          </Box>
+                        ) : (
+                          <Typography variant="pi" textColor="neutral500">
+                            Geen favicon gekozen (standaard Merkdraak-icoon blijft actief).
+                          </Typography>
+                        )}
+                        <Box>
+                          <Typography variant="pi" fontWeight="semiBold" textColor="neutral800">
+                            Bestand kiezen
+                          </Typography>
+                          <Box paddingTop={1}>
+                            <input
+                              type="file"
+                              accept="image/png,image/x-icon,image/vnd.microsoft.icon,image/svg+xml,image/jpeg,image/webp,.ico"
+                              onChange={(event) => {
+                                void onFaviconSelected(event.target.files);
+                                event.target.value = "";
+                              }}
+                            />
+                          </Box>
+                        </Box>
+                        {nav.settings.favicon ? (
+                          <Button
+                            type="button"
+                            variant="tertiary"
+                            onClick={() => setNav({ ...nav, settings: { ...nav.settings, favicon: null } })}
+                          >
+                            Verwijderen
+                          </Button>
+                        ) : null}
+                      </Flex>
+                    </Box>
+                    <Box paddingTop={1}>
+                      <Typography variant="pi" textColor="neutral600">
+                        Tabbladicoon van de website. Upload een vierkante PNG of ICO, daarna Opslaan.
+                      </Typography>
+                    </Box>
+                  </Field.Root>
                 </Box>
               </Flex>
             </Box>

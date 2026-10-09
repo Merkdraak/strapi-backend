@@ -587,6 +587,69 @@ export interface ApiEditorPresetEditorPreset
   };
 }
 
+export interface ApiEmailSettingEmailSetting extends Struct.SingleTypeSchema {
+  collectionName: 'email_settings';
+  info: {
+    description: 'Centrale mailconfiguratie zonder secrets. Credentials staan in environment variables.';
+    displayName: 'E-mailinstellingen';
+    pluralName: 'email-settings';
+    singularName: 'email-setting';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  pluginOptions: {
+    'content-manager': {
+      visible: false;
+    };
+    'content-type-builder': {
+      visible: false;
+    };
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    defaultRecipient: Schema.Attribute.Email;
+    fromEmail: Schema.Attribute.Email &
+      Schema.Attribute.DefaultTo<'noreply@merkdraak.nl'>;
+    fromName: Schema.Attribute.String & Schema.Attribute.DefaultTo<'Merkdraak'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::email-setting.email-setting'
+    > &
+      Schema.Attribute.Private;
+    provider: Schema.Attribute.Enumeration<
+      ['smtp', 'resend', 'sendgrid', 'mailgun', 'postmark', 'ses']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'smtp'>;
+    publishedAt: Schema.Attribute.DateTime;
+    replyTo: Schema.Attribute.Email &
+      Schema.Attribute.DefaultTo<'info@merkdraak.nl'>;
+    sendTeamNotification: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    sendVisitorConfirmation: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    teamIntro: Schema.Attribute.Text &
+      Schema.Attribute.DefaultTo<'Er is een nieuwe formulierinzending binnengekomen.'>;
+    teamOutro: Schema.Attribute.Text &
+      Schema.Attribute.DefaultTo<'Open Strapi om de inzending af te handelen.'>;
+    teamSubject: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Nieuwe aanvraag: {{type}} \u2013 {{name}}'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    visitorIntro: Schema.Attribute.Text &
+      Schema.Attribute.DefaultTo<'Bedankt voor je bericht. We hebben het ontvangen en nemen contact met je op.'>;
+    visitorOutro: Schema.Attribute.Text &
+      Schema.Attribute.DefaultTo<'Met vriendelijke groet,\n{{site}}'>;
+    visitorSubject: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'We hebben je bericht ontvangen \u2014 {{site}}'>;
+  };
+}
+
 export interface ApiFormSubmissionFormSubmission
   extends Struct.CollectionTypeSchema {
   collectionName: 'form_submissions';
@@ -599,7 +662,17 @@ export interface ApiFormSubmissionFormSubmission
   options: {
     draftAndPublish: false;
   };
+  pluginOptions: {
+    'content-manager': {
+      visible: false;
+    };
+    'content-type-builder': {
+      visible: false;
+    };
+  };
   attributes: {
+    companyName: Schema.Attribute.String;
+    companyUrl: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -611,14 +684,32 @@ export interface ApiFormSubmissionFormSubmission
       'api::form-submission.form-submission'
     > &
       Schema.Attribute.Private;
+    mailError: Schema.Attribute.Text;
     message: Schema.Attribute.Text & Schema.Attribute.Required;
     name: Schema.Attribute.String & Schema.Attribute.Required;
     phone: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    requestType: Schema.Attribute.Enumeration<
+      ['contact', 'seo', 'sea', 'cro']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'contact'>;
     siteKey: Schema.Attribute.String & Schema.Attribute.Required;
+    sourcePath: Schema.Attribute.String;
+    status: Schema.Attribute.Enumeration<['nieuw', 'gelezen', 'afgehandeld']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'nieuw'>;
+    teamMailStatus: Schema.Attribute.Enumeration<
+      ['pending', 'sent', 'skipped', 'failed']
+    > &
+      Schema.Attribute.DefaultTo<'pending'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    visitorMailStatus: Schema.Attribute.Enumeration<
+      ['pending', 'sent', 'skipped', 'failed']
+    > &
+      Schema.Attribute.DefaultTo<'pending'>;
   };
 }
 
@@ -849,6 +940,7 @@ export interface ApiSiteSite extends Struct.CollectionTypeSchema {
     editorUrl: Schema.Attribute.String;
     email: Schema.Attribute.String;
     emailHref: Schema.Attribute.String;
+    favicon: Schema.Attribute.Media<'images'>;
     footerDisclaimer: Schema.Attribute.Text;
     footerText: Schema.Attribute.Text;
     formWebhook: Schema.Attribute.String;
@@ -1384,6 +1476,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::case.case': ApiCaseCase;
       'api::editor-preset.editor-preset': ApiEditorPresetEditorPreset;
+      'api::email-setting.email-setting': ApiEmailSettingEmailSetting;
       'api::form-submission.form-submission': ApiFormSubmissionFormSubmission;
       'api::navigation.navigation': ApiNavigationNavigation;
       'api::page.page': ApiPagePage;

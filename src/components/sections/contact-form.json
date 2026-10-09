@@ -18,6 +18,51 @@
     "note": {
       "type": "text"
     },
+    "body": {
+      "type": "text"
+    },
+    "asideHeading": {
+      "type": "string"
+    },
+    "marketingscanLabel": {
+      "type": "string"
+    },
+    "marketingscanBody": {
+      "type": "text"
+    },
+    "websitescanLabel": {
+      "type": "string"
+    },
+    "websitescanBody": {
+      "type": "text"
+    },
+    "contactText": {
+      "type": "text"
+    },
+    "officePhone": {
+      "type": "string"
+    },
+    "officeEmail": {
+      "type": "email"
+    },
+    "officeAddress": {
+      "type": "string"
+    },
+    "officeKvk": {
+      "type": "string"
+    },
+    "officeBtw": {
+      "type": "string"
+    },
+    "disclaimer": {
+      "type": "text"
+    },
+    "recipientEmail": {
+      "type": "email"
+    },
+    "showSiteDetails": {
+      "type": "boolean"
+    },
     "interestLabel": {
       "type": "string"
     },
