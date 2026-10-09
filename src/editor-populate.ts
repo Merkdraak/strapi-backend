@@ -18,6 +18,7 @@ export const sectionPopulate = {
     "sections.contact-cta": { populate: "*" },
     "sections.contact-form": { populate: ["fields"] },
     "sections.scan-request-form": { populate: "*" },
+    "sections.vacancy-application-form": { populate: "*" },
     "sections.case-grid": { populate: { tabs: { populate: "*" } } },
     "sections.row": { populate: "*" },
     "sections.page-index": { populate: ["articleTypes"] },

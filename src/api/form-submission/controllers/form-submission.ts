@@ -122,20 +122,45 @@ export default factories.createCoreController("api::form-submission.form-submiss
       return;
     }
     const siteKey = clip(body.siteKey, 80);
-    const name = clip(body.name, 120);
+    const firstName = clip(body.firstName, 80);
+    const lastName = clip(body.lastName, 80);
+    const name = clip(body.name, 120) || [firstName, lastName].filter(Boolean).join(" ").trim();
     const email = clip(body.email, 200);
     const phone = clip(body.phone, 40);
     const companyName = clip(body.companyName, 200);
     const companyUrl = normalizeCompanyUrl(body.companyUrl);
     const socialMedia = clip(body.socialMedia, 2000);
-    const message = clip(body.message, 4000);
+    const vacancyTitle = clip(body.vacancyTitle, 200);
+    const attachments = clip(body.attachments, 4000);
+    const isVacancy = clip(body.requestType, 20).toLowerCase() === "vacancy";
+    let message = clip(body.message, 4000);
     const scanType = normalizeScanType(body.scanType);
     const scan = scanType ? scanRequests[scanType] : null;
-    const interest = clip(body.interest, 120) || (scan ? scan.label : "");
-    const requestType = scan ? scan.requestType : "contact";
-    const sourcePath = scan ? scan.path : clip(body.sourcePath, 200) || "/contact";
+    const interest =
+      clip(body.interest, 120) ||
+      (isVacancy ? vacancyTitle : "") ||
+      (scan ? scan.label : "");
+    const requestType = isVacancy ? ("vacancy" as const) : scan ? scan.requestType : "contact";
+    const sourcePath = scan ? scan.path : clip(body.sourcePath, 200) || (isVacancy ? "/vacatures" : "/contact");
     const isSocialScan = scanType === "social";
-    if (!siteKey || !name || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (isVacancy) {
+      if (!siteKey || !name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return ctx.badRequest("Vul naam en een geldig e-mailadres in.");
+      }
+      if (!vacancyTitle) {
+        return ctx.badRequest("Vacature ontbreekt. Open de pagina opnieuw.");
+      }
+      if (!phone || !validPhone(phone)) {
+        return ctx.badRequest("Vul een geldig telefoonnummer in.");
+      }
+      if (!message && !attachments) {
+        return ctx.badRequest("Vul een korte motivatie in of upload een motivatiebestand.");
+      }
+      if (!attachments.toLowerCase().includes("cv:")) {
+        return ctx.badRequest("Upload je CV.");
+      }
+      if (!message) message = "(Motivatie als bestand bijgevoegd)";
+    } else if (!siteKey || !name || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return ctx.badRequest("Vul naam, een geldig e-mailadres en een bericht in.");
     }
     if (scan && !companyName) {
@@ -150,11 +175,14 @@ export default factories.createCoreController("api::form-submission.form-submiss
     if (body.scanType != null && body.scanType !== "" && !scan) {
       return ctx.badRequest("Ongeldig scantype.");
     }
-    if (!validPhone(phone)) {
+    if (!isVacancy && !validPhone(phone)) {
       return ctx.badRequest("Vul een geldig telefoonnummer in.");
     }
     const hasStarted = body.started != null && String(body.started).trim() !== "";
-    if ((!scan && !validStarted(body.started)) || (scan && hasStarted && !validStarted(body.started))) {
+    if (
+      (!scan && !isVacancy && !validStarted(body.started)) ||
+      ((scan || isVacancy) && hasStarted && !validStarted(body.started))
+    ) {
       return ctx.badRequest("Even geduld. Wacht een paar seconden en verstuur het formulier opnieuw.");
     }
     if (tooMany(clientKey(ctx.request.ip, ctx.request.header["x-forwarded-for"], email))) {
@@ -171,7 +199,7 @@ export default factories.createCoreController("api::form-submission.form-submiss
     const staff =
       notifyAddress(body.notifyEmail) ||
       notifyAddress(body.to) ||
-      (scan ? "" : notifyAddress(site.email)) ||
+      (scan || isVacancy ? "" : notifyAddress(site.email)) ||
       notifyAddress(settings.defaultRecipient);
 
     const created = await strapi.documents("api::form-submission.form-submission").create({
@@ -183,6 +211,8 @@ export default factories.createCoreController("api::form-submission.form-submiss
         ...(companyName ? { companyName } : {}),
         ...(companyUrl ? { companyUrl } : {}),
         ...(socialMedia ? { socialMedia } : {}),
+        ...(vacancyTitle ? { vacancyTitle } : {}),
+        ...(attachments ? { attachments } : {}),
         message,
         interest,
         requestType,
@@ -199,13 +229,15 @@ export default factories.createCoreController("api::form-submission.form-submiss
       visitorTo: email,
       visitorReplyTo: email,
       ctx: {
-        type: interest || (scan ? scan.label : "Contact"),
+        type: isVacancy ? `Sollicitatie: ${vacancyTitle}` : interest || (scan ? scan.label : "Contact"),
         name,
         email,
         phone,
         companyName,
         companyUrl,
         socialMedia,
+        vacancyTitle,
+        attachments,
         message,
         site: String(site.name ?? siteKey),
         sourcePath,

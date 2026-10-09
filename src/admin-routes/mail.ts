@@ -25,6 +25,7 @@ const requestTypeLabels: Record<string, string> = {
   cro: "CRO-scan",
   general: "Algemene scan",
   social: "Social media scan",
+  vacancy: "Sollicitatie",
 };
 
 function clip(value: unknown, max: number) {
@@ -33,7 +34,13 @@ function clip(value: unknown, max: number) {
 
 function asRequestType(value: unknown) {
   const key = clip(value, 20).toLowerCase();
-  return key === "contact" || key === "seo" || key === "sea" || key === "cro" || key === "general" || key === "social"
+  return key === "contact" ||
+    key === "seo" ||
+    key === "sea" ||
+    key === "cro" ||
+    key === "general" ||
+    key === "social" ||
+    key === "vacancy"
     ? key
     : "";
 }
@@ -53,6 +60,8 @@ function mapRow(row: Record<string, unknown>) {
     companyName: String(row.companyName ?? ""),
     companyUrl: String(row.companyUrl ?? ""),
     socialMedia: String(row.socialMedia ?? ""),
+    vacancyTitle: String(row.vacancyTitle ?? ""),
+    attachments: String(row.attachments ?? ""),
     message: String(row.message ?? ""),
     interest: String(row.interest ?? ""),
     requestType,
@@ -80,17 +89,19 @@ export function registerMailAdminRoutes(
       const status = asStatus(ctx.query.status);
       const page = Math.max(1, Number(ctx.query.page ?? 1) || 1);
       const pageSize = Math.min(50, Math.max(1, Number(ctx.query.pageSize ?? 20) || 20));
-      const filters: Record<string, unknown> = {};
-      if (requestType) filters.requestType = requestType;
-      if (status) filters.status = status;
+      const where: Record<string, unknown> = {};
+      if (requestType) where.requestType = requestType;
+      if (status) where.status = status;
+      const uid = "api::form-submission.form-submission" as const;
       const [rows, total, newCount] = await Promise.all([
-        strapi.documents("api::form-submission.form-submission").findMany({
-          filters,
-          sort: ["createdAt:desc"],
-          pagination: { page, pageSize },
+        strapi.db.query(uid).findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          limit: pageSize,
+          offset: (page - 1) * pageSize,
         }),
-        strapi.documents("api::form-submission.form-submission").count({ filters }),
-        strapi.documents("api::form-submission.form-submission").count({ filters: { status: "nieuw" } }),
+        strapi.db.query(uid).count({ where }),
+        strapi.db.query(uid).count({ where: { status: "nieuw" } }),
       ]);
       ctx.body = {
         newCount,

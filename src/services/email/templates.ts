@@ -10,6 +10,8 @@ export type TemplateContext = {
   companyName?: string;
   companyUrl?: string;
   socialMedia?: string;
+  vacancyTitle?: string;
+  attachments?: string;
   message: string;
   site: string;
   sourcePath: string;
@@ -94,23 +96,28 @@ function fill(template: string, ctx: TemplateContext) {
     companyName: ctx.companyName || "-",
     companyUrl: ctx.companyUrl || "-",
     socialMedia: ctx.socialMedia || "-",
+    vacancyTitle: ctx.vacancyTitle || "-",
+    attachments: ctx.attachments || "-",
     message: ctx.message,
     site: ctx.site,
     sourcePath: ctx.sourcePath || "-",
     sourceUrl: ctx.sourceUrl || "-",
   };
   return template.replace(
-    /\{\{(type|name|email|phone|companyName|companyUrl|socialMedia|message|site|sourcePath|sourceUrl)\}\}/g,
+    /\{\{(type|name|email|phone|companyName|companyUrl|socialMedia|vacancyTitle|attachments|message|site|sourcePath|sourceUrl)\}\}/g,
     (_, key: string) => values[key] ?? "",
   );
 }
 
 export function renderTeamMail(settings: EmailSettings, ctx: TemplateContext) {
-  const subject = fill(settings.teamSubject, ctx);
+  const subject = ctx.vacancyTitle
+    ? `! Sollicitatie: ${ctx.vacancyTitle} — ${ctx.name}`
+    : fill(settings.teamSubject, ctx);
   const text = [
     fill(settings.teamIntro, ctx),
     "",
     `Type aanvraag: ${ctx.type}`,
+    ctx.vacancyTitle ? `Vacature: ${ctx.vacancyTitle}` : "",
     `Bron: ${ctx.sourcePath || "-"}`,
     ctx.sourceUrl ? `Bron-URL: ${ctx.sourceUrl}` : "",
     "",
@@ -124,8 +131,11 @@ export function renderTeamMail(settings: EmailSettings, ctx: TemplateContext) {
     `E-mail: ${ctx.email}`,
     `Telefoon: ${ctx.phone || "-"}`,
     "",
-    "Bericht:",
+    ctx.vacancyTitle ? "Motivatie:" : "Bericht:",
     ctx.message,
+    "",
+    ctx.attachments ? "Bijlagen:" : "",
+    ctx.attachments ? ctx.attachments : "",
     "",
     fill(settings.teamOutro, ctx),
   ]
