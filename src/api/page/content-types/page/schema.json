@@ -100,6 +100,17 @@
         "images"
       ]
     },
+    "cardImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "cardIcon": {
+      "type": "string",
+      "default": ""
+    },
     "nofollow": {
       "type": "boolean",
       "default": false
@@ -164,6 +175,7 @@
         "sections.contact-cta",
         "sections.contact-form",
         "sections.scan-request-form",
+        "sections.vacancy-application-form",
         "sections.notice",
         "sections.prose",
         "sections.bullet-list",

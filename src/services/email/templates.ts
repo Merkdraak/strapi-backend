@@ -1,5 +1,7 @@
 import type { EmailSettings } from "./types";
 
+export type VisitorMailKind = "contact" | "scan";
+
 export type TemplateContext = {
   type: string;
   name: string;
@@ -8,10 +10,13 @@ export type TemplateContext = {
   companyName?: string;
   companyUrl?: string;
   socialMedia?: string;
+  vacancyTitle?: string;
+  attachments?: string;
   message: string;
   site: string;
   sourcePath: string;
   sourceUrl: string;
+  kind?: VisitorMailKind;
 };
 
 function publicOrigin() {
@@ -91,23 +96,28 @@ function fill(template: string, ctx: TemplateContext) {
     companyName: ctx.companyName || "-",
     companyUrl: ctx.companyUrl || "-",
     socialMedia: ctx.socialMedia || "-",
+    vacancyTitle: ctx.vacancyTitle || "-",
+    attachments: ctx.attachments || "-",
     message: ctx.message,
     site: ctx.site,
     sourcePath: ctx.sourcePath || "-",
     sourceUrl: ctx.sourceUrl || "-",
   };
   return template.replace(
-    /\{\{(type|name|email|phone|companyName|companyUrl|socialMedia|message|site|sourcePath|sourceUrl)\}\}/g,
+    /\{\{(type|name|email|phone|companyName|companyUrl|socialMedia|vacancyTitle|attachments|message|site|sourcePath|sourceUrl)\}\}/g,
     (_, key: string) => values[key] ?? "",
   );
 }
 
 export function renderTeamMail(settings: EmailSettings, ctx: TemplateContext) {
-  const subject = fill(settings.teamSubject, ctx);
+  const subject = ctx.vacancyTitle
+    ? `! Sollicitatie: ${ctx.vacancyTitle} — ${ctx.name}`
+    : fill(settings.teamSubject, ctx);
   const text = [
     fill(settings.teamIntro, ctx),
     "",
     `Type aanvraag: ${ctx.type}`,
+    ctx.vacancyTitle ? `Vacature: ${ctx.vacancyTitle}` : "",
     `Bron: ${ctx.sourcePath || "-"}`,
     ctx.sourceUrl ? `Bron-URL: ${ctx.sourceUrl}` : "",
     "",
@@ -121,8 +131,11 @@ export function renderTeamMail(settings: EmailSettings, ctx: TemplateContext) {
     `E-mail: ${ctx.email}`,
     `Telefoon: ${ctx.phone || "-"}`,
     "",
-    "Bericht:",
+    ctx.vacancyTitle ? "Motivatie:" : "Bericht:",
     ctx.message,
+    "",
+    ctx.attachments ? "Bijlagen:" : "",
+    ctx.attachments ? ctx.attachments : "",
     "",
     fill(settings.teamOutro, ctx),
   ]
@@ -131,14 +144,59 @@ export function renderTeamMail(settings: EmailSettings, ctx: TemplateContext) {
   return { subject, text, html: emailHtml(text, ctx.site) };
 }
 
-export function renderVisitorMail(settings: EmailSettings, ctx: TemplateContext) {
-  const subject = fill(settings.visitorSubject, ctx);
-  const text = [
-    `Hallo ${ctx.name},`,
-    "",
-    fill(settings.visitorIntro, ctx),
-    "",
-    fill(settings.visitorOutro, ctx),
-  ].join("\n");
-  return { subject, text, html: emailHtml(text, ctx.site) };
+function firstName(name: string) {
+  const part = name.trim().split(/\s+/)[0];
+  return part || "daar";
+}
+
+function renderScanVisitor(ctx: TemplateContext) {
+  const website = ctx.companyUrl?.trim() || "-";
+  const interest = ctx.type.trim() || "-";
+  const note = ctx.message.trim() || "-";
+  return {
+    subject: "Je gratis scan bij Merkdraak is aangevraagd",
+    text: [
+      `Hoi ${firstName(ctx.name)},`,
+      "",
+      "Bedankt voor je aanvraag van de gratis scan! We gaan nu voor je aan de slag.",
+      "",
+      "Een van onze specialisten neemt zo snel mogelijk contact met je op. Daarna maken we de scan en zetten we je grootste groeikansen op een rij. Die bespreken we persoonlijk met je, bij jou op locatie of online.",
+      "",
+      "Een scan is helemaal vrijblijvend. Wil je daarna met de resultaten aan de slag? Dan helpen we je graag. Liever zelf? Ook prima, dan heb je in elk geval een helder plan.",
+      "",
+      ["Jouw aanvraag", `Website: ${website}`, `Interesse: ${interest}`, `Opmerking: ${note}`].join("\n"),
+      "",
+      "Tot snel!",
+      "",
+      "Met vriendelijke groet,",
+      "",
+      "Merkdraak",
+    ].join("\n"),
+  };
+}
+
+function renderContactVisitor(ctx: TemplateContext) {
+  const note = ctx.message.trim() || "-";
+  return {
+    subject: "We hebben je contactverzoek ontvangen",
+    text: [
+      `Hoi ${firstName(ctx.name)},`,
+      "",
+      "Bedankt voor je bericht! We hebben het goed ontvangen en een van onze drakentemmers pakt het op.",
+      "",
+      "Je hoort snel van ons. Gaat het om een nieuwe website, meer vindbaarheid of betere campagnes? Dan plannen we graag een kennismaking. Dat kan bij jou op locatie, zodat we je bedrijf echt leren kennen, of online als dat beter uitkomt.",
+      "",
+      ["Jouw bericht", note].join("\n"),
+      "",
+      "Tot snel!",
+      "",
+      "Met vriendelijke groet,",
+      "Team Merkdraak",
+    ].join("\n"),
+  };
+}
+
+export function renderVisitorMail(_settings: EmailSettings, ctx: TemplateContext) {
+  const mail = ctx.kind === "scan" ? renderScanVisitor(ctx) : renderContactVisitor(ctx);
+  return { subject: mail.subject, text: mail.text, html: emailHtml(mail.text, ctx.site) };
 }

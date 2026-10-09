@@ -504,6 +504,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
         'sections.contact-cta',
         'sections.contact-form',
         'sections.scan-request-form',
+        'sections.vacancy-application-form',
         'sections.notice',
         'sections.prose',
         'sections.bullet-list',
@@ -671,6 +672,7 @@ export interface ApiFormSubmissionFormSubmission
     };
   };
   attributes: {
+    attachments: Schema.Attribute.Text;
     companyName: Schema.Attribute.String;
     companyUrl: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
@@ -685,12 +687,12 @@ export interface ApiFormSubmissionFormSubmission
     > &
       Schema.Attribute.Private;
     mailError: Schema.Attribute.Text;
-    message: Schema.Attribute.Text & Schema.Attribute.Required;
+    message: Schema.Attribute.Text;
     name: Schema.Attribute.String & Schema.Attribute.Required;
     phone: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     requestType: Schema.Attribute.Enumeration<
-      ['contact', 'seo', 'sea', 'cro', 'general', 'social']
+      ['contact', 'seo', 'sea', 'cro', 'general', 'social', 'vacancy']
     > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'contact'>;
@@ -707,6 +709,7 @@ export interface ApiFormSubmissionFormSubmission
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    vacancyTitle: Schema.Attribute.String;
     visitorMailStatus: Schema.Attribute.Enumeration<
       ['pending', 'sent', 'skipped', 'failed']
     > &
@@ -775,6 +778,8 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
   attributes: {
     authorName: Schema.Attribute.String;
     canonicalUrl: Schema.Attribute.String;
+    cardIcon: Schema.Attribute.String & Schema.Attribute.DefaultTo<''>;
+    cardImage: Schema.Attribute.Media<'images'>;
     cluster: Schema.Attribute.String;
     composed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     createdAt: Schema.Attribute.DateTime;
@@ -826,6 +831,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.contact-cta',
         'sections.contact-form',
         'sections.scan-request-form',
+        'sections.vacancy-application-form',
         'sections.notice',
         'sections.prose',
         'sections.bullet-list',
