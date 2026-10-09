@@ -5,6 +5,7 @@ const scanRequests = {
   seo: { label: "SEO-scan", pageLabel: "SEO", path: "/online-marketing/seo", requestType: "seo" as const },
   sea: { label: "SEA-scan", pageLabel: "SEA", path: "/online-marketing/sea", requestType: "sea" as const },
   cro: { label: "CRO-scan", pageLabel: "CRO", path: "/online-marketing/conversieoptimalisatie", requestType: "cro" as const },
+  general: { label: "Algemene scan", pageLabel: "algemene scan", path: "/scan", requestType: "general" as const },
 } as const;
 
 type ScanType = keyof typeof scanRequests;
@@ -128,7 +129,7 @@ export default factories.createCoreController("api::form-submission.form-submiss
     const message = clip(body.message, 4000);
     const scanType = normalizeScanType(body.scanType);
     const scan = scanType ? scanRequests[scanType] : null;
-    const interest = scan ? scan.label : clip(body.interest, 120);
+    const interest = clip(body.interest, 120) || (scan ? scan.label : "");
     const requestType = scan ? scan.requestType : "contact";
     const sourcePath = scan ? scan.path : clip(body.sourcePath, 200) || "/contact";
     if (!siteKey || !name || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {

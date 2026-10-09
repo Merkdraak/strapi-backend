@@ -8,9 +8,16 @@
   "attributes": {
     "scanType": {
       "type": "enumeration",
-      "enum": ["seo", "sea", "cro"],
+      "enum": ["seo", "sea", "cro", "general"],
       "required": true,
       "default": "seo"
+    },
+    "interestLabel": {
+      "type": "string",
+      "default": "Gekozen interesse"
+    },
+    "interestValue": {
+      "type": "string"
     },
     "heading": {
       "type": "string"

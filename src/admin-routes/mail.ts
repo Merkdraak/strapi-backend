@@ -23,6 +23,7 @@ const requestTypeLabels: Record<string, string> = {
   seo: "SEO-scan",
   sea: "SEA-scan",
   cro: "CRO-scan",
+  general: "Algemene scan",
 };
 
 function clip(value: unknown, max: number) {
@@ -31,7 +32,7 @@ function clip(value: unknown, max: number) {
 
 function asRequestType(value: unknown) {
   const key = clip(value, 20).toLowerCase();
-  return key === "contact" || key === "seo" || key === "sea" || key === "cro" ? key : "";
+  return key === "contact" || key === "seo" || key === "sea" || key === "cro" || key === "general" ? key : "";
 }
 
 function asStatus(value: unknown) {

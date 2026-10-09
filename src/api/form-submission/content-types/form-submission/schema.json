@@ -49,7 +49,7 @@
     },
     "requestType": {
       "type": "enumeration",
-      "enum": ["contact", "seo", "sea", "cro"],
+      "enum": ["contact", "seo", "sea", "cro", "general"],
       "default": "contact",
       "required": true
     },
