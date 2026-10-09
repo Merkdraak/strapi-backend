@@ -6,7 +6,7 @@ const defaults: EmailSettings = {
   fromName: "Merkdraak",
   fromEmail: "noreply@merkdraak.nl",
   replyTo: "info@merkdraak.nl",
-  defaultRecipient: "",
+  defaultRecipient: "info@merkdraak.nl",
   sendVisitorConfirmation: true,
   sendTeamNotification: true,
   teamSubject: "Nieuwe aanvraag: {{type}} – {{name}}",
@@ -81,8 +81,12 @@ export async function saveEmailSettings(strapi: Core.Strapi, input: Record<strin
 export async function ensureEmailSettings(strapi: Core.Strapi) {
   const existing = await strapi.documents("api::email-setting.email-setting").findFirst({});
   if (existing?.documentId) return normalizeSettings(existing as unknown as Record<string, unknown>);
+  // Strapi email fields reject empty strings — omit blank optional emails on create.
+  const data = Object.fromEntries(
+    Object.entries(defaults).filter(([, value]) => value !== ""),
+  ) as EmailSettings;
   await strapi.documents("api::email-setting.email-setting").create({
-    data: { ...defaults },
+    data,
   });
   return { ...defaults };
 }

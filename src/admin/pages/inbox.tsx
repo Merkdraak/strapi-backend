@@ -19,6 +19,7 @@ type InboxItem = {
   phone: string;
   companyName: string;
   companyUrl: string;
+  socialMedia: string;
   message: string;
   interest: string;
   requestType: string;
@@ -54,6 +55,8 @@ const typeFilters = [
   { value: "seo", label: "SEO" },
   { value: "sea", label: "SEA" },
   { value: "cro", label: "CRO" },
+  { value: "general", label: "Algemeen" },
+  { value: "social", label: "Social" },
 ];
 
 const statusFilters = [
@@ -203,6 +206,11 @@ export default function InboxPage() {
                     <a href={detail.companyUrl} target="_blank" rel="noreferrer">
                       {detail.companyUrl}
                     </a>
+                  </DetailField>
+                ) : null}
+                {detail.socialMedia ? (
+                  <DetailField label="Social media">
+                    <span style={{ whiteSpace: "pre-wrap" }}>{detail.socialMedia}</span>
                   </DetailField>
                 ) : null}
                 <DetailField label="E-mail">
