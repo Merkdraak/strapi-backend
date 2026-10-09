@@ -34,9 +34,30 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
   },
   upload: {
     config: {
+      // Keep responsive formats + mild compression; prefer uploading sources ≥1600px wide for cases/heroes.
+      sizeOptimization: true,
+      responsiveDimensions: true,
       security: {
         allowedTypes: allowedMediaTypes,
         deniedTypes,
+      },
+    },
+  },
+  email: {
+    config: {
+      provider: 'nodemailer',
+      providerOptions: {
+        host: env('SMTP_HOST', 'smtp.gmail.com'),
+        port: env.int('SMTP_PORT', 587),
+        secure: env.bool('SMTP_SECURE', false),
+        auth: {
+          user: env('SMTP_USERNAME'),
+          pass: env('SMTP_PASSWORD'),
+        },
+      },
+      settings: {
+        defaultFrom: env('SMTP_DEFAULT_FROM', 'beheer@merkdraak.nl'),
+        defaultReplyTo: env('SMTP_DEFAULT_REPLY_TO', 'beheer@merkdraak.nl'),
       },
     },
   },
