@@ -35,6 +35,26 @@ function textOf(value: unknown) {
   return String(value ?? "");
 }
 
+function mediaFile(value: unknown) {
+  const row = asRecord(value);
+  const id = Number(row.id);
+  const url = textOf(row.url).trim();
+  if (!Number.isInteger(id) || id <= 0 || !url) return null;
+  return {
+    id,
+    url,
+    name: textOf(row.name).trim() || "favicon",
+  };
+}
+
+function faviconUpdate(value: unknown) {
+  if (value === null) return null;
+  if (value === undefined) return undefined;
+  const id = Number(value);
+  if (!Number.isInteger(id) || id <= 0) return undefined;
+  return id;
+}
+
 async function pageDocumentId(strapi: Core.Strapi, siteKey: string, value: unknown) {
   if (!value) return undefined;
   if (typeof value === "string" && value.trim()) return value.trim();
@@ -283,7 +303,11 @@ export default {
       path: "/merkdraak-editor/navigation",
       handler: async (ctx: { query: { siteKey?: string }; body: unknown }) => {
         const siteKey = String(ctx.query.siteKey ?? "");
-        const site = await strapi.documents("api::site.site").findFirst({ filters: { key: siteKey }, status: "published" });
+        const site = await strapi.documents("api::site.site").findFirst({
+          filters: { key: siteKey },
+          status: "published",
+          populate: { favicon: true },
+        });
         const navigation = await strapi.documents("api::navigation.navigation").findFirst({
           filters: { siteKey },
           status: "published",
@@ -320,6 +344,7 @@ export default {
             articlePrefix: site?.articlePrefix || "kennisbank",
             googlePlaceId: site?.googlePlaceId ?? "",
             formWebhook: site?.formWebhook ?? "",
+            favicon: mediaFile((site as { favicon?: unknown } | null)?.favicon),
           },
           footerServices: navigation?.footerServices ?? [],
           footerOrganization: navigation?.footerOrganization ?? [],
@@ -336,7 +361,11 @@ export default {
           const raw = ctx.request.body ?? {};
           const body = textOf(asRecord(raw.data).siteKey) || asRecord(raw.data).contact ? asRecord(raw.data) : raw;
           const siteKey = String(body.siteKey ?? "");
-          const site = await strapi.documents("api::site.site").findFirst({ filters: { key: siteKey }, status: "published" });
+          const site = await strapi.documents("api::site.site").findFirst({
+            filters: { key: siteKey },
+            status: "published",
+            populate: { favicon: true },
+          });
           if (!site?.documentId) {
             ctx.body = { ok: false, error: "Website niet gevonden." };
             return;
@@ -345,6 +374,9 @@ export default {
           const settings = asRecord(body.settings);
           const previousPrefix = site.articlePrefix || "kennisbank";
           const nextPrefix = normalizePrefix(settings.articlePrefix ?? previousPrefix);
+          const nextFavicon = Object.prototype.hasOwnProperty.call(settings, "faviconId")
+            ? faviconUpdate(settings.faviconId)
+            : undefined;
           await strapi.documents("api::site.site").update({
             documentId: site.documentId,
             data: {
@@ -361,6 +393,7 @@ export default {
               articlePrefix: nextPrefix,
               googlePlaceId: textOf(settings.googlePlaceId ?? site.googlePlaceId).trim(),
               formWebhook: textOf(settings.formWebhook ?? site.formWebhook).trim(),
+              ...(nextFavicon !== undefined ? { favicon: nextFavicon } : {}),
             },
             status: "published",
           });
