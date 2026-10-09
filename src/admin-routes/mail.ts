@@ -46,8 +46,6 @@ function mapRow(row: Record<string, unknown>) {
     name: String(row.name ?? ""),
     email: String(row.email ?? ""),
     phone: String(row.phone ?? ""),
-    companyName: String(row.companyName ?? ""),
-    companyUrl: String(row.companyUrl ?? ""),
     message: String(row.message ?? ""),
     interest: String(row.interest ?? ""),
     requestType,
