@@ -54,6 +54,7 @@ const typeFilters = [
   { value: "seo", label: "SEO" },
   { value: "sea", label: "SEA" },
   { value: "cro", label: "CRO" },
+  { value: "general", label: "Algemeen" },
 ];
 
 const statusFilters = [

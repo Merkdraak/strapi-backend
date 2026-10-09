@@ -690,7 +690,7 @@ export interface ApiFormSubmissionFormSubmission
     phone: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     requestType: Schema.Attribute.Enumeration<
-      ['contact', 'seo', 'sea', 'cro']
+      ['contact', 'seo', 'sea', 'cro', 'general']
     > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'contact'>;
