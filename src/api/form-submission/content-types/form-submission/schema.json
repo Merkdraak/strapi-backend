@@ -40,6 +40,9 @@
     "companyUrl": {
       "type": "string"
     },
+    "socialMedia": {
+      "type": "text"
+    },
     "message": {
       "type": "text",
       "required": true
@@ -49,7 +52,7 @@
     },
     "requestType": {
       "type": "enumeration",
-      "enum": ["contact", "seo", "sea", "cro", "general"],
+      "enum": ["contact", "seo", "sea", "cro", "general", "social"],
       "default": "contact",
       "required": true
     },

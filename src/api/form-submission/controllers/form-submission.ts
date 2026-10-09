@@ -6,6 +6,7 @@ const scanRequests = {
   sea: { label: "SEA-scan", pageLabel: "SEA", path: "/online-marketing/sea", requestType: "sea" as const },
   cro: { label: "CRO-scan", pageLabel: "CRO", path: "/online-marketing/conversieoptimalisatie", requestType: "cro" as const },
   general: { label: "Algemene scan", pageLabel: "algemene scan", path: "/scan", requestType: "general" as const },
+  social: { label: "Social media scan", pageLabel: "social media", path: "/social-media", requestType: "social" as const },
 } as const;
 
 type ScanType = keyof typeof scanRequests;
@@ -126,16 +127,24 @@ export default factories.createCoreController("api::form-submission.form-submiss
     const phone = clip(body.phone, 40);
     const companyName = clip(body.companyName, 200);
     const companyUrl = normalizeCompanyUrl(body.companyUrl);
+    const socialMedia = clip(body.socialMedia, 2000);
     const message = clip(body.message, 4000);
     const scanType = normalizeScanType(body.scanType);
     const scan = scanType ? scanRequests[scanType] : null;
     const interest = clip(body.interest, 120) || (scan ? scan.label : "");
     const requestType = scan ? scan.requestType : "contact";
     const sourcePath = scan ? scan.path : clip(body.sourcePath, 200) || "/contact";
+    const isSocialScan = scanType === "social";
     if (!siteKey || !name || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return ctx.badRequest("Vul naam, een geldig e-mailadres en een bericht in.");
     }
-    if (scan && (!companyName || !companyUrl)) {
+    if (scan && !companyName) {
+      return ctx.badRequest("Vul je bedrijfsnaam in.");
+    }
+    if (scan && isSocialScan && !socialMedia) {
+      return ctx.badRequest("Voeg minstens één social media-profiel toe.");
+    }
+    if (scan && !isSocialScan && !companyUrl) {
       return ctx.badRequest("Vul je bedrijfsnaam en een geldige website-URL in.");
     }
     if (body.scanType != null && body.scanType !== "" && !scan) {
@@ -173,6 +182,7 @@ export default factories.createCoreController("api::form-submission.form-submiss
         phone,
         ...(companyName ? { companyName } : {}),
         ...(companyUrl ? { companyUrl } : {}),
+        ...(socialMedia ? { socialMedia } : {}),
         message,
         interest,
         requestType,
@@ -195,6 +205,7 @@ export default factories.createCoreController("api::form-submission.form-submiss
         phone,
         companyName,
         companyUrl,
+        socialMedia,
         message,
         site: String(site.name ?? siteKey),
         sourcePath,

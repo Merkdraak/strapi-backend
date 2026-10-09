@@ -690,11 +690,12 @@ export interface ApiFormSubmissionFormSubmission
     phone: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     requestType: Schema.Attribute.Enumeration<
-      ['contact', 'seo', 'sea', 'cro', 'general']
+      ['contact', 'seo', 'sea', 'cro', 'general', 'social']
     > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'contact'>;
     siteKey: Schema.Attribute.String & Schema.Attribute.Required;
+    socialMedia: Schema.Attribute.Text;
     sourcePath: Schema.Attribute.String;
     status: Schema.Attribute.Enumeration<['nieuw', 'gelezen', 'afgehandeld']> &
       Schema.Attribute.Required &

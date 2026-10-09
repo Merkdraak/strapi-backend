@@ -24,6 +24,7 @@ const requestTypeLabels: Record<string, string> = {
   sea: "SEA-scan",
   cro: "CRO-scan",
   general: "Algemene scan",
+  social: "Social media scan",
 };
 
 function clip(value: unknown, max: number) {
@@ -32,7 +33,9 @@ function clip(value: unknown, max: number) {
 
 function asRequestType(value: unknown) {
   const key = clip(value, 20).toLowerCase();
-  return key === "contact" || key === "seo" || key === "sea" || key === "cro" || key === "general" ? key : "";
+  return key === "contact" || key === "seo" || key === "sea" || key === "cro" || key === "general" || key === "social"
+    ? key
+    : "";
 }
 
 function asStatus(value: unknown) {
@@ -49,6 +52,7 @@ function mapRow(row: Record<string, unknown>) {
     phone: String(row.phone ?? ""),
     companyName: String(row.companyName ?? ""),
     companyUrl: String(row.companyUrl ?? ""),
+    socialMedia: String(row.socialMedia ?? ""),
     message: String(row.message ?? ""),
     interest: String(row.interest ?? ""),
     requestType,
