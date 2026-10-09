@@ -1050,7 +1050,9 @@ export interface SectionsScanRequestForm extends Struct.ComponentSchema {
     intro: Schema.Attribute.Text;
     recipientEmail: Schema.Attribute.Email &
       Schema.Attribute.DefaultTo<'mike@merkdraak.nl'>;
-    scanType: Schema.Attribute.Enumeration<['seo', 'sea', 'cro', 'general']> &
+    scanType: Schema.Attribute.Enumeration<
+      ['seo', 'sea', 'cro', 'general', 'social']
+    > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'seo'>;
     spaceBottom: Schema.Attribute.String;
