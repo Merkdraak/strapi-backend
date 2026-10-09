@@ -456,7 +456,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
   };
   pluginOptions: {
     'content-manager': {
-      visible: false;
+      visible: true;
     };
   };
   attributes: {
@@ -938,6 +938,7 @@ export interface ApiSiteSite extends Struct.CollectionTypeSchema {
     editorUrl: Schema.Attribute.String;
     email: Schema.Attribute.String;
     emailHref: Schema.Attribute.String;
+    favicon: Schema.Attribute.Media<'images'>;
     footerDisclaimer: Schema.Attribute.Text;
     footerText: Schema.Attribute.Text;
     formWebhook: Schema.Attribute.String;
