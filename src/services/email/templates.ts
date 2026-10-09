@@ -35,31 +35,43 @@ export function emailHtml(text: string, siteName: string) {
   const origin = publicOrigin();
   const logo = `${origin}/brand/logo-merkdraak.png`;
   const name = siteName || "Merkdraak";
-  const body = text
+  const paragraphs = text
     .split(/\n{2,}/)
     .map((paragraph) => paragraph.trim())
-    .filter(Boolean)
-    .map(
-      (paragraph) =>
-        `<p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.5;color:#18171c;">${htmlText(paragraph)}</p>`,
-    )
+    .filter(Boolean);
+  const body = paragraphs
+    .map((paragraph, index) => {
+      const style =
+        index === 0
+          ? "margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:22px;line-height:1.35;font-weight:700;color:#ffffff;"
+          : "margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#f1f5f9;";
+      return `<p style="${style}">${htmlText(paragraph)}</p>`;
+    })
     .join("");
+  const host = origin.replace(/^https?:\/\//, "");
   return `<!DOCTYPE html>
 <html lang="nl">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f4f4f5;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;">
+<body style="margin:0;padding:0;background:#070709;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#070709" style="background:#070709;">
     <tr>
-      <td align="center" style="padding:24px 12px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;">
+      <td align="center" style="padding:32px 16px;">
+        <table role="presentation" width="560" cellpadding="0" cellspacing="0" bgcolor="#18171c" style="width:100%;max-width:560px;background:#18171c;border-radius:16px;">
           <tr>
-            <td style="padding:28px 28px 8px;">${body}</td>
+            <td align="center" bgcolor="#070709" style="padding:28px 32px 24px;background:#070709;border-bottom:3px solid #e10e12;">
+              <a href="${escapeHtml(origin)}" style="text-decoration:none;">
+                <img src="${escapeHtml(logo)}" width="210" height="48" alt="${escapeHtml(name)}" style="display:block;margin:0 auto;border:0;outline:none;text-decoration:none;width:210px;height:auto;background:#070709;">
+              </a>
+            </td>
           </tr>
           <tr>
-            <td align="center" style="padding:20px 28px 28px;border-top:3px solid #e10e12;">
-              <a href="${escapeHtml(origin)}" style="text-decoration:none;">
-                <img src="${escapeHtml(logo)}" width="220" height="50" alt="${escapeHtml(name)}" style="display:block;margin:0 auto;border:0;width:220px;max-width:100%;height:auto;">
-              </a>
+            <td bgcolor="#18171c" style="padding:32px 32px 8px;background:#18171c;">${body}</td>
+          </tr>
+          <tr>
+            <td bgcolor="#18171c" style="padding:4px 32px 28px;background:#18171c;">
+              <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.5;color:#9e9baa;">
+                <a href="${escapeHtml(origin)}" style="color:#ff2e1f;text-decoration:none;">${escapeHtml(host)}</a>
+              </p>
             </td>
           </tr>
         </table>
