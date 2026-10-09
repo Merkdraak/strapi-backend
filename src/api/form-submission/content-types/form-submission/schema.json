@@ -34,6 +34,12 @@
     "phone": {
       "type": "string"
     },
+    "companyName": {
+      "type": "string"
+    },
+    "companyUrl": {
+      "type": "string"
+    },
     "message": {
       "type": "text",
       "required": true
