@@ -1280,6 +1280,34 @@ export interface SectionsVacancies extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsVacancyApplicationForm extends Struct.ComponentSchema {
+  collectionName: 'components_sections_vacancy_application_forms';
+  info: {
+    displayName: 'Vacatureformulier';
+    icon: 'briefcase';
+  };
+  attributes: {
+    anchor: Schema.Attribute.String;
+    heading: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Kom jij ons aanvullen?'>;
+    intro: Schema.Attribute.Text &
+      Schema.Attribute.DefaultTo<'Vul ons sollicitatieformulier in'>;
+    recipientEmail: Schema.Attribute.Email &
+      Schema.Attribute.DefaultTo<'mike@merkdraak.nl'>;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
+    submitLabel: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Verzend'>;
+    thanks: Schema.Attribute.Text &
+      Schema.Attribute.DefaultTo<'Bedankt voor je sollicitatie. We nemen zo snel mogelijk contact met je op.'>;
+    vacancyTitle: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 export interface SectionsVideo extends Struct.ComponentSchema {
   collectionName: 'components_sections_videos';
   info: {
@@ -1683,6 +1711,7 @@ declare module '@strapi/strapi' {
       'sections.team': SectionsTeam;
       'sections.testimonial': SectionsTestimonial;
       'sections.vacancies': SectionsVacancies;
+      'sections.vacancy-application-form': SectionsVacancyApplicationForm;
       'sections.video': SectionsVideo;
       'sections.why-us': SectionsWhyUs;
       'shared.accordion-item': SharedAccordionItem;

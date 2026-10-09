@@ -44,15 +44,20 @@
       "type": "text"
     },
     "message": {
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     "interest": {
       "type": "string"
     },
+    "vacancyTitle": {
+      "type": "string"
+    },
+    "attachments": {
+      "type": "text"
+    },
     "requestType": {
       "type": "enumeration",
-      "enum": ["contact", "seo", "sea", "cro", "general", "social"],
+      "enum": ["contact", "seo", "sea", "cro", "general", "social", "vacancy"],
       "default": "contact",
       "required": true
     },

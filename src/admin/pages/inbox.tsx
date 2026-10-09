@@ -20,6 +20,8 @@ type InboxItem = {
   companyName: string;
   companyUrl: string;
   socialMedia: string;
+  vacancyTitle: string;
+  attachments: string;
   message: string;
   interest: string;
   requestType: string;
@@ -57,6 +59,7 @@ const typeFilters = [
   { value: "cro", label: "CRO" },
   { value: "general", label: "Algemeen" },
   { value: "social", label: "Social" },
+  { value: "vacancy", label: "Sollicitatie" },
 ];
 
 const statusFilters = [
@@ -198,6 +201,9 @@ export default function InboxPage() {
                     </SingleSelect>
                   </Flex>
                 </Flex>
+                {detail.vacancyTitle ? (
+                  <DetailField label="Vacature">{detail.vacancyTitle}</DetailField>
+                ) : null}
                 {detail.companyName ? (
                   <DetailField label="Bedrijfsnaam">{detail.companyName}</DetailField>
                 ) : null}
@@ -218,9 +224,14 @@ export default function InboxPage() {
                 </DetailField>
                 {detail.phone ? <DetailField label="Telefoon">{detail.phone}</DetailField> : null}
                 <DetailField label="Bronpagina">{detail.sourcePath || "-"}</DetailField>
-                <DetailField label="Bericht">
+                <DetailField label={detail.vacancyTitle ? "Motivatie" : "Bericht"}>
                   <span style={{ whiteSpace: "pre-wrap" }}>{detail.message}</span>
                 </DetailField>
+                {detail.attachments ? (
+                  <DetailField label="Bijlagen">
+                    <span style={{ whiteSpace: "pre-wrap" }}>{detail.attachments}</span>
+                  </DetailField>
+                ) : null}
                 <Flex direction="column" gap={1} alignItems="stretch">
                   <Typography tag="div" fontWeight="bold">
                     Mailstatus
@@ -247,7 +258,10 @@ export default function InboxPage() {
                 <Box marginTop={1}>
                   <SingleSelect
                     value={requestType}
-                    onChange={(value: string | number) => setRequestType(String(value))}
+                    onChange={(value: string | number) => {
+                      const next = value == null || value === "" ? "all" : String(value);
+                      setRequestType(next);
+                    }}
                     placeholder="Alle"
                   >
                     {typeFilters.map((item) => (
@@ -265,7 +279,10 @@ export default function InboxPage() {
                 <Box marginTop={1}>
                   <SingleSelect
                     value={status}
-                    onChange={(value: string | number) => setStatus(String(value))}
+                    onChange={(value: string | number) => {
+                      const next = value == null || value === "" ? "all" : String(value);
+                      setStatus(next);
+                    }}
                     placeholder="Alle statussen"
                   >
                     {statusFilters.map((item) => (
@@ -284,7 +301,11 @@ export default function InboxPage() {
                 </Box>
               ) : items.length === 0 ? (
                 <Box padding={4}>
-                  <Typography>Geen inzendingen voor deze filters.</Typography>
+                  <Typography>
+                    {requestType !== "all" || status !== "all"
+                      ? "Geen inzendingen voor deze filters. Kies Type “Alle” om alles te zien."
+                      : "Nog geen formulierinzendingen."}
+                  </Typography>
                 </Box>
               ) : (
                 <Flex direction="column" alignItems="stretch">
