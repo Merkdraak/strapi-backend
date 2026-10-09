@@ -157,7 +157,6 @@ export default factories.createCoreController("api::form-submission.form-submiss
       status: "published",
     });
     if (!site) return ctx.notFound();
-
     const settings = await loadEmailSettings(strapi);
     const staff =
       notifyAddress(body.notifyEmail) ||
