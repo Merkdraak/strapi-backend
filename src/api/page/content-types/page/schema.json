@@ -100,6 +100,17 @@
         "images"
       ]
     },
+    "cardImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "cardIcon": {
+      "type": "string",
+      "default": ""
+    },
     "nofollow": {
       "type": "boolean",
       "default": false

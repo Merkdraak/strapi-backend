@@ -282,35 +282,11 @@ export default function EmailSettingsPage() {
             </Box>
 
             <Box background="neutral0" padding={6} hasRadius shadow="filterShadow">
-              <Flex direction="column" gap={4} alignItems="stretch">
+              <Flex direction="column" gap={2} alignItems="stretch">
                 <Typography variant="delta">Bevestiging bezoeker</Typography>
-                <Field.Root>
-                  <Field.Label>Onderwerp</Field.Label>
-                  <TextInput
-                    value={settings.visitorSubject}
-                    onChange={(event: { target: { value: string } }) =>
-                      setSettings((current) => ({ ...current, visitorSubject: event.target.value }))
-                    }
-                  />
-                </Field.Root>
-                <Field.Root>
-                  <Field.Label>Intro</Field.Label>
-                  <TextInput
-                    value={settings.visitorIntro}
-                    onChange={(event: { target: { value: string } }) =>
-                      setSettings((current) => ({ ...current, visitorIntro: event.target.value }))
-                    }
-                  />
-                </Field.Root>
-                <Field.Root>
-                  <Field.Label>Outro</Field.Label>
-                  <TextInput
-                    value={settings.visitorOutro}
-                    onChange={(event: { target: { value: string } }) =>
-                      setSettings((current) => ({ ...current, visitorOutro: event.target.value }))
-                    }
-                  />
-                </Field.Root>
+                <Typography>
+                  De tekst staat vast. Een scanaanvraag krijgt de scanbevestiging, een contactaanvraag de contactbevestiging. De schakelaar hierboven zet beide mails aan of uit.
+                </Typography>
               </Flex>
             </Box>
 
