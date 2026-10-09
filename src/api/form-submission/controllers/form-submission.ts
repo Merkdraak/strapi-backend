@@ -56,6 +56,20 @@ function normalizeScanType(value: unknown): ScanType | null {
   return key in scanRequests ? (key as ScanType) : null;
 }
 
+function normalizeCompanyUrl(value: unknown) {
+  const raw = clip(value, 300);
+  if (!raw) return "";
+  const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  try {
+    const url = new URL(withProtocol);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return "";
+    if (!url.hostname.includes(".")) return "";
+    return url.toString();
+  } catch {
+    return "";
+  }
+}
+
 function publicOrigin() {
   const raw = String(process.env.FRONTEND_URL ?? process.env.EDITOR_PUBLIC_URL ?? "https://test.merkdraak.nl").trim();
   return raw.replace(/\/+$/, "") || "https://test.merkdraak.nl";
@@ -127,6 +141,8 @@ export default factories.createCoreController("api::form-submission.form-submiss
     const name = clip(body.name, 120);
     const email = clip(body.email, 200);
     const phone = clip(body.phone, 40);
+    const companyName = clip(body.companyName, 200);
+    const companyUrl = normalizeCompanyUrl(body.companyUrl);
     const message = clip(body.message, 4000);
     const scanType = normalizeScanType(body.scanType);
     const scan = scanType ? scanRequests[scanType] : null;
@@ -134,6 +150,9 @@ export default factories.createCoreController("api::form-submission.form-submiss
     const interest = scan ? scan.label : clip(body.interest, 120);
     if (!siteKey || !name || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return ctx.badRequest("Vul naam, een geldig e-mailadres en een bericht in.");
+    }
+    if (scan && (!companyName || !companyUrl)) {
+      return ctx.badRequest("Vul je bedrijfsnaam en een geldige website-URL in.");
     }
     if (body.scanType != null && body.scanType !== "" && !scan) {
       return ctx.badRequest("Ongeldig scantype.");
@@ -157,7 +176,16 @@ export default factories.createCoreController("api::form-submission.form-submiss
     });
     if (!site) return ctx.notFound();
     await strapi.documents("api::form-submission.form-submission").create({
-      data: { siteKey, name, email, phone, message, interest },
+      data: {
+        siteKey,
+        name,
+        email,
+        phone,
+        ...(companyName ? { companyName } : {}),
+        ...(companyUrl ? { companyUrl } : {}),
+        message,
+        interest,
+      },
     });
 
     const staff =
@@ -179,6 +207,8 @@ export default factories.createCoreController("api::form-submission.form-submiss
                 `Pagina: ${scan.pageLabel}`,
                 `Bron-URL: ${sourceUrl}`,
                 "",
+                `Bedrijfsnaam: ${companyName}`,
+                `Website: ${companyUrl}`,
                 `Naam: ${name}`,
                 `E-mail: ${email}`,
                 `Telefoon: ${phone || "-"}`,
