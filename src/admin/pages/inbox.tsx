@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Layouts, Page, useFetchClient, useNotification } from "@strapi/strapi/admin";
 import {
@@ -17,6 +17,8 @@ type InboxItem = {
   name: string;
   email: string;
   phone: string;
+  companyName: string;
+  companyUrl: string;
   message: string;
   interest: string;
   requestType: string;
@@ -28,6 +30,23 @@ type InboxItem = {
   mailError: string;
   createdAt: string;
 };
+
+function DetailField({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <Flex direction="column" gap={1} alignItems="stretch">
+      <Typography tag="div" fontWeight="bold">
+        {label}
+      </Typography>
+      <Typography tag="div">{children}</Typography>
+    </Flex>
+  );
+}
 
 const typeFilters = [
   { value: "all", label: "Alle" },
@@ -176,37 +195,37 @@ export default function InboxPage() {
                     </SingleSelect>
                   </Flex>
                 </Flex>
-                <Box>
-                  <Typography fontWeight="bold">E-mail</Typography>
-                  <Typography>
-                    <a href={`mailto:${detail.email}`}>{detail.email}</a>
-                  </Typography>
-                </Box>
-                {detail.phone ? (
-                  <Box>
-                    <Typography fontWeight="bold">Telefoon</Typography>
-                    <Typography>{detail.phone}</Typography>
-                  </Box>
+                {detail.companyName ? (
+                  <DetailField label="Bedrijfsnaam">{detail.companyName}</DetailField>
                 ) : null}
-                <Box>
-                  <Typography fontWeight="bold">Bronpagina</Typography>
-                  <Typography>{detail.sourcePath || "-"}</Typography>
-                </Box>
-                <Box>
-                  <Typography fontWeight="bold">Bericht</Typography>
-                  <Typography style={{ whiteSpace: "pre-wrap" }}>{detail.message}</Typography>
-                </Box>
-                <Box>
-                  <Typography fontWeight="bold">Mailstatus</Typography>
-                  <Typography>
+                {detail.companyUrl ? (
+                  <DetailField label="Website">
+                    <a href={detail.companyUrl} target="_blank" rel="noreferrer">
+                      {detail.companyUrl}
+                    </a>
+                  </DetailField>
+                ) : null}
+                <DetailField label="E-mail">
+                  <a href={`mailto:${detail.email}`}>{detail.email}</a>
+                </DetailField>
+                {detail.phone ? <DetailField label="Telefoon">{detail.phone}</DetailField> : null}
+                <DetailField label="Bronpagina">{detail.sourcePath || "-"}</DetailField>
+                <DetailField label="Bericht">
+                  <span style={{ whiteSpace: "pre-wrap" }}>{detail.message}</span>
+                </DetailField>
+                <Flex direction="column" gap={1} alignItems="stretch">
+                  <Typography tag="div" fontWeight="bold">
+                    Mailstatus
+                  </Typography>
+                  <Typography tag="div">
                     Team: {mailLabel(detail.teamMailStatus)} · Bevestiging: {mailLabel(detail.visitorMailStatus)}
                   </Typography>
                   {detail.mailError ? (
-                    <Typography textColor="danger600" marginTop={2}>
+                    <Typography tag="div" textColor="danger600">
                       ⚠ {detail.mailError}
                     </Typography>
                   ) : null}
-                </Box>
+                </Flex>
               </Flex>
             )}
           </Box>

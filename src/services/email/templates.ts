@@ -5,6 +5,8 @@ export type TemplateContext = {
   name: string;
   email: string;
   phone: string;
+  companyName?: string;
+  companyUrl?: string;
   message: string;
   site: string;
   sourcePath: string;
@@ -17,12 +19,17 @@ function fill(template: string, ctx: TemplateContext) {
     name: ctx.name,
     email: ctx.email,
     phone: ctx.phone || "-",
+    companyName: ctx.companyName || "-",
+    companyUrl: ctx.companyUrl || "-",
     message: ctx.message,
     site: ctx.site,
     sourcePath: ctx.sourcePath || "-",
     sourceUrl: ctx.sourceUrl || "-",
   };
-  return template.replace(/\{\{(type|name|email|phone|message|site|sourcePath|sourceUrl)\}\}/g, (_, key: string) => values[key] ?? "");
+  return template.replace(
+    /\{\{(type|name|email|phone|companyName|companyUrl|message|site|sourcePath|sourceUrl)\}\}/g,
+    (_, key: string) => values[key] ?? "",
+  );
 }
 
 export function renderTeamMail(settings: EmailSettings, ctx: TemplateContext) {
@@ -34,6 +41,8 @@ export function renderTeamMail(settings: EmailSettings, ctx: TemplateContext) {
     `Bron: ${ctx.sourcePath || "-"}`,
     ctx.sourceUrl ? `Bron-URL: ${ctx.sourceUrl}` : "",
     "",
+    ctx.companyName ? `Bedrijfsnaam: ${ctx.companyName}` : "",
+    ctx.companyUrl ? `Website: ${ctx.companyUrl}` : "",
     `Naam: ${ctx.name}`,
     `E-mail: ${ctx.email}`,
     `Telefoon: ${ctx.phone || "-"}`,
