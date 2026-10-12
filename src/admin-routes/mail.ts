@@ -25,6 +25,7 @@ const requestTypeLabels: Record<string, string> = {
   cro: "CRO-scan",
   general: "Algemene scan",
   social: "Social media scan",
+  website: "Websitescan",
   vacancy: "Sollicitatie",
 };
 
@@ -40,6 +41,7 @@ function asRequestType(value: unknown) {
     key === "cro" ||
     key === "general" ||
     key === "social" ||
+    key === "website" ||
     key === "vacancy"
     ? key
     : "";

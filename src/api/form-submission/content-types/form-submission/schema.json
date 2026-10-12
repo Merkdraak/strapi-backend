@@ -57,7 +57,7 @@
     },
     "requestType": {
       "type": "enumeration",
-      "enum": ["contact", "seo", "sea", "cro", "general", "social", "vacancy"],
+      "enum": ["contact", "seo", "sea", "cro", "general", "social", "website", "vacancy"],
       "default": "contact",
       "required": true
     },

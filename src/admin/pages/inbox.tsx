@@ -59,6 +59,7 @@ const typeFilters = [
   { value: "cro", label: "CRO" },
   { value: "general", label: "Algemeen" },
   { value: "social", label: "Social" },
+  { value: "website", label: "Website" },
   { value: "vacancy", label: "Sollicitatie" },
 ];
 

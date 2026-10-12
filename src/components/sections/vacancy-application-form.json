@@ -14,9 +14,16 @@
       "type": "text",
       "default": "Vul ons sollicitatieformulier in"
     },
-    "vacancyTitle": {
+    "applicationLabel": {
       "type": "string",
-      "required": true
+      "default": "Sollicitatie voor"
+    },
+    "openApplication": {
+      "type": "boolean",
+      "default": false
+    },
+    "vacancyTitle": {
+      "type": "string"
     },
     "recipientEmail": {
       "type": "email",

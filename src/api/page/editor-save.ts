@@ -48,6 +48,17 @@ function normalizeSections(sections: unknown) {
   for (const section of sections) {
     if (!section || typeof section !== "object") continue;
     const record = section as Record<string, unknown>;
+    if (record.__component === "sections.vacancy-application-form") {
+      const open = record.openApplication === true || record.openApplication === "true";
+      record.openApplication = open;
+      if (!String(record.applicationLabel ?? "").trim()) {
+        record.applicationLabel = "Sollicitatie voor";
+      }
+      if (open && !String(record.vacancyTitle ?? "").trim()) {
+        record.vacancyTitle = "Open sollicitatie";
+      }
+      continue;
+    }
     if (record.__component !== "sections.team" || !Array.isArray(record.members)) continue;
     for (const member of record.members) {
       if (!member || typeof member !== "object") continue;

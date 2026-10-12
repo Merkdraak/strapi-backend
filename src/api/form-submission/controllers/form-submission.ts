@@ -7,6 +7,7 @@ const scanRequests = {
   cro: { label: "CRO-scan", pageLabel: "CRO", path: "/online-marketing/conversieoptimalisatie", requestType: "cro" as const },
   general: { label: "Algemene scan", pageLabel: "algemene scan", path: "/scan", requestType: "general" as const },
   social: { label: "Social media scan", pageLabel: "social media", path: "/social-media", requestType: "social" as const },
+  website: { label: "Websitescan", pageLabel: "websitescan", path: "/websites", requestType: "website" as const },
 } as const;
 
 type ScanType = keyof typeof scanRequests;
