@@ -32,6 +32,22 @@
     "alt": {
       "type": "string"
     },
+    "imageAspect": {
+      "type": "enumeration",
+      "enum": [
+        "4/3",
+        "1/1",
+        "3/4",
+        "2/3",
+        "16/9",
+        "auto"
+      ],
+      "default": "4/3"
+    },
+    "imageFocus": {
+      "type": "string",
+      "default": "50,50"
+    },
     "side": {
       "type": "string"
     },
