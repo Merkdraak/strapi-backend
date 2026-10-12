@@ -54,6 +54,10 @@
     },
     "spaceBottomMobile": {
       "type": "string"
+    },
+    "imageFocus": {
+      "type": "string",
+      "default": "50,50"
     }
   }
 }

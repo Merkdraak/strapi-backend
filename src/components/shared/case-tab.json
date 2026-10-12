@@ -24,7 +24,9 @@
     "image": {
       "type": "media",
       "multiple": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
     },
     "imageAlt": {
       "type": "string"
@@ -50,8 +52,17 @@
     },
     "accent": {
       "type": "enumeration",
-      "enum": ["orange", "red", "amber", "emerald"],
+      "enum": [
+        "orange",
+        "red",
+        "amber",
+        "emerald"
+      ],
       "default": "orange"
+    },
+    "imageFocus": {
+      "type": "string",
+      "default": "50,50"
     }
   }
 }
