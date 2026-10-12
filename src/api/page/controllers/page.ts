@@ -46,6 +46,7 @@ export default factories.createCoreController("api::page.page", ({ strapi }) => 
         parent: { fields: ["entryKey"] },
         related: { fields: ["entryKey"] },
         ogImage: true,
+        cardImage: true,
       },
     });
     if (!page || page.siteKey !== siteKey) return ctx.notFound();

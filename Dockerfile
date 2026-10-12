@@ -21,7 +21,8 @@ RUN npm ci
 
 COPY . .
 ENV NODE_ENV=production
-RUN npm run build
+# Koekje has 4GB RAM. Cap the admin compile so Node is not SIGKILLed inside the buildkit cgroup.
+RUN NODE_OPTIONS=--max-old-space-size=2048 npm run build
 
 EXPOSE 1337
 CMD ["npm", "run", "start"]

@@ -1,0 +1,55 @@
+{
+  "collectionName": "components_sections_vacancy_application_forms",
+  "info": {
+    "displayName": "Vacatureformulier",
+    "icon": "briefcase"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "default": "Kom jij ons aanvullen?"
+    },
+    "intro": {
+      "type": "text",
+      "default": "Vul ons sollicitatieformulier in"
+    },
+    "vacancyTitle": {
+      "type": "string",
+      "required": true
+    },
+    "recipientEmail": {
+      "type": "email",
+      "default": "mike@merkdraak.nl"
+    },
+    "submitLabel": {
+      "type": "string",
+      "default": "Verzend"
+    },
+    "thanks": {
+      "type": "text",
+      "default": "Bedankt voor je sollicitatie. We nemen zo snel mogelijk contact met je op."
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "spaceTop": {
+      "type": "string"
+    },
+    "spaceBottom": {
+      "type": "string"
+    },
+    "spaceTopTablet": {
+      "type": "string"
+    },
+    "spaceBottomTablet": {
+      "type": "string"
+    },
+    "spaceTopMobile": {
+      "type": "string"
+    },
+    "spaceBottomMobile": {
+      "type": "string"
+    }
+  }
+}

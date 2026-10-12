@@ -10,6 +10,14 @@
   "options": {
     "draftAndPublish": false
   },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": false
+    },
+    "content-type-builder": {
+      "visible": false
+    }
+  },
   "attributes": {
     "siteKey": {
       "type": "string",
@@ -32,9 +40,17 @@
     "phone": {
       "type": "string"
     },
+    "companyName": {
+      "type": "string"
+    },
+    "companyUrl": {
+      "type": "string"
+    },
+    "socialMedia": {
+      "type": "text"
+    },
     "message": {
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     "interest": {
       "type": "string"
@@ -63,6 +79,37 @@
       "multiple": false,
       "required": false,
       "allowedTypes": ["files"]
+    },
+    "attachments": {
+      "type": "text"
+    },
+    "requestType": {
+      "type": "enumeration",
+      "enum": ["contact", "seo", "sea", "cro", "general", "social", "website", "vacancy"],
+      "default": "contact",
+      "required": true
+    },
+    "sourcePath": {
+      "type": "string"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["nieuw", "gelezen", "afgehandeld"],
+      "default": "nieuw",
+      "required": true
+    },
+    "teamMailStatus": {
+      "type": "enumeration",
+      "enum": ["pending", "sent", "skipped", "failed"],
+      "default": "pending"
+    },
+    "visitorMailStatus": {
+      "type": "enumeration",
+      "enum": ["pending", "sent", "skipped", "failed"],
+      "default": "pending"
+    },
+    "mailError": {
+      "type": "text"
     }
   }
 }

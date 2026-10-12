@@ -442,7 +442,11 @@ export interface SectionsContactForm extends Struct.ComponentSchema {
     anchor: Schema.Attribute.String;
     appearance: Schema.Attribute.Enumeration<['dark', 'light', 'accent']> &
       Schema.Attribute.DefaultTo<'dark'>;
+    asideHeading: Schema.Attribute.String;
     backgroundColor: Schema.Attribute.String;
+    body: Schema.Attribute.Text;
+    contactText: Schema.Attribute.Text;
+    disclaimer: Schema.Attribute.Text;
     emailLabel: Schema.Attribute.String;
     emailPlaceholder: Schema.Attribute.String;
     errorMessage: Schema.Attribute.Text;
@@ -454,14 +458,23 @@ export interface SectionsContactForm extends Struct.ComponentSchema {
     heading: Schema.Attribute.String;
     headingLevel: Schema.Attribute.String;
     interestLabel: Schema.Attribute.String;
+    marketingscanBody: Schema.Attribute.Text;
+    marketingscanLabel: Schema.Attribute.String;
     messageLabel: Schema.Attribute.String;
     messagePlaceholder: Schema.Attribute.String;
     nameLabel: Schema.Attribute.String;
     namePlaceholder: Schema.Attribute.String;
     note: Schema.Attribute.Text;
+    officeAddress: Schema.Attribute.String;
+    officeBtw: Schema.Attribute.String;
+    officeEmail: Schema.Attribute.Email;
+    officeKvk: Schema.Attribute.String;
+    officePhone: Schema.Attribute.String;
     pendingLabel: Schema.Attribute.String;
     phoneLabel: Schema.Attribute.String;
     phonePlaceholder: Schema.Attribute.String;
+    recipientEmail: Schema.Attribute.Email;
+    showSiteDetails: Schema.Attribute.Boolean;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -472,6 +485,8 @@ export interface SectionsContactForm extends Struct.ComponentSchema {
     submitLabel: Schema.Attribute.String;
     textColor: Schema.Attribute.String;
     thanks: Schema.Attribute.Text;
+    websitescanBody: Schema.Attribute.Text;
+    websitescanLabel: Schema.Attribute.String;
   };
 }
 
@@ -1071,10 +1086,15 @@ export interface SectionsScanRequestForm extends Struct.ComponentSchema {
   attributes: {
     anchor: Schema.Attribute.String;
     heading: Schema.Attribute.String;
+    interestLabel: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Gekozen interesse'>;
+    interestValue: Schema.Attribute.String;
     intro: Schema.Attribute.Text;
     recipientEmail: Schema.Attribute.Email &
       Schema.Attribute.DefaultTo<'mike@merkdraak.nl'>;
-    scanType: Schema.Attribute.Enumeration<['seo', 'sea', 'cro']> &
+    scanType: Schema.Attribute.Enumeration<
+      ['seo', 'sea', 'cro', 'general', 'social', 'website']
+    > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'seo'>;
     spaceBottom: Schema.Attribute.String;
@@ -1299,6 +1319,34 @@ export interface SectionsVacancies extends Struct.ComponentSchema {
     spaceTop: Schema.Attribute.String;
     spaceTopMobile: Schema.Attribute.String;
     spaceTopTablet: Schema.Attribute.String;
+  };
+}
+
+export interface SectionsVacancyApplicationForm extends Struct.ComponentSchema {
+  collectionName: 'components_sections_vacancy_application_forms';
+  info: {
+    displayName: 'Vacatureformulier';
+    icon: 'briefcase';
+  };
+  attributes: {
+    anchor: Schema.Attribute.String;
+    heading: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Kom jij ons aanvullen?'>;
+    intro: Schema.Attribute.Text &
+      Schema.Attribute.DefaultTo<'Vul ons sollicitatieformulier in'>;
+    recipientEmail: Schema.Attribute.Email &
+      Schema.Attribute.DefaultTo<'mike@merkdraak.nl'>;
+    spaceBottom: Schema.Attribute.String;
+    spaceBottomMobile: Schema.Attribute.String;
+    spaceBottomTablet: Schema.Attribute.String;
+    spaceTop: Schema.Attribute.String;
+    spaceTopMobile: Schema.Attribute.String;
+    spaceTopTablet: Schema.Attribute.String;
+    submitLabel: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Verzend'>;
+    thanks: Schema.Attribute.Text &
+      Schema.Attribute.DefaultTo<'Bedankt voor je sollicitatie. We nemen zo snel mogelijk contact met je op.'>;
+    vacancyTitle: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
@@ -1742,6 +1790,7 @@ declare module '@strapi/strapi' {
       'sections.team': SectionsTeam;
       'sections.testimonial': SectionsTestimonial;
       'sections.vacancies': SectionsVacancies;
+      'sections.vacancy-application-form': SectionsVacancyApplicationForm;
       'sections.video': SectionsVideo;
       'sections.why-us': SectionsWhyUs;
       'shared.accordion-item': SharedAccordionItem;

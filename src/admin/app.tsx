@@ -1,4 +1,5 @@
 import type { StrapiApp } from "@strapi/strapi/admin";
+import { Mail, PaperPlane } from "@strapi/icons";
 import { Navigate, useLocation } from "react-router-dom";
 
 function isContentManagerPath(path: string | undefined) {
@@ -51,6 +52,36 @@ export default {
   },
   register(app: StrapiApp) {
     hideDefaultEditor(app);
+    if ("widgets" in app) {
+      app.widgets.register({
+        id: "merkdraak-incoming-mail",
+        icon: PaperPlane,
+        title: { id: "merkdraak.incoming-mail", defaultMessage: "Inkomende mails" },
+        link: {
+          label: { id: "merkdraak.incoming-mail.link", defaultMessage: "Alles bekijken" },
+          href: "/merkdraak-inbox",
+        },
+        component: async () => {
+          const mod = await import("./widgets/incoming-mail");
+          return mod.default;
+        },
+      });
+    }
+    app.addSettingsLink(
+      {
+        id: "merkdraak-email",
+        intlLabel: { id: "merkdraak.email.section", defaultMessage: "E-mail" },
+      },
+      [
+        {
+          id: "merkdraak-email-settings",
+          to: "merkdraak-email/settings",
+          intlLabel: { id: "merkdraak.email.settings", defaultMessage: "E-mail" },
+          Component: () => import("./pages/email-settings"),
+          permissions: [],
+        },
+      ],
+    );
   },
   bootstrap(app: StrapiApp) {
     app.addMenuLink({
@@ -58,6 +89,13 @@ export default {
       icon: EditorIcon,
       intlLabel: { id: "merkdraak.editor", defaultMessage: "Websites" },
       Component: () => import("./pages/editor"),
+      permissions: [],
+    });
+    app.addMenuLink({
+      to: "merkdraak-inbox",
+      icon: Mail,
+      intlLabel: { id: "merkdraak.inbox", defaultMessage: "Inkomende mails" },
+      Component: () => import("./pages/inbox"),
       permissions: [],
     });
   },

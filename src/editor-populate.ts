@@ -19,6 +19,7 @@ export const sectionPopulate = {
     "sections.contact-form": { populate: ["fields"] },
     "sections.application-form": { populate: ["fields"] },
     "sections.scan-request-form": { populate: "*" },
+    "sections.vacancy-application-form": { populate: "*" },
     "sections.case-grid": { populate: { tabs: { populate: "*" } } },
     "sections.row": { populate: "*" },
     "sections.page-index": { populate: ["articleTypes"] },
