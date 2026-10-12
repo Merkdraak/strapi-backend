@@ -9,6 +9,9 @@
     "heading": {
       "type": "string"
     },
+    "titleColor": {
+      "type": "string"
+    },
     "steps": {
       "type": "component",
       "repeatable": true,

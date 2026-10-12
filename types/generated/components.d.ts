@@ -830,6 +830,7 @@ export interface SectionsNumberedSteps extends Struct.ComponentSchema {
     spaceTopTablet: Schema.Attribute.String;
     steps: Schema.Attribute.Component<'shared.step', true>;
     textColor: Schema.Attribute.String;
+    titleColor: Schema.Attribute.String;
   };
 }
 
