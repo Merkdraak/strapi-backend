@@ -210,6 +210,10 @@
         "sections.document",
         "sections.button-row"
       ]
+    },
+    "cardImageFocus": {
+      "type": "string",
+      "default": "50,50"
     }
   }
 }
