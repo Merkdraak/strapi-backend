@@ -130,10 +130,12 @@ export interface SectionsBeforeAfter extends Struct.ComponentSchema {
     after: Schema.Attribute.Media<'images'>;
     afterAlt: Schema.Attribute.String;
     afterCaption: Schema.Attribute.String;
+    afterFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
     anchor: Schema.Attribute.String;
     before: Schema.Attribute.Media<'images'>;
     beforeAlt: Schema.Attribute.String;
     beforeCaption: Schema.Attribute.String;
+    beforeFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
     heading: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -293,6 +295,7 @@ export interface SectionsCaseStory extends Struct.ComponentSchema {
     fontSize: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
     imageAlt: Schema.Attribute.String;
+    imageFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
     imageHeight: Schema.Attribute.Integer;
     imageSrc: Schema.Attribute.String;
     imageWidth: Schema.Attribute.Integer;
@@ -500,6 +503,7 @@ export interface SectionsExpert extends Struct.ComponentSchema {
     heading: Schema.Attribute.String;
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
+    imageFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
     name: Schema.Attribute.String;
     pageId: Schema.Attribute.String;
     role: Schema.Attribute.String;
@@ -603,6 +607,7 @@ export interface SectionsHero extends Struct.ComponentSchema {
     highlight: Schema.Attribute.String;
     highlightColor: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
+    imageFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
     primaryHref: Schema.Attribute.String;
     primaryLabel: Schema.Attribute.String;
     secondaryHref: Schema.Attribute.String;
@@ -637,6 +642,7 @@ export interface SectionsImage extends Struct.ComponentSchema {
     fontSize: Schema.Attribute.String;
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
+    imageFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -1418,6 +1424,7 @@ export interface SharedCaseTab extends Struct.ComponentSchema {
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
     imageAlt: Schema.Attribute.String;
+    imageFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
     label: Schema.Attribute.String;
     metrics: Schema.Attribute.Component<'shared.stat', true>;
     sector: Schema.Attribute.String;
@@ -1438,6 +1445,7 @@ export interface SharedContentCard extends Struct.ComponentSchema {
     alt: Schema.Attribute.String;
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
+    imageFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
     pageId: Schema.Attribute.String;
     text: Schema.Attribute.Text;
     title: Schema.Attribute.String;
@@ -1490,6 +1498,7 @@ export interface SharedNamedItem extends Struct.ComponentSchema {
   attributes: {
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
+    imageFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
     itemId: Schema.Attribute.String;
     name: Schema.Attribute.String;
   };
@@ -1557,6 +1566,7 @@ export interface SharedSlide extends Struct.ComponentSchema {
     alt: Schema.Attribute.String;
     caption: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
+    imageFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
   };
 }
 
@@ -1630,6 +1640,7 @@ export interface SharedTeamMember extends Struct.ComponentSchema {
     bio: Schema.Attribute.Text;
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
+    imageFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
     initials: Schema.Attribute.String;
     name: Schema.Attribute.String;
     pageId: Schema.Attribute.String;

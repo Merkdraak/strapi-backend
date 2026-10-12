@@ -55,6 +55,14 @@
     },
     "spaceBottomMobile": {
       "type": "string"
+    },
+    "beforeFocus": {
+      "type": "string",
+      "default": "50,50"
+    },
+    "afterFocus": {
+      "type": "string",
+      "default": "50,50"
     }
   }
 }

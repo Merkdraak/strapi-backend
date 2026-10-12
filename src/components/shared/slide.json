@@ -9,13 +9,19 @@
     "image": {
       "type": "media",
       "multiple": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
     },
     "alt": {
       "type": "string"
     },
     "caption": {
       "type": "string"
+    },
+    "imageFocus": {
+      "type": "string",
+      "default": "50,50"
     }
   }
 }

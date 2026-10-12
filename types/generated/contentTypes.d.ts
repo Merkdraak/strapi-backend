@@ -789,6 +789,8 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     canonicalUrl: Schema.Attribute.String;
     cardIcon: Schema.Attribute.String & Schema.Attribute.DefaultTo<''>;
     cardImage: Schema.Attribute.Media<'images'>;
+    cardImageFocus: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'50,50'>;
     cluster: Schema.Attribute.String;
     composed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     createdAt: Schema.Attribute.DateTime;
