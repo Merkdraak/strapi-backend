@@ -368,6 +368,7 @@ export interface SectionsContactCta extends Struct.ComponentSchema {
   };
   attributes: {
     accentColor: Schema.Attribute.String;
+    alt: Schema.Attribute.String;
     anchor: Schema.Attribute.String;
     backgroundColor: Schema.Attribute.String;
     body: Schema.Attribute.Text;
@@ -376,8 +377,21 @@ export interface SectionsContactCta extends Struct.ComponentSchema {
     highlight: Schema.Attribute.String;
     highlightColor: Schema.Attribute.String;
     href: Schema.Attribute.String;
+    image: Schema.Attribute.Media<'images'>;
+    imageFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
+    imageWidth: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 55;
+          min: 20;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<30>;
     label: Schema.Attribute.String;
     showCta: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    side: Schema.Attribute.Enumeration<['left', 'right']> &
+      Schema.Attribute.DefaultTo<'left'>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
