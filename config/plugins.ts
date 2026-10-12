@@ -34,9 +34,15 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
   },
   upload: {
     config: {
-      // Keep responsive formats + mild compression; prefer uploading sources ≥1600px wide for cases/heroes.
-      sizeOptimization: true,
+      // Don't crush originals on upload (was causing soft/pixelated case & hero photos).
+      // Prefer sources ≥400px high (≈800px for sharp retina). Responsive widths stay generous.
+      sizeOptimization: false,
       responsiveDimensions: true,
+      breakpoints: {
+        large: 1600,
+        medium: 1000,
+        small: 600,
+      },
       security: {
         allowedTypes: allowedMediaTypes,
         deniedTypes,
