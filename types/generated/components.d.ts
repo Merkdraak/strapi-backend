@@ -1147,6 +1147,11 @@ export interface SectionsSplit extends Struct.ComponentSchema {
     heading: Schema.Attribute.String;
     href: Schema.Attribute.String;
     image: Schema.Attribute.Media<'images'>;
+    imageAspect: Schema.Attribute.Enumeration<
+      ['4/3', '1/1', '3/4', '2/3', '16/9', 'auto']
+    > &
+      Schema.Attribute.DefaultTo<'4/3'>;
+    imageFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
     label: Schema.Attribute.String;
     showCta: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     side: Schema.Attribute.String;
@@ -1288,10 +1293,14 @@ export interface SectionsVacancyApplicationForm extends Struct.ComponentSchema {
   };
   attributes: {
     anchor: Schema.Attribute.String;
+    applicationLabel: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Sollicitatie voor'>;
     heading: Schema.Attribute.String &
       Schema.Attribute.DefaultTo<'Kom jij ons aanvullen?'>;
     intro: Schema.Attribute.Text &
       Schema.Attribute.DefaultTo<'Vul ons sollicitatieformulier in'>;
+    openApplication: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
     recipientEmail: Schema.Attribute.Email &
       Schema.Attribute.DefaultTo<'mike@merkdraak.nl'>;
     spaceBottom: Schema.Attribute.String;
@@ -1304,7 +1313,7 @@ export interface SectionsVacancyApplicationForm extends Struct.ComponentSchema {
       Schema.Attribute.DefaultTo<'Verzend'>;
     thanks: Schema.Attribute.Text &
       Schema.Attribute.DefaultTo<'Bedankt voor je sollicitatie. We nemen zo snel mogelijk contact met je op.'>;
-    vacancyTitle: Schema.Attribute.String & Schema.Attribute.Required;
+    vacancyTitle: Schema.Attribute.String;
   };
 }
 
