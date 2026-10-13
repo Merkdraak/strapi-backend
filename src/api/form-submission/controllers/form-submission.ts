@@ -1,5 +1,5 @@
 import { factories } from "@strapi/strapi";
-import { loadEmailSettings, sendFormEmails } from "../../../services/email";
+import { sendFormEmails } from "../../../services/email";
 
 const scanRequests = {
   seo: { label: "SEO-scan", pageLabel: "SEO", path: "/online-marketing/seo", requestType: "seo" as const },
@@ -47,12 +47,6 @@ function validStarted(value: unknown) {
   if (!Number.isFinite(started) || started <= 0) return false;
   const wait = Date.now() - started;
   return wait >= 2500 && wait <= 48 * 60 * 60 * 1000;
-}
-
-function notifyAddress(value: unknown) {
-  const email = clip(value, 200);
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "";
-  return email;
 }
 
 function normalizeScanType(value: unknown): ScanType | null {
@@ -196,13 +190,6 @@ export default factories.createCoreController("api::form-submission.form-submiss
       status: "published",
     });
     if (!site) return ctx.notFound();
-    const settings = await loadEmailSettings(strapi);
-    const staff =
-      notifyAddress(body.notifyEmail) ||
-      notifyAddress(body.to) ||
-      (scan || isVacancy ? "" : notifyAddress(site.email)) ||
-      notifyAddress(settings.defaultRecipient);
-
     const created = await strapi.documents("api::form-submission.form-submission").create({
       data: {
         siteKey,
@@ -225,8 +212,8 @@ export default factories.createCoreController("api::form-submission.form-submiss
       },
     });
 
+    // Bedanktmail → bezoeker; teammail met formuliergegevens → altijd info@merkdraak.nl.
     const mail = await sendFormEmails(strapi, {
-      staffTo: staff,
       visitorTo: email,
       visitorReplyTo: email,
       ctx: {

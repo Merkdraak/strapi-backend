@@ -26,8 +26,7 @@
       "type": "text"
     },
     "recipientEmail": {
-      "type": "email",
-      "default": "mike@merkdraak.nl"
+      "type": "email"
     },
     "anchor": {
       "type": "string"

@@ -611,7 +611,8 @@ export interface ApiEmailSettingEmailSetting extends Struct.SingleTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    defaultRecipient: Schema.Attribute.Email;
+    defaultRecipient: Schema.Attribute.Email &
+      Schema.Attribute.DefaultTo<'info@merkdraak.nl'>;
     fromEmail: Schema.Attribute.Email &
       Schema.Attribute.DefaultTo<'noreply@merkdraak.nl'>;
     fromName: Schema.Attribute.String & Schema.Attribute.DefaultTo<'Merkdraak'>;
