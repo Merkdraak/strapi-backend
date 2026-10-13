@@ -868,6 +868,7 @@ export interface SectionsPageIndex extends Struct.ComponentSchema {
       Schema.Attribute.DefaultTo<'dark'>;
     articleTypes: Schema.Attribute.Component<'shared.article-type', true>;
     backgroundColor: Schema.Attribute.String;
+    cards: Schema.Attribute.Component<'shared.page-card', true>;
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     knowledgeNote: Schema.Attribute.Text;
@@ -1517,6 +1518,26 @@ export interface SharedNamedItem extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedPageCard extends Struct.ComponentSchema {
+  collectionName: 'components_shared_page_cards';
+  info: {
+    displayName: 'Overzichtskaart';
+    icon: 'picture';
+  };
+  attributes: {
+    cardTitle: Schema.Attribute.String;
+    description: Schema.Attribute.Text;
+    icon: Schema.Attribute.String & Schema.Attribute.DefaultTo<'auto'>;
+    image: Schema.Attribute.Media<'images'>;
+    imageFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
+    pageId: Schema.Attribute.String;
+    showIcon: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    showImage: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    showText: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    title: Schema.Attribute.String;
+  };
+}
+
 export interface SharedPillar extends Struct.ComponentSchema {
   collectionName: 'components_shared_pillars';
   info: {
@@ -1755,6 +1776,7 @@ declare module '@strapi/strapi' {
       'shared.faq-item': SharedFaqItem;
       'shared.form-field': SharedFormField;
       'shared.named-item': SharedNamedItem;
+      'shared.page-card': SharedPageCard;
       'shared.pillar': SharedPillar;
       'shared.review-item': SharedReviewItem;
       'shared.service-card': SharedServiceCard;

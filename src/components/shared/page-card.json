@@ -1,0 +1,49 @@
+{
+  "collectionName": "components_shared_page_cards",
+  "info": {
+    "displayName": "Overzichtskaart",
+    "icon": "picture"
+  },
+  "options": {},
+  "attributes": {
+    "pageId": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "cardTitle": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "icon": {
+      "type": "string",
+      "default": "auto"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "imageFocus": {
+      "type": "string",
+      "default": "50,50"
+    },
+    "showImage": {
+      "type": "boolean",
+      "default": true
+    },
+    "showIcon": {
+      "type": "boolean",
+      "default": true
+    },
+    "showText": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}
