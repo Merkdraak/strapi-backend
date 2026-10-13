@@ -1,9 +1,17 @@
 import type { Core } from "@strapi/strapi";
+import { registerEditorLockRoutes } from "./admin-routes/editor-locks";
 import { registerMailAdminRoutes } from "./admin-routes/mail";
 import { clearEditorRequiredFieldsCache } from "./editor-required-fields";
 import { backfillMenu, normalizePrefix, syncArticlePrefix } from "./knowledge";
 import { registerPageBlocksTool } from "./page-blocks-mcp";
 import { publishScheduledPages } from "./publish-scheduled";
+import {
+  acquireEditorLock,
+  adminDisplayName,
+  adminUserId,
+  documentIdFromEditorNext,
+  listEditorLocks,
+} from "./services/editor-locks";
 import { syncComposedPages } from "./sync-composed-pages";
 import { syncContactPageBuilder } from "./sync-contact-page";
 import { syncEditorUrl } from "./sync-editor-url";
@@ -182,6 +190,7 @@ export default {
     const routes = strapi.admin.routes.admin.routes as unknown[];
     const adminOnly = { policies: ["admin::isAuthenticatedAdmin"] };
     registerMailAdminRoutes(strapi, routes, adminOnly);
+    registerEditorLockRoutes(strapi, routes, adminOnly);
     routes.push({
       method: "GET",
       path: "/merkdraak-editor/sites",
@@ -256,16 +265,22 @@ export default {
     routes.push({
       method: "GET",
       path: "/merkdraak-editor/pages",
-      handler: async (ctx: { query: { siteKey?: string }; body: unknown }) => {
+      handler: async (ctx: {
+        query: { siteKey?: string };
+        body: unknown;
+        state: { user?: { id?: number | string; firstname?: string; lastname?: string; username?: string; email?: string } };
+      }) => {
         const siteKey = String(ctx.query.siteKey ?? "");
         const site = await strapi.documents("api::site.site").findFirst({
           filters: { key: siteKey },
           status: "published",
         });
         if (!site) {
-          ctx.body = { pages: [] };
+          ctx.body = { pages: [], cases: [], locks: {} };
           return;
         }
+        const viewerId = adminUserId(ctx.state.user);
+        const locks = listEditorLocks(siteKey, viewerId);
         const pages = await strapi.documents("api::page.page").findMany({
           status: "draft",
           filters: { siteKey, pageType: { $ne: "case" } },
@@ -280,23 +295,32 @@ export default {
           sort: ["title:asc"],
           pagination: { pageSize: 200 },
         });
+        const withLock = <T extends { documentId: string }>(row: T) => ({
+          ...row,
+          lock: locks[row.documentId] ?? null,
+        });
         ctx.body = {
-          pages: pages.map((page) => ({
-            documentId: page.documentId,
-            title: page.title ?? "",
-            slug: page.slug ?? "",
-            visibility: page.visibility ?? "",
-            pageType: page.pageType ?? "",
-            kind: "page",
-          })),
-          cases: cases.map((item) => ({
-            documentId: item.documentId,
-            title: item.title ?? "",
-            slug: item.slug ?? "",
-            visibility: item.visibility ?? "",
-            pageType: "case",
-            kind: "case",
-          })),
+          pages: pages.map((page) =>
+            withLock({
+              documentId: page.documentId,
+              title: page.title ?? "",
+              slug: page.slug ?? "",
+              visibility: page.visibility ?? "",
+              pageType: page.pageType ?? "",
+              kind: "page" as const,
+            }),
+          ),
+          cases: cases.map((item) =>
+            withLock({
+              documentId: item.documentId,
+              title: item.title ?? "",
+              slug: item.slug ?? "",
+              visibility: item.visibility ?? "",
+              pageType: "case",
+              kind: "case" as const,
+            }),
+          ),
+          locks,
         };
       },
       config: adminOnly,
@@ -434,7 +458,12 @@ export default {
     routes.push({
       method: "GET",
       path: "/merkdraak-editor/open",
-      handler: async (ctx: { query: { next?: string; siteKey?: string }; body: unknown }) => {
+      handler: async (ctx: {
+        query: { next?: string; siteKey?: string };
+        body: unknown;
+        status: number;
+        state: { user?: { id?: number | string; firstname?: string; lastname?: string; username?: string; email?: string } };
+      }) => {
         const secret = process.env.EDITOR_SECRET;
         const siteKey = String(ctx.query.siteKey ?? "");
         const site = await strapi.documents("api::site.site").findFirst({
@@ -446,6 +475,26 @@ export default {
         if (!secret || !origin) {
           ctx.body = { url: null };
           return;
+        }
+        const documentId = documentIdFromEditorNext(next);
+        if (documentId) {
+          const userId = adminUserId(ctx.state.user);
+          const userName = adminDisplayName(ctx.state.user);
+          if (!userId) {
+            ctx.status = 401;
+            ctx.body = { url: null, error: "Niet ingelogd." };
+            return;
+          }
+          const lock = acquireEditorLock({ siteKey, documentId, userId, userName });
+          if (!lock.ok) {
+            ctx.status = 409;
+            ctx.body = {
+              url: null,
+              lockedBy: lock.lock.userName,
+              error: `${lock.lock.userName} is hier aan het werk. Je kunt deze pagina nu niet openen.`,
+            };
+            return;
+          }
         }
         const url = new URL("/api/editor/session", origin);
         url.searchParams.set("token", secret);
