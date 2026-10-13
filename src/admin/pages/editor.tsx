@@ -22,7 +22,16 @@ import { ArrowLeft, ArrowRight, ChevronDown, ChevronRight, Cog, Globe, Plus } fr
 import { EmptyDocuments } from "@strapi/icons/symbols";
 
 type SiteRow = { key: string; name: string; domain: string; editorUrl: string };
-type PageRow = { documentId: string; title: string; slug: string; visibility: string; pageType: string; kind?: "page" | "case" };
+type PageLock = { userId: string; userName: string; mine: boolean };
+type PageRow = {
+  documentId: string;
+  title: string;
+  slug: string;
+  visibility: string;
+  pageType: string;
+  kind?: "page" | "case";
+  lock?: PageLock | null;
+};
 type LinkRow = { label?: string; href?: string };
 type FaviconFile = { id: number; url: string; name: string };
 
@@ -168,6 +177,7 @@ export default function MerkdraakEditor() {
   const [domainDraft, setDomainDraft] = useState("");
   const [savingSite, setSavingSite] = useState(false);
   const [keyTouched, setKeyTouched] = useState(false);
+  const [editorDirty, setEditorDirty] = useState(false);
   const { get, post } = useFetchClient();
   const { toggleNotification } = useNotification();
 
@@ -194,17 +204,42 @@ export default function MerkdraakEditor() {
     return () => window.removeEventListener("popstate", syncFromUrl);
   }, [get]);
 
-  useEffect(() => {
-    if (!siteKey) return;
-    setLoadingPages(true);
-    get(`/admin/merkdraak-editor/pages?siteKey=${encodeURIComponent(siteKey)}`)
+  function loadPages(quiet = false) {
+    if (!siteKey) return Promise.resolve();
+    if (!quiet) setLoadingPages(true);
+    return get(`/admin/merkdraak-editor/pages?siteKey=${encodeURIComponent(siteKey)}`)
       .then((response: { data?: { pages?: PageRow[]; cases?: PageRow[] } }) => {
         setPages([...(response.data?.pages ?? []), ...(response.data?.cases ?? [])]);
         setError("");
       })
-      .catch(() => setError("Pagina's konden niet worden geladen."))
-      .finally(() => setLoadingPages(false));
+      .catch(() => {
+        if (!quiet) setError("Pagina's konden niet worden geladen.");
+      })
+      .finally(() => {
+        if (!quiet) setLoadingPages(false);
+      });
+  }
+
+  useEffect(() => {
+    if (!siteKey) return;
+    loadPages();
   }, [get, siteKey, documentId]);
+
+  // Refresh lock presence while browsing the page list.
+  useEffect(() => {
+    if (!siteKey || documentId) return;
+    const timer = window.setInterval(() => {
+      loadPages(true);
+    }, 12_000);
+    return () => window.clearInterval(timer);
+  }, [get, siteKey, documentId]);
+
+  function releaseLock(nextSite: string, nextDocument: string) {
+    if (!nextSite || !nextDocument || nextDocument === "site" || nextDocument === "nieuw" || nextDocument === "case-nieuw") {
+      return;
+    }
+    post("/admin/merkdraak-editor/lock/release", { siteKey: nextSite, documentId: nextDocument }).catch(() => undefined);
+  }
 
   useEffect(() => {
     if (!siteKey || !documentId || documentId === "site") {
@@ -221,7 +256,17 @@ export default function MerkdraakEditor() {
             ? `/editor/cases/${documentId}`
             : `/editor/${documentId}`;
     get(`/admin/merkdraak-editor/open?siteKey=${encodeURIComponent(siteKey)}&next=${encodeURIComponent(next)}`)
-      .then((response: { data?: { url?: string } }) => {
+      .then((response: { data?: { url?: string; error?: string; lockedBy?: string } }) => {
+        if (response.data?.error || response.data?.lockedBy) {
+          setError(response.data.error || `${response.data.lockedBy} is hier aan het werk.`);
+          setSrc("");
+          remember(siteKey, "");
+          toggleNotification({
+            type: "warning",
+            message: response.data.error || `${response.data.lockedBy} is hier aan het werk.`,
+          });
+          return;
+        }
         if (!response.data?.url) {
           setError("Deze website heeft geen editor-adres.");
           setSrc("");
@@ -230,8 +275,50 @@ export default function MerkdraakEditor() {
         setError("");
         setSrc(response.data.url);
       })
-      .catch(() => setError("De editor kon niet worden geopend."));
+      .catch((error: unknown) => {
+        const err = error as { response?: { data?: { error?: string; lockedBy?: string }; status?: number } };
+        const lockedBy = err.response?.data?.lockedBy;
+        const message =
+          err.response?.data?.error ||
+          (lockedBy ? `${lockedBy} is hier aan het werk. Je kunt deze pagina nu niet openen.` : "De editor kon niet worden geopend.");
+        setError(message);
+        setSrc("");
+        if (err.response?.status === 409 || lockedBy) {
+          remember(siteKey, "");
+          toggleNotification({ type: "warning", message });
+        }
+      });
   }, [get, siteKey, documentId, pages]);
+
+  // Keep lock alive while the editor is open.
+  useEffect(() => {
+    if (!siteKey || !documentId || documentId === "site" || documentId === "nieuw" || documentId === "case-nieuw") {
+      return;
+    }
+    const beat = () => {
+      post("/admin/merkdraak-editor/lock/heartbeat", { siteKey, documentId }).catch((error: unknown) => {
+        const err = error as { response?: { status?: number; data?: { lockedBy?: string; message?: string } } };
+        if (err.response?.status !== 409) return;
+        const message =
+          err.response.data?.message ||
+          (err.response.data?.lockedBy
+            ? `${err.response.data.lockedBy} is hier aan het werk.`
+            : "Iemand anders bewerkt deze pagina.");
+        setSrc("");
+        remember(siteKey, "");
+        toggleNotification({ type: "warning", message });
+      });
+    };
+    beat();
+    const timer = window.setInterval(beat, 25_000);
+    const onLeave = () => releaseLock(siteKey, documentId);
+    window.addEventListener("beforeunload", onLeave);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("beforeunload", onLeave);
+      releaseLock(siteKey, documentId);
+    };
+  }, [post, siteKey, documentId]);
 
   useEffect(() => {
     if (documentId !== "site" || !siteKey) return;
@@ -266,6 +353,9 @@ export default function MerkdraakEditor() {
   }, [documentId, get, siteKey]);
 
   function remember(nextSite: string, nextDocument: string) {
+    if (siteKey && documentId && documentId !== "site" && (nextSite !== siteKey || nextDocument !== documentId)) {
+      releaseLock(siteKey, documentId);
+    }
     const params = new URLSearchParams();
     if (nextSite) params.set("siteKey", nextSite);
     if (nextDocument) params.set("documentId", nextDocument);
@@ -274,7 +364,52 @@ export default function MerkdraakEditor() {
     setSiteKey(nextSite);
     setDocumentId(nextDocument);
     setError("");
+    if (!nextDocument || nextDocument === "site") setEditorDirty(false);
   }
+
+  function confirmLeaveEditor() {
+    if (!editorDirty) return true;
+    return window.confirm(
+      "Je hebt wijzigingen die nog niet zijn opgeslagen. Als je weggaat, gaan die verloren. Toch weggaan?",
+    );
+  }
+
+  function leaveToPages() {
+    if (!confirmLeaveEditor()) return;
+    setEditorDirty(false);
+    remember(siteKey, "");
+  }
+
+  function openPage(page: PageRow) {
+    if (page.lock && !page.lock.mine) {
+      toggleNotification({
+        type: "warning",
+        message: `${page.lock.userName} is hier aan het werk. Je kunt deze pagina nu niet openen.`,
+      });
+      return;
+    }
+    remember(siteKey, page.documentId);
+  }
+
+  useEffect(() => {
+    function onMessage(event: MessageEvent) {
+      const data = event.data as { source?: string; action?: string; dirty?: boolean } | null;
+      if (!data || data.source !== "merkdraak-editor" || data.action !== "dirty-state") return;
+      setEditorDirty(Boolean(data.dirty));
+    }
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
+
+  useEffect(() => {
+    if (!editorDirty || !documentId || documentId === "site") return;
+    function onBeforeUnload(event: BeforeUnloadEvent) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [editorDirty, documentId]);
 
   const site = sites.find((item) => item.key === siteKey);
 
@@ -597,24 +732,35 @@ export default function MerkdraakEditor() {
                       {open
                         ? group.pages.map((page) => {
                             const depth = Math.max(0, (page.slug ?? "").split("/").filter(Boolean).length - 1);
+                            const lockedByOther = Boolean(page.lock && !page.lock.mine);
                             return (
                               <Table.Row
                                 key={page.documentId}
-                                cursor="pointer"
+                                cursor={lockedByOther ? "not-allowed" : "pointer"}
                                 tabIndex={0}
-                                onClick={() => remember(siteKey, page.documentId)}
+                                onClick={() => openPage(page)}
                                 onKeyDown={(event) => {
                                   if (event.key === "Enter" || event.key === " ") {
                                     event.preventDefault();
-                                    remember(siteKey, page.documentId);
+                                    openPage(page);
                                   }
                                 }}
                               >
                                 <Table.Cell>
                                   <Box paddingLeft={depth * 4}>
-                                    <Typography fontWeight="semiBold" textColor="primary600">
+                                    <Typography
+                                      fontWeight="semiBold"
+                                      textColor={lockedByOther ? "neutral500" : "primary600"}
+                                    >
                                       {page.title}
                                     </Typography>
+                                    {page.lock ? (
+                                      <Typography variant="pi" textColor={page.lock.mine ? "success600" : "warning600"}>
+                                        {page.lock.mine
+                                          ? "Jij bewerkt deze pagina"
+                                          : `${page.lock.userName} is hier aan het werk`}
+                                      </Typography>
+                                    ) : null}
                                   </Box>
                                 </Table.Cell>
                                 <Table.Cell>
@@ -930,9 +1076,19 @@ export default function MerkdraakEditor() {
         borderStyle="solid"
         borderWidth="0 0 1px 0"
       >
-        <BackLink href={`/admin/merkdraak-editor?siteKey=${encodeURIComponent(siteKey)}`} label="Pagina's" onBack={() => remember(siteKey, "")} />
+        <BackLink href={`/admin/merkdraak-editor?siteKey=${encodeURIComponent(siteKey)}`} label="Pagina's" onBack={leaveToPages} />
         <Box paddingLeft={3} borderColor="neutral200" borderStyle="solid" borderWidth="0 0 0 1px">
           <Typography tag="h1" variant="delta" textColor="neutral800">{title}</Typography>
+          {documentId && documentId !== "nieuw" && documentId !== "case-nieuw" ? (
+            <Typography variant="pi" textColor="success600">
+              Jij bewerkt deze pagina — anderen kunnen niet tegelijk openen
+            </Typography>
+          ) : null}
+          {editorDirty ? (
+            <Typography variant="pi" textColor="warning600">
+              Niet-opgeslagen wijzigingen
+            </Typography>
+          ) : null}
         </Box>
         {page?.slug !== undefined ? (
           <Box background="neutral100" hasRadius paddingLeft={2} paddingRight={2} paddingTop={1} paddingBottom={1}>
