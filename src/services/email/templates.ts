@@ -109,6 +109,8 @@ function fill(template: string, ctx: TemplateContext) {
   );
 }
 
+const CMS_ADMIN_URL = "https://cms.merkdraak.nl/admin";
+
 export function renderTeamMail(settings: EmailSettings, ctx: TemplateContext) {
   const subject = ctx.vacancyTitle
     ? `! Sollicitatie: ${ctx.vacancyTitle} — ${ctx.name}`
@@ -138,6 +140,7 @@ export function renderTeamMail(settings: EmailSettings, ctx: TemplateContext) {
     ctx.attachments ? ctx.attachments : "",
     "",
     fill(settings.teamOutro, ctx),
+    `CMS: ${CMS_ADMIN_URL}`,
   ]
     .filter((line, index, all) => !(line === "" && all[index - 1] === ""))
     .join("\n");

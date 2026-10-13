@@ -82,6 +82,36 @@ function footerRows(value: unknown) {
   });
 }
 
+/** Frontend custom tokens with page read must also read cases (avoids /api/cases 403). */
+async function ensureFrontendCaseReadPermissions(strapi: Core.Strapi) {
+  const required = [
+    "api::page.page.find",
+    "api::page.page.findOne",
+    "api::case.case.find",
+    "api::case.case.findOne",
+    "api::site.site.find",
+    "api::site.site.findOne",
+    "api::navigation.navigation.find",
+    "api::navigation.navigation.findOne",
+  ];
+  const tokens = await strapi.db.query("admin::api-token").findMany({
+    populate: ["permissions"],
+  });
+  for (const token of tokens) {
+    if (token.kind !== "content-api" || token.type !== "custom") continue;
+    if (token.name !== "merkdraak-frontend") continue;
+    const actions = new Set(
+      (Array.isArray(token.permissions) ? token.permissions : []).map((row: { action?: string }) =>
+        String(row.action ?? ""),
+      ),
+    );
+    if (!actions.has("api::page.page.find")) continue;
+    if (actions.has("api::case.case.find") && actions.has("api::case.case.findOne")) continue;
+    await strapi.service("admin::api-token").update(token.id, { permissions: required });
+    strapi.log.info(`API token "${token.name}" granted case find/findOne`);
+  }
+}
+
 async function navItems(strapi: Core.Strapi, siteKey: string, value: unknown) {
   if (!Array.isArray(value)) return [];
   const items = [];
@@ -457,6 +487,9 @@ export default {
   },
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     clearEditorRequiredFieldsCache();
+    await ensureFrontendCaseReadPermissions(strapi).catch((error: unknown) => {
+      strapi.log.error(error);
+    });
     await ensureEmailSettings(strapi).catch((error: unknown) => {
       strapi.log.error(error);
     });

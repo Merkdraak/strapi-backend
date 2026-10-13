@@ -65,8 +65,8 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
           }
         : {},
       settings: {
-        defaultFrom: env('SMTP_DEFAULT_FROM', 'beheer@merkdraak.nl'),
-        defaultReplyTo: env('SMTP_DEFAULT_REPLY_TO', 'beheer@merkdraak.nl'),
+        defaultFrom: env('SMTP_DEFAULT_FROM', 'noreply@merkdraak.nl'),
+        defaultReplyTo: env('SMTP_DEFAULT_REPLY_TO', 'info@merkdraak.nl'),
       },
     },
   },

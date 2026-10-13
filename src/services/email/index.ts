@@ -71,38 +71,36 @@ export async function emailServiceSend(strapi: Core.Strapi, payload: Omit<MailPa
   });
 }
 
+/** Every form submission notifies this inbox with the filled-in data. */
+export const FORM_TEAM_INBOX = "info@merkdraak.nl";
+
 export async function sendFormEmails(
   strapi: Core.Strapi,
   input: {
-    staffTo: string;
+    staffTo?: string;
     visitorTo: string;
     visitorReplyTo?: string;
     ctx: TemplateContext;
   },
 ) {
   const settings = await loadEmailSettings(strapi);
-  const team = settings.sendTeamNotification
-    ? await (async () => {
-        if (!input.staffTo) {
-          return { ok: false as const, skipped: true as const, result: null };
-        }
-        const mail = renderTeamMail(settings, input.ctx);
-        const result = await emailServiceSend(strapi, {
-          to: input.staffTo,
-          subject: mail.subject,
-          text: mail.text,
-          html: mail.html,
-          replyTo: input.visitorReplyTo || input.visitorTo,
-        });
-        return { ok: result.ok, skipped: false as const, result };
-      })()
-    : { ok: true as const, skipped: true as const, result: null };
+  // Always: team mail with form data → info@ (ignores per-form overrides).
+  const staffTo = FORM_TEAM_INBOX;
+  const team = await (async () => {
+    const mail = renderTeamMail(settings, input.ctx);
+    const result = await emailServiceSend(strapi, {
+      to: staffTo,
+      subject: mail.subject,
+      text: mail.text,
+      html: mail.html,
+      replyTo: input.visitorReplyTo || input.visitorTo,
+    });
+    return { ok: result.ok, skipped: false as const, result };
+  })();
 
-  const visitor = settings.sendVisitorConfirmation
+  // Always: thank-you / confirmation to the visitor when we have their e-mail.
+  const visitor = input.visitorTo
     ? await (async () => {
-        if (!input.visitorTo) {
-          return { ok: false as const, skipped: true as const, result: null };
-        }
         const mail = renderVisitorMail(settings, input.ctx);
         const result = await emailServiceSend(strapi, {
           to: input.visitorTo,

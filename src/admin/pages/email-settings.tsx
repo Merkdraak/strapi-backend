@@ -9,7 +9,6 @@ import {
   SingleSelect,
   SingleSelectOption,
   TextInput,
-  Switch,
   Typography,
 } from "@strapi/design-system";
 
@@ -41,7 +40,7 @@ const emptySettings: Settings = {
   fromName: "Merkdraak",
   fromEmail: "noreply@merkdraak.nl",
   replyTo: "info@merkdraak.nl",
-  defaultRecipient: "",
+  defaultRecipient: "info@merkdraak.nl",
   sendVisitorConfirmation: true,
   sendTeamNotification: true,
   teamSubject: "",
@@ -193,7 +192,7 @@ export default function EmailSettingsPage() {
                     }
                   />
                 </Field.Root>
-                <Field.Root>
+                <Field.Root hint="Dit adres staat als From op team- en bevestigingsmails (en testmails). Vereist dat SMTP dit adres mag versturen.">
                   <Field.Label>Afzender e-mail</Field.Label>
                   <TextInput
                     type="email"
@@ -202,8 +201,9 @@ export default function EmailSettingsPage() {
                       setSettings((current) => ({ ...current, fromEmail: event.target.value }))
                     }
                   />
+                  <Field.Hint />
                 </Field.Root>
-                <Field.Root>
+                <Field.Root hint="Reply-to op bevestigingsmails naar bezoekers. Teammails gebruiken het bezoekersadres als reply-to.">
                   <Field.Label>Reply-to</Field.Label>
                   <TextInput
                     type="email"
@@ -212,38 +212,13 @@ export default function EmailSettingsPage() {
                       setSettings((current) => ({ ...current, replyTo: event.target.value }))
                     }
                   />
-                </Field.Root>
-                <Field.Root hint="Fallback als pagina/scan geen ontvanger heeft.">
-                  <Field.Label>Standaard ontvanger formulieren</Field.Label>
-                  <TextInput
-                    type="email"
-                    value={settings.defaultRecipient}
-                    onChange={(event: { target: { value: string } }) =>
-                      setSettings((current) => ({ ...current, defaultRecipient: event.target.value }))
-                    }
-                  />
                   <Field.Hint />
                 </Field.Root>
-                <Flex gap={6} wrap="wrap">
-                  <Switch
-                    checked={settings.sendTeamNotification}
-                    onCheckedChange={(checked: boolean) =>
-                      setSettings((current) => ({ ...current, sendTeamNotification: checked }))
-                    }
-                    visibleLabels
-                    onLabel="Teamnotificatie aan"
-                    offLabel="Teamnotificatie uit"
-                  />
-                  <Switch
-                    checked={settings.sendVisitorConfirmation}
-                    onCheckedChange={(checked: boolean) =>
-                      setSettings((current) => ({ ...current, sendVisitorConfirmation: checked }))
-                    }
-                    visibleLabels
-                    onLabel="Bevestigingsmail aan"
-                    offLabel="Bevestigingsmail uit"
-                  />
-                </Flex>
+                <Field.Root hint="Elke formulierinzending stuurt de ingevulde gegevens altijd naar info@merkdraak.nl. De bezoeker krijgt apart een bedanktmail.">
+                  <Field.Label>Team-inbox formulieren</Field.Label>
+                  <TextInput type="email" value="info@merkdraak.nl" disabled />
+                  <Field.Hint />
+                </Field.Root>
               </Flex>
             </Box>
 

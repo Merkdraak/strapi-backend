@@ -156,6 +156,29 @@ export function registerMailAdminRoutes(
   });
 
   routes.push({
+    method: "POST",
+    path: "/merkdraak-mail/inbox/delete",
+    handler: async (ctx: AdminCtx) => {
+      const raw = ctx.request.body?.documentIds;
+      const ids = Array.isArray(raw)
+        ? [...new Set(raw.map((item) => clip(item, 120)).filter(Boolean))]
+        : [];
+      if (!ids.length) return ctx.badRequest("Geen inzendingen geselecteerd");
+      if (ids.length > 100) return ctx.badRequest("Maximaal 100 inzendingen per keer.");
+      const uid = "api::form-submission.form-submission" as const;
+      let deleted = 0;
+      for (const documentId of ids) {
+        const existing = await strapi.documents(uid).findOne({ documentId });
+        if (!existing) continue;
+        await strapi.documents(uid).delete({ documentId });
+        deleted += 1;
+      }
+      ctx.body = { ok: true, deleted, requested: ids.length };
+    },
+    config: adminOnly,
+  });
+
+  routes.push({
     method: "GET",
     path: "/merkdraak-mail/settings",
     handler: async (ctx: AdminCtx) => {

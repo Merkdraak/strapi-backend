@@ -611,7 +611,8 @@ export interface ApiEmailSettingEmailSetting extends Struct.SingleTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    defaultRecipient: Schema.Attribute.Email;
+    defaultRecipient: Schema.Attribute.Email &
+      Schema.Attribute.DefaultTo<'info@merkdraak.nl'>;
     fromEmail: Schema.Attribute.Email &
       Schema.Attribute.DefaultTo<'noreply@merkdraak.nl'>;
     fromName: Schema.Attribute.String & Schema.Attribute.DefaultTo<'Merkdraak'>;
@@ -636,7 +637,7 @@ export interface ApiEmailSettingEmailSetting extends Struct.SingleTypeSchema {
     teamIntro: Schema.Attribute.Text &
       Schema.Attribute.DefaultTo<'Er is een nieuwe formulierinzending binnengekomen.'>;
     teamOutro: Schema.Attribute.Text &
-      Schema.Attribute.DefaultTo<'Open Strapi om de inzending af te handelen.'>;
+      Schema.Attribute.DefaultTo<'Open Strapi om de inzending af te handelen: https://cms.merkdraak.nl/admin'>;
     teamSubject: Schema.Attribute.String &
       Schema.Attribute.DefaultTo<'Nieuwe aanvraag: {{type}} \u2013 {{name}}'>;
     updatedAt: Schema.Attribute.DateTime;

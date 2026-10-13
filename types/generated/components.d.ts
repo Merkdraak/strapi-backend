@@ -1070,8 +1070,7 @@ export interface SectionsScanRequestForm extends Struct.ComponentSchema {
       Schema.Attribute.DefaultTo<'Gekozen interesse'>;
     interestValue: Schema.Attribute.String;
     intro: Schema.Attribute.Text;
-    recipientEmail: Schema.Attribute.Email &
-      Schema.Attribute.DefaultTo<'mike@merkdraak.nl'>;
+    recipientEmail: Schema.Attribute.Email;
     scanType: Schema.Attribute.Enumeration<
       ['seo', 'sea', 'cro', 'general', 'social', 'website']
     > &
@@ -1323,8 +1322,7 @@ export interface SectionsVacancyApplicationForm extends Struct.ComponentSchema {
       Schema.Attribute.DefaultTo<'Vul ons sollicitatieformulier in'>;
     openApplication: Schema.Attribute.Boolean &
       Schema.Attribute.DefaultTo<false>;
-    recipientEmail: Schema.Attribute.Email &
-      Schema.Attribute.DefaultTo<'mike@merkdraak.nl'>;
+    recipientEmail: Schema.Attribute.Email;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
     spaceBottomTablet: Schema.Attribute.String;
