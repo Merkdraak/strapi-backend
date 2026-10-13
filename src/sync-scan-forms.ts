@@ -1,5 +1,8 @@
 import type { Core } from "@strapi/strapi";
 
+/** Old hardcoded inbox — empty recipient now means E-mail settings → Standaard ontvanger. */
+const LEGACY_FORM_RECIPIENT = "mike@merkdraak.nl";
+
 const pages = [
   {
     entryKey: "seo",
@@ -23,10 +26,35 @@ const pages = [
 
 type PageDraft = {
   documentId?: string;
+  entryKey?: string | null;
   composed?: boolean | null;
   visibility?: string | null;
-  sections?: { __component?: string; scanType?: string }[] | null;
+  formEmail?: string | null;
+  sections?: Record<string, unknown>[] | null;
 };
+
+function isLegacyRecipient(value: unknown) {
+  return String(value ?? "").trim().toLowerCase() === LEGACY_FORM_RECIPIENT;
+}
+
+function clearLegacyFormRecipients(sections: Record<string, unknown>[]) {
+  let changed = false;
+  const next = sections.map((section) => {
+    if (!section || typeof section !== "object") return section;
+    const component = String(section.__component ?? "");
+    if (
+      component !== "sections.scan-request-form" &&
+      component !== "sections.vacancy-application-form" &&
+      component !== "sections.contact-form"
+    ) {
+      return section;
+    }
+    if (!isLegacyRecipient(section.recipientEmail)) return section;
+    changed = true;
+    return { ...section, recipientEmail: "" };
+  });
+  return { sections: next, changed };
+}
 
 export function scanRequestSection(page: (typeof pages)[number]) {
   return {
@@ -34,7 +62,7 @@ export function scanRequestSection(page: (typeof pages)[number]) {
     scanType: page.scanType,
     heading: page.heading,
     intro: page.intro,
-    recipientEmail: "mike@merkdraak.nl",
+    recipientEmail: "",
   };
 }
 
@@ -52,34 +80,38 @@ export function ensureScanRequestSections(entryKey: string, sections: unknown) {
 }
 
 /**
- * Ensure SEO / SEA / CRO pages have an editable scanaanvraag-blok in Strapi.
+ * Ensure SEO / SEA / CRO pages have an editable scanaanvraag-blok in Strapi,
+ * and clear legacy mike@ recipients so E-mail settings control the inbox.
  */
 export async function syncScanRequestForms(strapi: Core.Strapi) {
   const siteKey = "merkdraak";
-  for (const target of pages) {
-    const page = (await strapi.documents("api::page.page").findFirst({
-      filters: { siteKey, entryKey: target.entryKey },
-      status: "draft",
-      populate: { sections: true },
-    })) as PageDraft | null;
-    if (!page?.documentId) {
-      strapi.log.warn(`syncScanRequestForms: page not found entryKey=${target.entryKey}`);
-      continue;
-    }
+  const drafts = (await strapi.documents("api::page.page").findMany({
+    filters: { siteKey },
+    status: "draft",
+    populate: { sections: true },
+    limit: 200,
+  })) as PageDraft[];
 
+  for (const page of drafts) {
+    if (!page?.documentId) continue;
     const sections = Array.isArray(page.sections) ? page.sections : [];
-    const hasForm = sections.some((section) => section?.__component === "sections.scan-request-form");
-    if (hasForm) {
-      strapi.log.info(`syncScanRequestForms: ${target.entryKey} already has scanaanvraag`);
-      continue;
-    }
+    const cleared = clearLegacyFormRecipients(sections);
+    const entryKey = String(page.entryKey ?? "");
+    const target = pages.find((item) => item.entryKey === entryKey);
+    const hasScanForm = cleared.sections.some(
+      (section) => section && String(section.__component ?? "") === "sections.scan-request-form",
+    );
+    const needsScanForm = Boolean(target) && !hasScanForm;
+    const clearPageFormEmail = isLegacyRecipient(page.formEmail);
+    if (!cleared.changed && !needsScanForm && !clearPageFormEmail) continue;
 
-    const nextSections = [...sections, scanRequestSection(target)];
+    const nextSections = needsScanForm && target ? [...cleared.sections, scanRequestSection(target)] : cleared.sections;
     await strapi.documents("api::page.page").update({
       documentId: page.documentId,
       status: "draft",
       data: {
         sections: nextSections as never,
+        ...(clearPageFormEmail ? { formEmail: "" } : {}),
       },
     });
 
@@ -88,7 +120,7 @@ export async function syncScanRequestForms(strapi: Core.Strapi) {
     }
 
     strapi.log.info(
-      `syncScanRequestForms: ${target.entryKey} documentId=${page.documentId} sections=${nextSections.length}`,
+      `syncScanRequestForms: entryKey=${entryKey || "?"} documentId=${page.documentId} clearedLegacy=${cleared.changed || clearPageFormEmail} addedScan=${needsScanForm}`,
     );
   }
 }

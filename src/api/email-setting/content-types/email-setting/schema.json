@@ -38,7 +38,8 @@
       "default": "info@merkdraak.nl"
     },
     "defaultRecipient": {
-      "type": "email"
+      "type": "email",
+      "default": "info@merkdraak.nl"
     },
     "sendVisitorConfirmation": {
       "type": "boolean",

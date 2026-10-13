@@ -40,7 +40,7 @@ export function normalizeSettings(row: Record<string, unknown> | null | undefine
     fromName: text(row.fromName, defaults.fromName),
     fromEmail: email(row.fromEmail, defaults.fromEmail),
     replyTo: email(row.replyTo, defaults.replyTo),
-    defaultRecipient: email(row.defaultRecipient, ""),
+    defaultRecipient: email(row.defaultRecipient, defaults.defaultRecipient),
     sendVisitorConfirmation: row.sendVisitorConfirmation !== false,
     sendTeamNotification: row.sendTeamNotification !== false,
     teamSubject: text(row.teamSubject, defaults.teamSubject),
