@@ -11,7 +11,7 @@ const defaults: EmailSettings = {
   sendTeamNotification: true,
   teamSubject: "Nieuwe aanvraag: {{type}} – {{name}}",
   teamIntro: "Er is een nieuwe formulierinzending binnengekomen.",
-  teamOutro: "Open Strapi om de inzending af te handelen.",
+  teamOutro: "Open Strapi om de inzending af te handelen: https://cms.merkdraak.nl/admin",
   visitorSubject: "We hebben je bericht ontvangen — {{site}}",
   visitorIntro: "Bedankt voor je bericht. We hebben het ontvangen en nemen contact met je op.",
   visitorOutro: "Met vriendelijke groet,\n{{site}}",
