@@ -59,7 +59,7 @@
     },
     "teamOutro": {
       "type": "text",
-      "default": "Open Strapi om de inzending af te handelen."
+      "default": "Open Strapi om de inzending af te handelen: https://cms.merkdraak.nl/admin"
     },
     "visitorSubject": {
       "type": "string",
