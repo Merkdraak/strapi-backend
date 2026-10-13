@@ -103,6 +103,8 @@ export default function InboxPage() {
   const [newCount, setNewCount] = useState(0);
   const [detail, setDetail] = useState<InboxItem | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [deleting, setDeleting] = useState(false);
 
   const query = useMemo(() => {
     const search = new URLSearchParams();
@@ -112,12 +114,17 @@ export default function InboxPage() {
     return search.toString();
   }, [requestType, status]);
 
+  const allVisibleSelected = items.length > 0 && items.every((item) => selectedIds.includes(item.documentId));
+  const someSelected = selectedIds.length > 0;
+
   function loadList() {
     setLoading(true);
     return get(`/admin/merkdraak-mail/inbox?${query}`)
       .then((response: { data?: { items?: InboxItem[]; newCount?: number } }) => {
-        setItems(response.data?.items ?? []);
+        const nextItems = response.data?.items ?? [];
+        setItems(nextItems);
         setNewCount(response.data?.newCount ?? 0);
+        setSelectedIds((current) => current.filter((id) => nextItems.some((item) => item.documentId === id)));
       })
       .catch(() => {
         toggleNotification({ type: "danger", message: "Inzendingen konden niet worden geladen." });
@@ -161,6 +168,49 @@ export default function InboxPage() {
     }
   }
 
+  function toggleOne(documentId: string) {
+    setSelectedIds((current) =>
+      current.includes(documentId) ? current.filter((id) => id !== documentId) : [...current, documentId],
+    );
+  }
+
+  function toggleAllVisible() {
+    if (allVisibleSelected) {
+      setSelectedIds([]);
+      return;
+    }
+    setSelectedIds(items.map((item) => item.documentId));
+  }
+
+  async function deleteIds(ids: string[]) {
+    const unique = [...new Set(ids.filter(Boolean))];
+    if (!unique.length) return;
+    const label =
+      unique.length === 1
+        ? "Deze inzending permanent verwijderen?"
+        : `${unique.length} inzendingen permanent verwijderen?`;
+    if (!window.confirm(label)) return;
+    setDeleting(true);
+    try {
+      const response = await post(`/admin/merkdraak-mail/inbox/delete`, { documentIds: unique });
+      const deleted = Number(response.data?.deleted ?? 0);
+      setSelectedIds([]);
+      if (selectedId && unique.includes(selectedId)) {
+        setParams({});
+        setDetail(null);
+      }
+      await loadList();
+      toggleNotification({
+        type: "success",
+        message: deleted === 1 ? "Inzending verwijderd." : `${deleted} inzendingen verwijderd.`,
+      });
+    } catch {
+      toggleNotification({ type: "danger", message: "Verwijderen mislukt." });
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <Page.Main>
       <Page.Title>Inkomende mails</Page.Title>
@@ -171,6 +221,13 @@ export default function InboxPage() {
           selectedId ? (
             <Button variant="tertiary" startIcon={<ArrowLeft />} onClick={() => setParams({})}>
               Terug naar overzicht
+            </Button>
+          ) : undefined
+        }
+        primaryAction={
+          !selectedId && someSelected ? (
+            <Button variant="danger" loading={deleting} onClick={() => deleteIds(selectedIds)}>
+              Verwijder selectie ({selectedIds.length})
             </Button>
           ) : undefined
         }
@@ -189,7 +246,7 @@ export default function InboxPage() {
                       {detail.requestTypeLabel} · {formatWhen(detail.createdAt)}
                     </Typography>
                   </Box>
-                  <Flex gap={2}>
+                  <Flex gap={2} wrap="wrap">
                     <Badge>{detail.status}</Badge>
                     <SingleSelect
                       value={detail.status}
@@ -200,6 +257,13 @@ export default function InboxPage() {
                       <SingleSelectOption value="gelezen">Gelezen</SingleSelectOption>
                       <SingleSelectOption value="afgehandeld">Afgehandeld</SingleSelectOption>
                     </SingleSelect>
+                    <Button
+                      variant="danger-light"
+                      loading={deleting}
+                      onClick={() => deleteIds([detail.documentId])}
+                    >
+                      Verwijderen
+                    </Button>
                   </Flex>
                 </Flex>
                 {detail.vacancyTitle ? (
@@ -251,49 +315,68 @@ export default function InboxPage() {
           </Box>
         ) : (
           <Flex direction="column" gap={4} alignItems="stretch">
-            <Flex gap={3} wrap="wrap">
-              <Box style={{ minWidth: 160 }}>
-                <Typography variant="pi" fontWeight="bold">
-                  Type
-                </Typography>
-                <Box marginTop={1}>
-                  <SingleSelect
-                    value={requestType}
-                    onChange={(value: string | number) => {
-                      const next = value == null || value === "" ? "all" : String(value);
-                      setRequestType(next);
-                    }}
-                    placeholder="Alle"
-                  >
-                    {typeFilters.map((item) => (
-                      <SingleSelectOption key={item.value} value={item.value}>
-                        {item.label}
-                      </SingleSelectOption>
-                    ))}
-                  </SingleSelect>
+            <Flex gap={3} wrap="wrap" justifyContent="space-between" alignItems="flex-end">
+              <Flex gap={3} wrap="wrap">
+                <Box style={{ minWidth: 160 }}>
+                  <Typography variant="pi" fontWeight="bold">
+                    Type
+                  </Typography>
+                  <Box marginTop={1}>
+                    <SingleSelect
+                      value={requestType}
+                      onChange={(value: string | number) => {
+                        const next = value == null || value === "" ? "all" : String(value);
+                        setRequestType(next);
+                        setSelectedIds([]);
+                      }}
+                      placeholder="Alle"
+                    >
+                      {typeFilters.map((item) => (
+                        <SingleSelectOption key={item.value} value={item.value}>
+                          {item.label}
+                        </SingleSelectOption>
+                      ))}
+                    </SingleSelect>
+                  </Box>
                 </Box>
-              </Box>
-              <Box style={{ minWidth: 180 }}>
-                <Typography variant="pi" fontWeight="bold">
-                  Status
-                </Typography>
-                <Box marginTop={1}>
-                  <SingleSelect
-                    value={status}
-                    onChange={(value: string | number) => {
-                      const next = value == null || value === "" ? "all" : String(value);
-                      setStatus(next);
-                    }}
-                    placeholder="Alle statussen"
-                  >
-                    {statusFilters.map((item) => (
-                      <SingleSelectOption key={item.value} value={item.value}>
-                        {item.label}
-                      </SingleSelectOption>
-                    ))}
-                  </SingleSelect>
+                <Box style={{ minWidth: 180 }}>
+                  <Typography variant="pi" fontWeight="bold">
+                    Status
+                  </Typography>
+                  <Box marginTop={1}>
+                    <SingleSelect
+                      value={status}
+                      onChange={(value: string | number) => {
+                        const next = value == null || value === "" ? "all" : String(value);
+                        setStatus(next);
+                        setSelectedIds([]);
+                      }}
+                      placeholder="Alle statussen"
+                    >
+                      {statusFilters.map((item) => (
+                        <SingleSelectOption key={item.value} value={item.value}>
+                          {item.label}
+                        </SingleSelectOption>
+                      ))}
+                    </SingleSelect>
+                  </Box>
                 </Box>
-              </Box>
+              </Flex>
+              {items.length > 0 ? (
+                <Flex gap={2} wrap="wrap">
+                  <Button variant="tertiary" onClick={toggleAllVisible} disabled={loading || deleting}>
+                    {allVisibleSelected ? "Selectie wissen" : "Alles selecteren"}
+                  </Button>
+                  <Button
+                    variant="danger"
+                    loading={deleting}
+                    disabled={!someSelected}
+                    onClick={() => deleteIds(selectedIds)}
+                  >
+                    Verwijderen{someSelected ? ` (${selectedIds.length})` : ""}
+                  </Button>
+                </Flex>
+              ) : null}
             </Flex>
             <Box background="neutral0" hasRadius shadow="filterShadow" padding={2}>
               {loading ? (
@@ -310,7 +393,20 @@ export default function InboxPage() {
                 </Box>
               ) : (
                 <Flex direction="column" alignItems="stretch">
-                  <Flex padding={3} gap={3} style={{ borderBottom: "1px solid #ddd" }}>
+                  <Flex padding={3} gap={3} alignItems="center" style={{ borderBottom: "1px solid #ddd" }}>
+                    <Box style={{ width: 28, flexShrink: 0 }}>
+                      <input
+                        type="checkbox"
+                        checked={allVisibleSelected}
+                        ref={(element) => {
+                          if (element) {
+                            element.indeterminate = someSelected && !allVisibleSelected;
+                          }
+                        }}
+                        onChange={toggleAllVisible}
+                        aria-label="Alles selecteren"
+                      />
+                    </Box>
                     <Box style={{ flex: 2 }}>
                       <Typography fontWeight="bold">Naam</Typography>
                     </Box>
@@ -324,34 +420,56 @@ export default function InboxPage() {
                       <Typography fontWeight="bold">Datum</Typography>
                     </Box>
                   </Flex>
-                  {items.map((item) => (
-                    <Box
-                      key={item.documentId}
-                      padding={3}
-                      style={{ borderBottom: "1px solid #eee", cursor: "pointer" }}
-                      onClick={() => navigate(`/merkdraak-inbox?id=${encodeURIComponent(item.documentId)}`)}
-                    >
-                      <Flex gap={3} alignItems="center">
-                        <Box style={{ flex: 2, minWidth: 0 }}>
-                          <Typography fontWeight="semiBold" ellipsis>
-                            {item.name}
-                          </Typography>
-                          <Typography variant="pi" textColor="neutral600" ellipsis>
-                            {item.email}
-                          </Typography>
-                        </Box>
-                        <Box style={{ flex: 1 }}>
-                          <Typography>{item.requestTypeLabel}</Typography>
-                        </Box>
-                        <Box style={{ flex: 1 }}>
-                          <Badge active={item.status === "nieuw"}>{item.status}</Badge>
-                        </Box>
-                        <Box style={{ flex: 1 }}>
-                          <Typography variant="pi">{formatWhen(item.createdAt)}</Typography>
-                        </Box>
-                      </Flex>
-                    </Box>
-                  ))}
+                  {items.map((item) => {
+                    const checked = selectedIds.includes(item.documentId);
+                    return (
+                      <Box
+                        key={item.documentId}
+                        padding={3}
+                        style={{ borderBottom: "1px solid #eee" }}
+                      >
+                        <Flex gap={3} alignItems="center">
+                          <Box style={{ width: 28, flexShrink: 0 }} onClick={(event) => event.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() => toggleOne(item.documentId)}
+                              aria-label={`Selecteer ${item.name}`}
+                            />
+                          </Box>
+                          <Box
+                            style={{ flex: 2, minWidth: 0, cursor: "pointer" }}
+                            onClick={() => navigate(`/merkdraak-inbox?id=${encodeURIComponent(item.documentId)}`)}
+                          >
+                            <Typography fontWeight="semiBold" ellipsis>
+                              {item.name}
+                            </Typography>
+                            <Typography variant="pi" textColor="neutral600" ellipsis>
+                              {item.email}
+                            </Typography>
+                          </Box>
+                          <Box
+                            style={{ flex: 1, cursor: "pointer" }}
+                            onClick={() => navigate(`/merkdraak-inbox?id=${encodeURIComponent(item.documentId)}`)}
+                          >
+                            <Typography>{item.requestTypeLabel}</Typography>
+                          </Box>
+                          <Box
+                            style={{ flex: 1, cursor: "pointer" }}
+                            onClick={() => navigate(`/merkdraak-inbox?id=${encodeURIComponent(item.documentId)}`)}
+                          >
+                            <Badge active={item.status === "nieuw"}>{item.status}</Badge>
+                          </Box>
+                          <Box
+                            style={{ flex: 1, cursor: "pointer" }}
+                            onClick={() => navigate(`/merkdraak-inbox?id=${encodeURIComponent(item.documentId)}`)}
+                          >
+                            <Typography variant="pi">{formatWhen(item.createdAt)}</Typography>
+                          </Box>
+                        </Flex>
+                      </Box>
+                    );
+                  })}
                 </Flex>
               )}
             </Box>
