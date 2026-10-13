@@ -38,7 +38,8 @@
       "default": "info@merkdraak.nl"
     },
     "defaultRecipient": {
-      "type": "email"
+      "type": "email",
+      "default": "info@merkdraak.nl"
     },
     "sendVisitorConfirmation": {
       "type": "boolean",
@@ -58,7 +59,7 @@
     },
     "teamOutro": {
       "type": "text",
-      "default": "Open Strapi om de inzending af te handelen."
+      "default": "Open Strapi om de inzending af te handelen: https://cms.merkdraak.nl/admin"
     },
     "visitorSubject": {
       "type": "string",
