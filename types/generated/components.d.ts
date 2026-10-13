@@ -368,6 +368,7 @@ export interface SectionsContactCta extends Struct.ComponentSchema {
   };
   attributes: {
     accentColor: Schema.Attribute.String;
+    alt: Schema.Attribute.String;
     anchor: Schema.Attribute.String;
     backgroundColor: Schema.Attribute.String;
     body: Schema.Attribute.Text;
@@ -376,8 +377,21 @@ export interface SectionsContactCta extends Struct.ComponentSchema {
     highlight: Schema.Attribute.String;
     highlightColor: Schema.Attribute.String;
     href: Schema.Attribute.String;
+    image: Schema.Attribute.Media<'images'>;
+    imageFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
+    imageWidth: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 55;
+          min: 20;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<30>;
     label: Schema.Attribute.String;
     showCta: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    side: Schema.Attribute.Enumeration<['left', 'right']> &
+      Schema.Attribute.DefaultTo<'left'>;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
@@ -855,6 +869,7 @@ export interface SectionsPageIndex extends Struct.ComponentSchema {
       Schema.Attribute.DefaultTo<'dark'>;
     articleTypes: Schema.Attribute.Component<'shared.article-type', true>;
     backgroundColor: Schema.Attribute.String;
+    cards: Schema.Attribute.Component<'shared.page-card', true>;
     fontSize: Schema.Attribute.String;
     heading: Schema.Attribute.String;
     knowledgeNote: Schema.Attribute.Text;
@@ -1504,6 +1519,26 @@ export interface SharedNamedItem extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedPageCard extends Struct.ComponentSchema {
+  collectionName: 'components_shared_page_cards';
+  info: {
+    displayName: 'Overzichtskaart';
+    icon: 'picture';
+  };
+  attributes: {
+    cardTitle: Schema.Attribute.String;
+    description: Schema.Attribute.Text;
+    icon: Schema.Attribute.String & Schema.Attribute.DefaultTo<'auto'>;
+    image: Schema.Attribute.Media<'images'>;
+    imageFocus: Schema.Attribute.String & Schema.Attribute.DefaultTo<'50,50'>;
+    pageId: Schema.Attribute.String;
+    showIcon: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    showImage: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    showText: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    title: Schema.Attribute.String;
+  };
+}
+
 export interface SharedPillar extends Struct.ComponentSchema {
   collectionName: 'components_shared_pillars';
   info: {
@@ -1742,6 +1777,7 @@ declare module '@strapi/strapi' {
       'shared.faq-item': SharedFaqItem;
       'shared.form-field': SharedFormField;
       'shared.named-item': SharedNamedItem;
+      'shared.page-card': SharedPageCard;
       'shared.pillar': SharedPillar;
       'shared.review-item': SharedReviewItem;
       'shared.service-card': SharedServiceCard;

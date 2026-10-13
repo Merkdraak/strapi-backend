@@ -31,6 +31,34 @@
     "eyebrow": {
       "type": "string"
     },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "imageFocus": {
+      "type": "string",
+      "default": "50,50"
+    },
+    "alt": {
+      "type": "string"
+    },
+    "side": {
+      "type": "enumeration",
+      "enum": [
+        "left",
+        "right"
+      ],
+      "default": "left"
+    },
+    "imageWidth": {
+      "type": "integer",
+      "default": 30,
+      "min": 20,
+      "max": 55
+    },
     "backgroundColor": {
       "type": "string"
     },

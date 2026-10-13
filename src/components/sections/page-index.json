@@ -21,6 +21,11 @@
     "notice": {
       "type": "text"
     },
+    "cards": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.page-card"
+    },
     "articleTypes": {
       "type": "component",
       "repeatable": true,
