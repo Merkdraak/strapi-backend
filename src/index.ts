@@ -1,6 +1,7 @@
 import type { Core } from "@strapi/strapi";
 import { registerEditorLockRoutes } from "./admin-routes/editor-locks";
 import { registerMailAdminRoutes } from "./admin-routes/mail";
+import { registerRecaptchaAdminRoutes } from "./admin-routes/recaptcha";
 import { clearEditorRequiredFieldsCache } from "./editor-required-fields";
 import { backfillMenu, normalizePrefix, syncArticlePrefix } from "./knowledge";
 import { registerPageBlocksTool } from "./page-blocks-mcp";
@@ -17,6 +18,7 @@ import { syncContactPageBuilder } from "./sync-contact-page";
 import { syncEditorUrl } from "./sync-editor-url";
 import { syncScanRequestForms } from "./sync-scan-forms";
 import { ensureEmailSettings } from "./services/email/settings";
+import { ensureRecaptchaSettings } from "./services/recaptcha";
 
 // Webhook events that refresh the public site when content is saved.
 const events = ["entry.create", "entry.update", "entry.delete", "entry.publish", "entry.unpublish"];
@@ -220,6 +222,7 @@ export default {
     const routes = strapi.admin.routes.admin.routes as unknown[];
     const adminOnly = { policies: ["admin::isAuthenticatedAdmin"] };
     registerMailAdminRoutes(strapi, routes, adminOnly);
+    registerRecaptchaAdminRoutes(strapi, routes, adminOnly);
     registerEditorLockRoutes(strapi, routes, adminOnly);
     routes.push({
       method: "GET",
@@ -540,6 +543,9 @@ export default {
       strapi.log.error(error);
     });
     await ensureEmailSettings(strapi).catch((error: unknown) => {
+      strapi.log.error(error);
+    });
+    await ensureRecaptchaSettings(strapi).catch((error: unknown) => {
       strapi.log.error(error);
     });
     await syncEditorUrl(strapi).catch((error: unknown) => {
