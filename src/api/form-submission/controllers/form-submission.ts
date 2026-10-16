@@ -1,5 +1,6 @@
 import { factories } from "@strapi/strapi";
 import { sendFormEmails } from "../../../services/email";
+import { verifyRecaptchaToken } from "../../../services/recaptcha";
 
 const scanRequests = {
   seo: { label: "SEO-scan", pageLabel: "SEO", path: "/online-marketing/seo", requestType: "seo" as const },
@@ -190,6 +191,11 @@ export default factories.createCoreController("api::form-submission.form-submiss
       status: "published",
     });
     if (!site) return ctx.notFound();
+    const captchaAction = isVacancy ? "vacancy" : scan ? "scan" : "contact";
+    const captcha = await verifyRecaptchaToken(strapi, site, body.recaptchaToken, captchaAction);
+    if (!captcha.ok) {
+      return ctx.badRequest(captcha.error);
+    }
     const created = await strapi.documents("api::form-submission.form-submission").create({
       data: {
         siteKey,

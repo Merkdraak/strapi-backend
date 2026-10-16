@@ -76,6 +76,26 @@
     "formWebhook": {
       "type": "string"
     },
+    "recaptchaEnabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "recaptchaCloudProjectId": {
+      "type": "string"
+    },
+    "recaptchaSiteKey": {
+      "type": "string"
+    },
+    "recaptchaSecretKey": {
+      "type": "string",
+      "private": true
+    },
+    "recaptchaMinScore": {
+      "type": "decimal",
+      "default": 0.5,
+      "min": 0,
+      "max": 1
+    },
     "favicon": {
       "type": "media",
       "multiple": false,

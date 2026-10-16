@@ -976,6 +976,20 @@ export interface ApiSiteSite extends Struct.CollectionTypeSchema {
     phoneDisplay: Schema.Attribute.String;
     phoneHref: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    recaptchaCloudProjectId: Schema.Attribute.String;
+    recaptchaEnabled: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    recaptchaMinScore: Schema.Attribute.Decimal &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 1;
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0.5>;
+    recaptchaSecretKey: Schema.Attribute.String & Schema.Attribute.Private;
+    recaptchaSiteKey: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

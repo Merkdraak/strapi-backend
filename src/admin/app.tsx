@@ -82,6 +82,21 @@ export default {
         },
       ],
     );
+    app.addSettingsLink(
+      {
+        id: "merkdraak-recaptcha",
+        intlLabel: { id: "merkdraak.recaptcha.section", defaultMessage: "reCAPTCHA" },
+      },
+      [
+        {
+          id: "merkdraak-recaptcha-settings",
+          to: "merkdraak-recaptcha/settings",
+          intlLabel: { id: "merkdraak.recaptcha.settings", defaultMessage: "reCAPTCHA" },
+          Component: () => import("./pages/recaptcha-settings"),
+          permissions: [],
+        },
+      ],
+    );
   },
   bootstrap(app: StrapiApp) {
     app.addMenuLink({
