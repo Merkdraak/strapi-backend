@@ -1198,6 +1198,7 @@ export interface SectionsTable extends Struct.ComponentSchema {
   attributes: {
     anchor: Schema.Attribute.String;
     heading: Schema.Attribute.String;
+    matrix: Schema.Attribute.JSON;
     rows: Schema.Attribute.Component<'shared.table-row', true>;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
