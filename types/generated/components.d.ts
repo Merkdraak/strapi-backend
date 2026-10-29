@@ -1039,12 +1039,15 @@ export interface SectionsRow extends Struct.ComponentSchema {
     accentColor: Schema.Attribute.String;
     anchor: Schema.Attribute.String;
     backgroundColor: Schema.Attribute.String;
-    columns: Schema.Attribute.Enumeration<['2', '3']> &
+    columns: Schema.Attribute.Enumeration<['1', '2', '3', '4', '5', '6']> &
       Schema.Attribute.DefaultTo<'2'>;
     extra: Schema.Attribute.JSON;
+    fifth: Schema.Attribute.JSON;
     fontSize: Schema.Attribute.String;
+    fourth: Schema.Attribute.JSON;
     left: Schema.Attribute.JSON;
     right: Schema.Attribute.JSON;
+    sixth: Schema.Attribute.JSON;
     space: Schema.Attribute.String;
     spaceBottom: Schema.Attribute.String;
     spaceBottomMobile: Schema.Attribute.String;
