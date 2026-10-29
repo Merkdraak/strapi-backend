@@ -9,8 +9,12 @@
     "columns": {
       "type": "enumeration",
       "enum": [
+        "1",
         "2",
-        "3"
+        "3",
+        "4",
+        "5",
+        "6"
       ],
       "default": "2"
     },
@@ -21,6 +25,15 @@
       "type": "json"
     },
     "extra": {
+      "type": "json"
+    },
+    "fourth": {
+      "type": "json"
+    },
+    "fifth": {
+      "type": "json"
+    },
+    "sixth": {
       "type": "json"
     },
     "backgroundColor": {
