@@ -68,8 +68,11 @@ export interface NavLink extends Struct.ComponentSchema {
     icon: 'link';
   };
   attributes: {
+    href: Schema.Attribute.String;
     label: Schema.Attribute.String & Schema.Attribute.Required;
     page: Schema.Attribute.Relation<'oneToOne', 'api::page.page'>;
+    placement: Schema.Attribute.Enumeration<['main', 'utility']> &
+      Schema.Attribute.DefaultTo<'main'>;
   };
 }
 
@@ -95,6 +98,7 @@ export interface NavPageLink extends Struct.ComponentSchema {
     icon: 'layer';
   };
   attributes: {
+    href: Schema.Attribute.String;
     label: Schema.Attribute.String;
     page: Schema.Attribute.Relation<'oneToOne', 'api::page.page'>;
   };

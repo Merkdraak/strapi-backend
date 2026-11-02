@@ -133,6 +133,8 @@ async function navItems(strapi: Core.Strapi, siteKey: string, value: unknown) {
         __component: "nav.link",
         ...withId(item),
         label: textOf(item.label).trim() || "Link",
+        href: textOf(item.href).trim(),
+        placement: textOf(item.placement).trim() === "utility" ? "utility" : "main",
         page: await pageDocumentId(strapi, siteKey, item.page),
       });
       continue;
@@ -149,6 +151,7 @@ async function navItems(strapi: Core.Strapi, siteKey: string, value: unknown) {
             return {
               ...withId(entry),
               label: textOf(entry.label),
+              href: textOf(entry.href).trim(),
               page: await pageDocumentId(strapi, siteKey, entry.page),
             };
           }),
@@ -188,6 +191,7 @@ async function navItems(strapi: Core.Strapi, siteKey: string, value: unknown) {
                       return {
                         ...withId(entry),
                         label: textOf(entry.label),
+                        href: textOf(entry.href).trim(),
                         page: await pageDocumentId(strapi, siteKey, entry.page),
                       };
                     }),
@@ -471,6 +475,7 @@ export default {
               await strapi.documents("api::navigation.navigation").update({
                 documentId: navigation.documentId,
                 data: {
+                  items: await navItems(strapi, siteKey, body.items),
                   footerServices: footerRows(body.footerServices),
                   footerOrganization: footerRows(body.footerOrganization),
                 } as never,

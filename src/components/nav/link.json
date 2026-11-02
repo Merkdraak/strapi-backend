@@ -14,6 +14,14 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::page.page"
+    },
+    "href": {
+      "type": "string"
+    },
+    "placement": {
+      "type": "enumeration",
+      "enum": ["main", "utility"],
+      "default": "main"
     }
   }
 }
