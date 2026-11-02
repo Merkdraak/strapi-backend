@@ -128,10 +128,10 @@ async function navItems(strapi: Core.Strapi, siteKey: string, value: unknown) {
   for (const row of value) {
     const item = asRecord(row);
     const component = textOf(item.__component);
+    // Omit component ids: full DZ replace avoids "components … not related to the entity".
     if (component === "nav.link") {
       items.push({
         __component: "nav.link",
-        ...withId(item),
         label: textOf(item.label).trim() || "Link",
         href: textOf(item.href).trim(),
         placement: textOf(item.placement).trim() === "utility" ? "utility" : "main",
@@ -143,13 +143,11 @@ async function navItems(strapi: Core.Strapi, siteKey: string, value: unknown) {
       const links = Array.isArray(item.links) ? item.links : [];
       items.push({
         __component: "nav.dropdown",
-        ...withId(item),
         label: textOf(item.label).trim() || "Menu",
         links: await Promise.all(
           links.map(async (link) => {
             const entry = asRecord(link);
             return {
-              ...withId(entry),
               label: textOf(entry.label),
               href: textOf(entry.href).trim(),
               page: await pageDocumentId(strapi, siteKey, entry.page),
@@ -166,9 +164,8 @@ async function navItems(strapi: Core.Strapi, siteKey: string, value: unknown) {
     const body = textOf(feature.body).trim();
     const href = textOf(feature.href).trim();
     const cta = textOf(feature.cta).trim();
-    items.push({
+    const mega: Record<string, unknown> = {
       __component: "nav.mega",
-      ...withId(item),
       menuId: textOf(item.menuId).trim() || textOf(item.label).trim() || "menu",
       label: textOf(item.label).trim() || "Menu",
       description: textOf(item.description),
@@ -177,19 +174,16 @@ async function navItems(strapi: Core.Strapi, siteKey: string, value: unknown) {
           const col = asRecord(column);
           const groups = Array.isArray(col.groups) ? col.groups : [];
           return {
-            ...withId(col),
             label: textOf(col.label).trim() || "Kolom",
             groups: await Promise.all(
               groups.map(async (group) => {
                 const grp = asRecord(group);
                 const links = Array.isArray(grp.links) ? grp.links : [];
                 return {
-                  ...withId(grp),
                   links: await Promise.all(
                     links.map(async (link) => {
                       const entry = asRecord(link);
                       return {
-                        ...withId(entry),
                         label: textOf(entry.label),
                         href: textOf(entry.href).trim(),
                         page: await pageDocumentId(strapi, siteKey, entry.page),
@@ -202,8 +196,11 @@ async function navItems(strapi: Core.Strapi, siteKey: string, value: unknown) {
           };
         }),
       ),
-      feature: title && body && href && cta ? { ...withId(feature), title, body, href, cta } : undefined,
-    });
+    };
+    if (title && body && href && cta) {
+      mega.feature = { title, body, href, cta };
+    }
+    items.push(mega);
   }
   return items;
 }
@@ -466,24 +463,34 @@ export default {
           } catch (error) {
             strapi.log.error(error);
           }
-          const navigation = await strapi.documents("api::navigation.navigation").findFirst({
+          let navigation = await strapi.documents("api::navigation.navigation").findFirst({
             filters: { siteKey },
             status: "draft",
           });
-          if (navigation?.documentId) {
-            try {
-              await strapi.documents("api::navigation.navigation").update({
-                documentId: navigation.documentId,
-                data: {
-                  items: await navItems(strapi, siteKey, body.items),
-                  footerServices: footerRows(body.footerServices),
-                  footerOrganization: footerRows(body.footerOrganization),
-                } as never,
-                status: "published",
-              });
-            } catch (error) {
-              strapi.log.error(error);
-            }
+          if (!navigation?.documentId) {
+            navigation = await strapi.documents("api::navigation.navigation").findFirst({
+              filters: { siteKey },
+              status: "published",
+            });
+          }
+          if (!navigation?.documentId) {
+            ctx.body = { ok: false, error: "Navigatie niet gevonden." };
+            return;
+          }
+          try {
+            await strapi.documents("api::navigation.navigation").update({
+              documentId: navigation.documentId,
+              data: {
+                items: await navItems(strapi, siteKey, body.items),
+                footerServices: footerRows(body.footerServices),
+                footerOrganization: footerRows(body.footerOrganization),
+              } as never,
+              status: "published",
+            });
+          } catch (error) {
+            strapi.log.error(error);
+            ctx.body = { ok: false, error: saveError(error) };
+            return;
           }
           ctx.body = { ok: true };
         } catch (error) {
