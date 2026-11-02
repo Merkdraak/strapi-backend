@@ -34,6 +34,20 @@ type PageRow = {
 };
 type LinkRow = { label?: string; href?: string };
 type FaviconFile = { id: number; url: string; name: string };
+type NavPageLink = { label?: string; href?: string; page?: { entryKey?: string } };
+type NavColumn = { label?: string; groups?: { links?: NavPageLink[] }[] };
+type NavItemRow = {
+  __component?: string;
+  label?: string;
+  href?: string;
+  placement?: "main" | "utility";
+  menuId?: string;
+  description?: string;
+  page?: { entryKey?: string };
+  links?: NavPageLink[];
+  columns?: NavColumn[];
+  feature?: { title?: string; body?: string; href?: string; cta?: string };
+};
 
 type SiteEditor = {
   contact: {
@@ -54,7 +68,7 @@ type SiteEditor = {
   };
   footerServices: LinkRow[];
   footerOrganization: LinkRow[];
-  items: { __component?: string; label?: string; page?: { entryKey?: string }; links?: { label?: string; page?: { entryKey?: string } }[] }[];
+  items: NavItemRow[];
 };
 
 const statusLabel: Record<string, string> = {
@@ -822,6 +836,7 @@ export default function MerkdraakEditor() {
           formWebhook: nav.settings.formWebhook,
           faviconId: nav.settings.favicon?.id ?? null,
         },
+        items: nav.items,
         footerServices: nav.footerServices,
         footerOrganization: nav.footerOrganization,
       })
@@ -1023,29 +1038,198 @@ export default function MerkdraakEditor() {
             <Box paddingTop={6}>
               <Typography variant="delta" tag="h2">Menu</Typography>
               <Box paddingTop={1}>
-                <Typography variant="pi" textColor="neutral600">Namen en links van het hoofdmenu.</Typography>
+                <Typography variant="pi" textColor="neutral600">
+                  Pagina publiceren voegt niets toe. Beheer hier volgorde, labels en links. Megamenu-kolommen kun je ook bewerken via Content Manager → Navigation.
+                </Typography>
               </Box>
+              <Flex gap={2} paddingTop={4} wrap="wrap">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  startIcon={<Plus />}
+                  onClick={() => setNav({ ...nav, items: [...nav.items, { __component: "nav.link", label: "Nieuwe link", placement: "main", page: { entryKey: "" }, href: "" }] })}
+                >
+                  Link
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  startIcon={<Plus />}
+                  onClick={() => setNav({ ...nav, items: [...nav.items, { __component: "nav.dropdown", label: "Nieuw submenu", links: [{ label: "", page: { entryKey: "" }, href: "" }] }] })}
+                >
+                  Submenu
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  startIcon={<Plus />}
+                  onClick={() =>
+                    setNav({
+                      ...nav,
+                      items: [
+                        ...nav.items,
+                        {
+                          __component: "nav.mega",
+                          menuId: "nieuw-menu",
+                          label: "Nieuw megamenu",
+                          description: "",
+                          columns: [{ label: "Kolom", groups: [{ links: [{ label: "", page: { entryKey: "" }, href: "" }] }] }],
+                        },
+                      ],
+                    })
+                  }
+                >
+                  Megamenu
+                </Button>
+              </Flex>
               <Flex direction="column" alignItems="stretch" gap={4} paddingTop={4}>
-                {nav.items.map((item, index) => (
-                  <Flex key={`${item.label}-${index}`} gap={4} alignItems="flex-end">
-                    <Box flex="1">
-                      {textField(`menu-label-${index}`, "Menunaam", item.label ?? "", (value) => {
-                        const items = [...nav.items];
-                        items[index] = { ...item, label: value };
-                        setNav({ ...nav, items });
-                      })}
+                {nav.items.map((item, index) => {
+                  const kind = item.__component === "nav.mega" ? "Megamenu" : item.__component === "nav.dropdown" ? "Submenu" : "Link";
+                  const setItem = (next: NavItemRow) => {
+                    const items = [...nav.items];
+                    items[index] = next;
+                    setNav({ ...nav, items });
+                  };
+                  const move = (offset: number) => {
+                    const target = index + offset;
+                    if (target < 0 || target >= nav.items.length) return;
+                    const items = [...nav.items];
+                    const [row] = items.splice(index, 1);
+                    items.splice(target, 0, row);
+                    setNav({ ...nav, items });
+                  };
+                  const pageLinkEditor = (links: NavPageLink[], onChange: (next: NavPageLink[]) => void) => (
+                    <Flex direction="column" alignItems="stretch" gap={3} paddingTop={3}>
+                      {links.map((link, linkIndex) => (
+                        <Flex key={`link-${index}-${linkIndex}`} gap={3} alignItems="flex-end" wrap="wrap">
+                          <Box flex="1" style={{ minWidth: 140 }}>
+                            {textField(`item-${index}-link-${linkIndex}-label`, "Label", link.label ?? "", (value) => {
+                              const next = [...links];
+                              next[linkIndex] = { ...link, label: value };
+                              onChange(next);
+                            })}
+                          </Box>
+                          <Box flex="1" style={{ minWidth: 140 }}>
+                            {textField(`item-${index}-link-${linkIndex}-page`, "Paginasleutel", link.page?.entryKey ?? "", (value) => {
+                              const next = [...links];
+                              next[linkIndex] = { ...link, page: { entryKey: value } };
+                              onChange(next);
+                            })}
+                          </Box>
+                          <Box flex="1" style={{ minWidth: 140 }}>
+                            {textField(`item-${index}-link-${linkIndex}-href`, "Of eigen URL", link.href ?? "", (value) => {
+                              const next = [...links];
+                              next[linkIndex] = { ...link, href: value };
+                              onChange(next);
+                            })}
+                          </Box>
+                          <Button
+                            type="button"
+                            variant="tertiary"
+                            onClick={() => onChange(links.filter((_, i) => i !== linkIndex))}
+                          >
+                            Verwijder
+                          </Button>
+                        </Flex>
+                      ))}
+                      <Button type="button" variant="tertiary" startIcon={<Plus />} onClick={() => onChange([...links, { label: "", page: { entryKey: "" }, href: "" }])}>
+                        Link toevoegen
+                      </Button>
+                    </Flex>
+                  );
+                  return (
+                    <Box key={`menu-item-${index}`} padding={4} background="neutral100" hasRadius>
+                      <Flex justifyContent="space-between" alignItems="center" gap={3} wrap="wrap">
+                        <Badge>{kind}</Badge>
+                        <Flex gap={2}>
+                          <Button type="button" variant="tertiary" onClick={() => move(-1)} disabled={index === 0}>Omhoog</Button>
+                          <Button type="button" variant="tertiary" onClick={() => move(1)} disabled={index === nav.items.length - 1}>Omlaag</Button>
+                          <Button type="button" variant="danger-light" onClick={() => setNav({ ...nav, items: nav.items.filter((_, i) => i !== index) })}>Verwijder</Button>
+                        </Flex>
+                      </Flex>
+                      <Flex direction="column" alignItems="stretch" gap={3} paddingTop={3}>
+                        {textField(`menu-label-${index}`, "Menunaam", item.label ?? "", (value) => setItem({ ...item, label: value }))}
+                        {item.__component === "nav.link" ? (
+                          <>
+                            {textField(`menu-key-${index}`, "Paginasleutel", item.page?.entryKey ?? "", (value) => setItem({ ...item, page: { entryKey: value } }))}
+                            {textField(`menu-href-${index}`, "Of eigen URL", item.href ?? "", (value) => setItem({ ...item, href: value }))}
+                            <Field.Root name={`menu-placement-${index}`}>
+                              <Field.Label>Plaatsing</Field.Label>
+                              <Box paddingTop={1}>
+                                <select
+                                  aria-label="Plaatsing"
+                                  value={item.placement === "utility" ? "utility" : "main"}
+                                  onChange={(event) => setItem({ ...item, placement: event.target.value === "utility" ? "utility" : "main" })}
+                                  style={{ width: "100%", minHeight: 40, padding: "0 12px", borderRadius: 4 }}
+                                >
+                                  <option value="main">Hoofdmenu</option>
+                                  <option value="utility">Rode balk (utility)</option>
+                                </select>
+                              </Box>
+                            </Field.Root>
+                          </>
+                        ) : null}
+                        {item.__component === "nav.dropdown" ? (
+                          <>
+                            <Typography variant="pi" fontWeight="semiBold">Submenu-links</Typography>
+                            {pageLinkEditor(item.links ?? [], (links) => setItem({ ...item, links }))}
+                          </>
+                        ) : null}
+                        {item.__component === "nav.mega" ? (
+                          <>
+                            {textField(`menu-id-${index}`, "Menu-id", item.menuId ?? "", (value) => setItem({ ...item, menuId: value }))}
+                            {textField(`menu-desc-${index}`, "Beschrijving", item.description ?? "", (value) => setItem({ ...item, description: value }))}
+                            <Typography variant="pi" fontWeight="semiBold">Kolommen</Typography>
+                            {(item.columns ?? []).map((column, columnIndex) => (
+                              <Box key={`col-${index}-${columnIndex}`} padding={3} background="neutral0" hasRadius>
+                                {textField(`col-label-${index}-${columnIndex}`, "Kolomnaam", column.label ?? "", (value) => {
+                                  const columns = [...(item.columns ?? [])];
+                                  columns[columnIndex] = { ...column, label: value };
+                                  setItem({ ...item, columns });
+                                })}
+                                {pageLinkEditor(
+                                  (column.groups ?? []).flatMap((group) => group.links ?? []),
+                                  (links) => {
+                                    const columns = [...(item.columns ?? [])];
+                                    columns[columnIndex] = { ...column, groups: [{ links }] };
+                                    setItem({ ...item, columns });
+                                  },
+                                )}
+                                <Box paddingTop={2}>
+                                  <Button
+                                    type="button"
+                                    variant="tertiary"
+                                    onClick={() => setItem({ ...item, columns: (item.columns ?? []).filter((_, i) => i !== columnIndex) })}
+                                  >
+                                    Kolom verwijderen
+                                  </Button>
+                                </Box>
+                              </Box>
+                            ))}
+                            <Button
+                              type="button"
+                              variant="tertiary"
+                              startIcon={<Plus />}
+                              onClick={() =>
+                                setItem({
+                                  ...item,
+                                  columns: [...(item.columns ?? []), { label: "Kolom", groups: [{ links: [{ label: "", page: { entryKey: "" }, href: "" }] }] }],
+                                })
+                              }
+                            >
+                              Kolom toevoegen
+                            </Button>
+                            <Typography variant="pi" fontWeight="semiBold">Feature-blok (optioneel)</Typography>
+                            {textField(`feat-title-${index}`, "Titel", item.feature?.title ?? "", (value) => setItem({ ...item, feature: { ...item.feature, title: value } }))}
+                            {textField(`feat-body-${index}`, "Tekst", item.feature?.body ?? "", (value) => setItem({ ...item, feature: { ...item.feature, body: value } }))}
+                            {textField(`feat-href-${index}`, "Link", item.feature?.href ?? "", (value) => setItem({ ...item, feature: { ...item.feature, href: value } }))}
+                            {textField(`feat-cta-${index}`, "Knoptekst", item.feature?.cta ?? "", (value) => setItem({ ...item, feature: { ...item.feature, cta: value } }))}
+                          </>
+                        ) : null}
+                      </Flex>
                     </Box>
-                    {item.__component === "nav.link" ? (
-                      <Box flex="1">
-                        {textField(`menu-key-${index}`, "Paginasleutel", item.page?.entryKey ?? "", (value) => {
-                          const items = [...nav.items];
-                          items[index] = { ...item, page: { entryKey: value } };
-                          setNav({ ...nav, items });
-                        })}
-                      </Box>
-                    ) : null}
-                  </Flex>
-                ))}
+                  );
+                })}
               </Flex>
             </Box>
             <Box paddingTop={6}>
