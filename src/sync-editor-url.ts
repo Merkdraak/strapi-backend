@@ -13,16 +13,19 @@ function publicFrontendUrl() {
   } catch {
     origin = "";
   }
+  if (origin && /(?:^|\.)test\.merkdraak\.nl$/i.test(new URL(origin).hostname)) {
+    return "https://merkdraak.nl";
+  }
   const isLocal = !origin || /localhost|127\.0\.0\.1/i.test(origin);
   // On koekje/cms, never point the pagebuilder iframe at the editor's laptop.
   if (isLocal && process.env.NODE_ENV === "production") {
-    return "https://test.merkdraak.nl";
+    return "https://merkdraak.nl";
   }
   return origin || "http://localhost:3000";
 }
 
 /**
- * Pagebuilder in cms.merkdraak.nl is an iframe of FRONTEND_URL (test.merkdraak.nl).
+ * Pagebuilder in cms.merkdraak.nl is an iframe of FRONTEND_URL (merkdraak.nl).
  * Keep Site.editorUrl in sync so editor UI deploys show up inside the CMS after main → koekje.
  */
 export async function syncEditorUrl(strapi: Core.Strapi) {

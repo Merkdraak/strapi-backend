@@ -1,4 +1,4 @@
-const allowed = new Set(["'self'", "http://localhost:3000", "https://test.merkdraak.nl"]);
+const allowed = new Set(["'self'", "http://localhost:3000", "https://merkdraak.nl", "https://test.merkdraak.nl"]);
 let cachedAt = 0;
 let origins = [...allowed].join(" ");
 
