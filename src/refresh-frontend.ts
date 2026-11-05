@@ -1,7 +1,9 @@
 export async function refreshFrontend(payload?: { slug?: string; siteKey?: string }) {
   const url = process.env.REVALIDATE_URL;
   const secret = process.env.REVALIDATE_SECRET;
-  if (!url || !secret) return;
+  if (!url || !secret) {
+    throw new Error("Frontendverversing is niet geconfigureerd (REVALIDATE_URL / REVALIDATE_SECRET).");
+  }
   const response = await fetch(url, {
     method: "POST",
     headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
