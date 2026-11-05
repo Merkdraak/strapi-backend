@@ -44,7 +44,11 @@ export async function publishScheduledPages(strapi: Core.Strapi) {
     const pagesChanged = await publishDue(strapi, "api::page.page");
     const casesChanged = await publishDue(strapi, "api::case.case");
     if (!pagesChanged && !casesChanged) return;
-    await refreshFrontend();
+    try {
+      await refreshFrontend();
+    } catch (revalidateError) {
+      strapi.log.warn("scheduled publish frontend revalidate failed", revalidateError);
+    }
   } catch (error) {
     if (error instanceof ReferenceError || error instanceof TypeError) return;
     throw error;

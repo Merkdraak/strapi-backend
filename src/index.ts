@@ -19,6 +19,7 @@ import { syncEditorUrl } from "./sync-editor-url";
 import { syncScanRequestForms } from "./sync-scan-forms";
 import { ensureEmailSettings } from "./services/email/settings";
 import { ensureRecaptchaSettings } from "./services/recaptcha";
+import { refreshFrontend } from "./refresh-frontend";
 
 // Webhook events that refresh the public site when content is saved.
 const events = ["entry.create", "entry.update", "entry.delete", "entry.publish", "entry.unpublish"];
@@ -74,11 +75,19 @@ async function pageDocumentId(strapi: Core.Strapi, siteKey: string, value: unkno
   if (typeof row.documentId === "string" && row.documentId) return row.documentId;
   const entryKey = textOf(row.entryKey).trim();
   if (!entryKey) return undefined;
-  const page = await strapi.documents("api::page.page").findFirst({
+  // Published first; planned/concept pages often live as draft and must still resolve on save.
+  const published = await strapi.documents("api::page.page").findFirst({
     filters: { siteKey, entryKey },
     fields: ["entryKey"],
+    status: "published",
   });
-  return page?.documentId;
+  if (published?.documentId) return published.documentId;
+  const draft = await strapi.documents("api::page.page").findFirst({
+    filters: { siteKey, entryKey },
+    fields: ["entryKey"],
+    status: "draft",
+  });
+  return draft?.documentId;
 }
 
 function footerRows(value: unknown) {
@@ -318,14 +327,14 @@ export default {
         const pages = await strapi.documents("api::page.page").findMany({
           status: "draft",
           filters: { siteKey, pageType: { $ne: "case" } },
-          fields: ["title", "slug", "visibility", "pageType"],
+          fields: ["title", "slug", "visibility", "pageType", "entryKey", "navLabel"],
           sort: ["title:asc"],
           pagination: { pageSize: 200 },
         });
         const cases = await strapi.documents("api::case.case").findMany({
           status: "draft",
           filters: { siteKey },
-          fields: ["title", "slug", "visibility"],
+          fields: ["title", "slug", "visibility", "entryKey", "navLabel"],
           sort: ["title:asc"],
           pagination: { pageSize: 200 },
         });
@@ -341,6 +350,8 @@ export default {
               slug: page.slug ?? "",
               visibility: page.visibility ?? "",
               pageType: page.pageType ?? "",
+              entryKey: page.entryKey ?? "",
+              navLabel: page.navLabel ?? "",
               kind: "page" as const,
             }),
           ),
@@ -351,6 +362,8 @@ export default {
               slug: item.slug ?? "",
               visibility: item.visibility ?? "",
               pageType: "case",
+              entryKey: (item as { entryKey?: string }).entryKey ?? "",
+              navLabel: (item as { navLabel?: string }).navLabel ?? "",
               kind: "case" as const,
             }),
           ),
@@ -377,11 +390,17 @@ export default {
             footerOrganization: true,
             items: {
               on: {
-                "nav.link": { populate: { page: { fields: ["entryKey"] } } },
-                "nav.dropdown": { populate: { links: { populate: { page: { fields: ["entryKey"] } } } } },
+                "nav.link": { populate: { page: { fields: ["entryKey", "title", "navLabel"] } } },
+                "nav.dropdown": { populate: { links: { populate: { page: { fields: ["entryKey", "title", "navLabel"] } } } } },
                 "nav.mega": {
                   populate: {
-                    columns: { populate: { groups: { populate: { links: { populate: { page: { fields: ["entryKey"] } } } } } } },
+                    columns: {
+                      populate: {
+                        groups: {
+                          populate: { links: { populate: { page: { fields: ["entryKey", "title", "navLabel"] } } } },
+                        },
+                      },
+                    },
                     feature: true,
                   },
                 },
@@ -492,10 +511,55 @@ export default {
             ctx.body = { ok: false, error: saveError(error) };
             return;
           }
-          ctx.body = { ok: true };
+          let revalidated = false;
+          let revalidateError: string | undefined;
+          try {
+            await refreshFrontend({ siteKey });
+            revalidated = true;
+          } catch (error) {
+            strapi.log.warn("navigation save frontend revalidate failed", error);
+            revalidateError =
+              error instanceof Error && error.message
+                ? error.message
+                : "De lokale website kon niet worden vernieuwd.";
+          }
+          ctx.body = {
+            ok: true,
+            saved: true,
+            revalidated,
+            ...(revalidateError ? { revalidateError } : {}),
+          };
         } catch (error) {
           strapi.log.error(error);
           ctx.body = { ok: false, error: saveError(error) };
+        }
+      },
+      config: adminOnly,
+    });
+    routes.push({
+      method: "POST",
+      path: "/merkdraak-editor/navigation/revalidate",
+      handler: async (ctx: { request: { body: Record<string, unknown> }; body: unknown; status: number }) => {
+        try {
+          const raw = ctx.request.body ?? {};
+          const body = textOf(asRecord(raw.data).siteKey) ? asRecord(raw.data) : raw;
+          const siteKey = String(body.siteKey ?? "").trim();
+          if (!siteKey) {
+            ctx.body = { ok: false, error: "Geen website geselecteerd." };
+            return;
+          }
+          await refreshFrontend({ siteKey });
+          ctx.body = { ok: true, revalidated: true };
+        } catch (error) {
+          strapi.log.warn("navigation revalidate retry failed", error);
+          ctx.body = {
+            ok: false,
+            revalidated: false,
+            error:
+              error instanceof Error && error.message
+                ? error.message
+                : "De lokale website kon niet worden vernieuwd.",
+          };
         }
       },
       config: adminOnly,
