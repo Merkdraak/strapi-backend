@@ -70,8 +70,9 @@ function normalizeCompanyUrl(value: unknown) {
 }
 
 function publicOrigin() {
-  const raw = String(process.env.FRONTEND_URL ?? process.env.EDITOR_PUBLIC_URL ?? "https://test.merkdraak.nl").trim();
-  return raw.replace(/\/+$/, "") || "https://test.merkdraak.nl";
+  const raw = String(process.env.FRONTEND_URL ?? process.env.EDITOR_PUBLIC_URL ?? "https://merkdraak.nl").trim();
+  const cleaned = raw.replace(/\/+$/, "") || "https://merkdraak.nl";
+  return cleaned.replace(/https?:\/\/test\.merkdraak\.nl/gi, "https://merkdraak.nl");
 }
 
 function validPhone(value: string) {
